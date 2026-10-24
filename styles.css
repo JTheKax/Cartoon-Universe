@@ -296,3 +296,31 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
  .header #nav{gap:4px}
  .header #nav>a,.header #nav .nav-trigger{font-size:13px;padding:10px 12px;min-height:40px}
 }
+
+/* Player portal sizing fix: size to content without clipping the profile. */
+.header .home-player-dashboard{
+ box-sizing:border-box;flex:0 1 300px;width:300px;max-width:100%;
+ min-width:0;min-height:0;align-self:center;padding:9px 11px;
+ overflow:visible;
+}
+.header .home-profile-identity{align-items:center;margin:0 0 5px;min-width:0}
+.header .home-profile-identity>div:last-child{min-width:0;flex:1}
+.header .home-profile-identity h2,
+.header #home-profile-handle{overflow-wrap:anywhere}
+.header .home-profile-stats{grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:4px}
+.header .home-profile-stats>div{min-width:0}
+.header .home-presence-control{flex-wrap:wrap}
+.header .home-presence-control select{max-width:100%;width:auto}
+.header .home-profile-actions{flex-wrap:wrap}
+@media(min-width:1001px){
+ .header .home-player-dashboard{flex:0 1 300px;width:300px;max-width:300px}
+}
+@media(min-width:541px) and (max-width:1000px){
+ .header .home-player-dashboard{flex:0 1 300px;width:300px;max-width:min(300px,100%)}
+}
+@media(max-width:540px){
+ .header .home-player-dashboard{flex:1 1 100%;width:100%;max-width:100%;order:0}
+ .header .brand{order:1}
+ .header .menu{order:2}
+ .header #nav{order:3}
+}

@@ -233,3 +233,16 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
  .header #nav>a{font-size:16px;padding:14px 16px}
  .header #nav .nav-trigger{font-size:16px;padding:14px 16px}
 }
+
+/* Wider player profile box beside the header tabs */
+@media(min-width:1001px){
+ .header .home-player-dashboard{width:310px;max-width:310px;min-height:78px;padding:10px 16px}
+ .header .home-profile-identity{gap:12px}
+ .header .home-profile-actions{margin-top:5px}
+}
+@media(min-width:541px) and (max-width:1000px){
+ .header .home-player-dashboard{width:290px;max-width:min(290px,100%)}
+}
+@media(max-width:540px){
+ .header .home-player-dashboard{width:100%;max-width:100%}
+}

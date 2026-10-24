@@ -1,0 +1,23 @@
+name: Validate Cartoon Universe
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    name: Validate website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run static site checks
+        run: node scripts/check-site.mjs
+      - name: Validate JavaScript syntax
+        run: |
+          node --check script.js
+          if [ -f auth.js ]; then node --check auth.js; fi

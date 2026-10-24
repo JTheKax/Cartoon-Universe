@@ -144,3 +144,20 @@ html[data-background-theme="neon"] body::before{background:repeating-linear-grad
 html[data-background-theme="midnight"] body::before{background:linear-gradient(145deg,#080b19,#15142d 55%,#080813) !important}
 html[data-background-theme]:not([data-background-theme="haunted"]) .hero{background:transparent}
 .theme-section{scroll-margin-top:110px}.theme-grid{max-width:1100px;margin:28px auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.theme-option{font:inherit;color:#fff;cursor:pointer;text-align:left;padding:13px;background:#1d0e2fea;border:2px solid #995e9d;border-radius:17px;display:flex;flex-direction:column;gap:10px;box-shadow:0 6px 0 #080414}.theme-option[aria-pressed="true"]{border-color:#ffdd84;box-shadow:0 0 0 3px #ffbd4b55,0 6px 0 #080414}.theme-option:focus-visible,.theme-reset:focus-visible{outline:3px solid #70faff;outline-offset:4px}.theme-option strong{color:#ffe4b1;font-size:17px}.theme-option small{color:#e8d4f0;line-height:1.5}.theme-swatch{height:115px;width:100%;display:grid;place-items:center;border-radius:10px;font-size:43px;background-size:cover;background-position:center}.theme-haunted{background-image:linear-gradient(#140b2780,#140b2780),url("static/haunted-arcade.gif")}.theme-galaxy{background:radial-gradient(circle at 30% 30%,#8a5ed0,#261258 50%,#080c2c)}.theme-neon{background:linear-gradient(135deg,#eb35a0,#20105c 55%,#3ce1f3)}.theme-midnight{background:linear-gradient(145deg,#050711,#222440)}#theme-status{color:#ffe4ae;font-weight:800}.theme-reset{font:inherit;font-weight:900;color:#1a092b;padding:13px 20px;border:2px solid #ffe2a1;border-radius:10px;background:linear-gradient(130deg,#ffcb64,#ff8a51);cursor:pointer}@media(max-width:900px){.theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:480px){.theme-grid{grid-template-columns:1fr}}
+
+/* Homepage authenticated player headquarters */
+.home-player-dashboard{display:block;text-align:left;min-width:0;background:linear-gradient(145deg,#351341e8,#1a0c2fef);border-color:#c26aff}
+.home-player-dashboard>.eyebrow{font-size:12px;margin:0 0 20px;color:#ffb76e}
+.home-player-dashboard h2{font-size:clamp(19px,2vw,26px);line-height:1.2;margin:0 0 9px}
+.home-player-dashboard p{line-height:1.5}.home-profile-identity{display:flex;align-items:center;gap:14px;margin:10px 0 22px}
+.home-profile-avatar{display:grid;place-items:center;flex:0 0 70px;height:70px;border:3px solid #ffb448;border-radius:50%;font-size:25px;font-weight:1000;color:#180d27;text-shadow:0 1px #ffffff88;box-shadow:0 0 17px #f0a75d66}
+#home-profile-handle{font-size:13px;color:#e0b8ed;margin:0 0 8px;overflow-wrap:anywhere}
+.home-profile-role{display:inline-flex;padding:5px 10px;border-radius:20px;border:1px solid #ffbe79;background:#54224f;font-size:12px;font-weight:900;color:#ffe3ac}
+.home-profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 18px}
+.home-profile-stats>div{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;background:#1e102fee;border:1px solid #67377b;border-radius:10px;padding:12px 5px}
+.home-profile-stats span{font-size:22px}.home-profile-stats strong{font-size:23px;color:#ffe0a9}.home-profile-stats small{font-size:10px;line-height:1.4;color:#d5b3e6}
+.home-profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.home-profile-actions .cta{padding:11px 13px;font-size:12px;box-shadow:0 3px 0 #72234b}
+.home-profile-actions .secondary{background:#64287e;color:#fff;border:1px solid #bf80e6}
+.home-profile-status{font-size:12px;color:#d6b9e5;margin:14px 0 0}
+@media(max-width:600px){.home-profile-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.home-profile-avatar{flex-basis:62px;height:62px}}

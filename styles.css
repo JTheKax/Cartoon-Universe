@@ -96,3 +96,17 @@ body::after{background:linear-gradient(180deg,#08041240,#09051455 55%,#07031072)
 .section.dark{background:linear-gradient(180deg,#13091f9c,#25102ba3)}
 .account-wrap section,.owner-stats article,.owner-tile,#owner-status{background:#1a0d2bbd;backdrop-filter:blur(3px)}
 .card{background:linear-gradient(145deg,#32183ec9,#10091ed4 85%)}
+
+/* First illustrated Cartoon Universe carnival: shared background on all pages */
+html{background:#12051f}
+body::before{background:#12051f url("static/cartoon-carnival.png") center center / cover no-repeat}
+body::after{background:linear-gradient(180deg,#10061c20,#10061c35 55%,#0a03165c)}
+.hero{background:linear-gradient(180deg,#10051d2b,#14092130 55%,#08041360),url("static/cartoon-carnival.png") center center / cover no-repeat}
+.section:not(.dark){background:linear-gradient(180deg,#0b06156e,#160a2588)}
+.section.dark{background:linear-gradient(180deg,#13091f83,#25102b94)}
+.account-wrap section,.owner-stats article,.owner-tile,#owner-status{background:#1a0d2bb8;backdrop-filter:blur(3px)}
+.header{background:linear-gradient(100deg,#160820da,#2d1138d6)}
+/* Functional buttons that visually match the carnival signage */
+button,.btn,.cta,.account-wrap button{border:2px solid #ffac51;border-radius:12px;background:linear-gradient(120deg,#341027d9,#6c1948cc);color:#fff1cc;text-shadow:0 1px 5px #140416;box-shadow:0 0 12px #ff7b415c,inset 0 0 10px #ff9e3926;transition:filter .2s,box-shadow .2s,transform .2s}
+button:hover:not(:disabled),.btn:hover,.cta:hover,.account-wrap button:hover:not(:disabled){filter:brightness(1.2);box-shadow:0 0 22px #ff963b9e,inset 0 0 15px #ff9e3955}
+@media(max-width:800px){body::before{background-position:center top}.hero{background-position:center top}}

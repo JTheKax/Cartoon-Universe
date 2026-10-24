@@ -246,3 +246,14 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 @media(max-width:540px){
  .header .home-player-dashboard{width:100%;max-width:100%}
 }
+
+/* Show coin, card, and achievement totals inside the longer profile box */
+.header .home-player-dashboard{width:370px;max-width:370px}
+.header .home-profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:7px 0}
+.header .home-profile-stats>div,
+.header .home-profile-stats>div:not(:first-child){display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;padding:5px 2px;background:#190d2b99;border:1px solid #8d5ab277;border-radius:8px}
+.header .home-profile-stats>div:first-child{display:flex;flex-direction:column}
+.header .home-profile-stats small{font-size:10px;text-align:center;white-space:normal}
+.header .home-profile-stats strong{font-size:15px}
+@media(min-width:541px) and (max-width:1000px){.header .home-player-dashboard{width:370px;max-width:min(370px,100%)}}
+@media(max-width:540px){.header .home-player-dashboard{width:100%;max-width:100%}}

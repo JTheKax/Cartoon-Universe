@@ -262,3 +262,37 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 .header .home-presence-control{display:flex;align-items:center;gap:6px;margin-top:5px;color:#f1dbff;font-size:11px;font-weight:700}
 .header .home-presence-control select{min-width:0;max-width:180px;padding:5px 7px;border:1px solid #a776d2;border-radius:8px;background:#241136;color:#fff;font:inherit;cursor:pointer}
 .header .home-presence-control select:focus-visible{outline:2px solid #70fff0;outline-offset:2px}
+
+/* Compact Halloween navigation box: retain readable profile stats and status. */
+.header{padding:6px max(1.2vw,10px);gap:6px 9px}
+.header .brand{gap:6px}
+.header #nav{gap:3px}
+.header #nav>a,.header #nav .nav-trigger{font-size:12px;padding:7px 9px;border-radius:8px}
+.header .home-player-dashboard{width:310px;max-width:310px;min-height:0;padding:6px 9px;border-radius:10px;margin-right:2px}
+.header .home-profile-identity{gap:6px;margin:0}
+.header .home-profile-avatar{width:30px;height:30px;min-width:30px;flex-basis:30px;font-size:12px}
+.header .home-profile-identity h2{font-size:12px}
+.header .home-profile-role{font-size:9px;padding:2px 4px}
+.header .home-profile-stats{gap:4px;margin:4px 0}
+.header .home-profile-stats>div,.header .home-profile-stats>div:not(:first-child){padding:3px 2px}
+.header .home-profile-stats strong{font-size:12px}
+.header .home-profile-stats small{font-size:9px}
+.header .home-profile-actions{margin:3px 0}
+.header .home-profile-actions .cta{font-size:10px;padding:4px 7px}
+.header .home-presence-control{font-size:10px;margin-top:3px}
+.header .home-presence-control select{padding:3px 5px;max-width:145px}
+@media(min-width:1001px){
+ .header #nav{gap:3px}
+ .header #nav>a,.header #nav .nav-trigger{font-size:12px;padding:7px 9px}
+ .header .home-player-dashboard{width:310px;max-width:310px;min-height:0;padding:6px 9px}
+}
+@media(min-width:541px) and (max-width:1000px){
+ .header .home-player-dashboard{width:310px;max-width:min(310px,100%)}
+ .header #nav>a,.header #nav .nav-trigger{font-size:13px;padding:9px 11px}
+}
+@media(max-width:540px){
+ .header{padding:7px 9px}
+ .header .home-player-dashboard{width:100%;max-width:100%;padding:7px 9px}
+ .header #nav{gap:4px}
+ .header #nav>a,.header #nav .nav-trigger{font-size:13px;padding:10px 12px;min-height:40px}
+}

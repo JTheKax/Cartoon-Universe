@@ -7,6 +7,19 @@ if(panel&&SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30){
  const guest=document.getElementById('home-profile-guest');
  const signedIn=document.getElementById('home-profile-signed-in');
  const status=document.getElementById('home-profile-status');
+ const presenceSelect=document.getElementById('home-presence-mode');
+ let activeUserId=null;
+ const presenceModes=new Set(['online','away','offline','dnd']);
+ presenceSelect?.addEventListener('change',async()=>{
+  if(!activeUserId)return;
+  const userId=activeUserId,mode=presenceSelect.value;
+  if(!presenceModes.has(mode))return;
+  presenceSelect.disabled=true;
+  const {error}=await client.from('profiles').update({presence_mode:mode}).eq('id',userId);
+  presenceSelect.disabled=false;
+  if(error){status.textContent='Could not save status. Please try again.';refresh();}
+  else status.textContent='Status saved: '+presenceSelect.selectedOptions[0].textContent.trim();
+ });
  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value};
  let refreshId=0;
  async function refresh(){
@@ -14,14 +27,16 @@ if(panel&&SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30){
   try{
    const {data:{user},error}=await client.auth.getUser();
    if(id!==refreshId)return;
-   if(error||!user){signedIn.hidden=true;guest.hidden=false;status.textContent='Sign in to view your player dashboard.';return}
+   if(error||!user){activeUserId=null;signedIn.hidden=true;guest.hidden=false;status.textContent='Sign in to view your player dashboard.';return}
    const [profileResult,ownerResult,walletResult]=await Promise.all([
-    client.from('profiles').select('username,display_name,avatar_color').eq('id',user.id).maybeSingle(),
+    client.from('profiles').select('username,display_name,avatar_color,presence_mode').eq('id',user.id).maybeSingle(),
     client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle(),
     client.from('coin_wallets').select('balance').eq('user_id',user.id).maybeSingle()
    ]);
    if(id!==refreshId)return;
    const profile=profileResult.data;
+   activeUserId=user.id;
+   if(presenceSelect)presenceSelect.value=presenceModes.has(profile?.presence_mode)?profile.presence_mode:'offline';
    const username=profile?.username||'Player';
    const name=profile?.display_name||username;
    set('home-profile-name',name);
@@ -39,7 +54,7 @@ if(panel&&SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30){
    status.textContent=profileResult.error?'Signed in. Some profile details could not be loaded.':'Your player profile is ready.';
   }catch{
    if(id!==refreshId)return;
-   signedIn.hidden=true;guest.hidden=false;status.textContent='Profile temporarily unavailable. You can still open your account.';
+   activeUserId=null;signedIn.hidden=true;guest.hidden=false;status.textContent='Profile temporarily unavailable. You can still open your account.';
   }
  }
  client.auth.onAuthStateChange(()=>setTimeout(refresh,0));

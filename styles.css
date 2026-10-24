@@ -426,3 +426,29 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
  .header .home-profile-stats{gap:4px}
  .header .home-profile-stats small{font-size:9px}
 }
+
+/* Larger Halloween navigation tabs with comfortable click/touch targets. */
+.header #nav{gap:7px;flex-wrap:wrap;align-items:center}
+.header #nav>a,.header #nav .nav-trigger{
+ font-size:16px;font-weight:800;line-height:1.2;
+ padding:12px 15px;min-height:44px;
+ border-radius:10px;
+}
+@media(min-width:1001px){
+ .header #nav{gap:7px}
+ .header #nav>a,.header #nav .nav-trigger{
+  font-size:16px;padding:12px 15px;min-height:44px;
+ }
+}
+@media(min-width:541px) and (max-width:1000px){
+ .header #nav{gap:6px}
+ .header #nav>a,.header #nav .nav-trigger{
+  font-size:16px;padding:12px 15px;min-height:44px;
+ }
+}
+@media(max-width:540px){
+ .header #nav{gap:6px}
+ .header #nav>a,.header #nav .nav-trigger{
+  font-size:16px;padding:12px 15px;min-height:44px;
+ }
+}

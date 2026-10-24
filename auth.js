@@ -12,6 +12,8 @@ else{
  client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
  const params=new URLSearchParams(location.search);
  if(params.has('code') && params.get('type')==='recovery'){show('password-update')}
+ else if(params.get('view')==='signup'){show('signup')}
+ else if(params.get('view')==='login'){show('login')}
  async function render(){
   const {data:{user}}=await client.auth.getUser();
   authForms.hidden=!!user;account.hidden=!user;

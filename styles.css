@@ -204,3 +204,21 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
  .header .menu{order:1}
 }
 @media(max-width:540px){.header .home-player-dashboard{max-width:100%;width:100%;order:3;margin:0}.header #nav{order:4}.header .brand{margin-right:0}}
+
+/* Player profile on opposite (left) side of the header tabs */
+.header .home-player-dashboard{order:0;margin-right:4px;margin-left:0}
+.header .brand{order:1;margin-right:auto}
+.header .menu{order:2}
+.header #nav{order:3}
+@media(max-width:1000px){
+ .header .home-player-dashboard{order:0;margin:0;max-width:250px}
+ .header .brand{order:1;margin-right:auto}
+ .header .menu{order:2}
+ .header #nav{order:3}
+}
+@media(max-width:540px){
+ .header .home-player-dashboard{order:0;width:auto;max-width:calc(100% - 75px)}
+ .header .brand{order:1;width:100%;max-width:100%}
+ .header .menu{order:2;margin-left:auto}
+ .header #nav{order:3}
+}

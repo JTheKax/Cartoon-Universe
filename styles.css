@@ -136,3 +136,6 @@ body::before{background:#080414 url("static/haunted-arcade.gif") center center /
 .header-player-avatar-face{display:grid;place-items:center;width:42px;height:42px;flex-shrink:0;border-radius:50%;border:3px solid #ffd36b;color:#180b2c;font-weight:1000;text-shadow:none;box-shadow:0 0 12px #ffab5380}
 .header-player-avatar-name{font-size:13px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:700px){.header-player-avatar{max-width:65px;padding:4px}.header-player-avatar-name{display:none}.header-player-avatar-face{width:36px;height:36px}.brand{font-size:15px}}
+
+.header-player-avatar-face{background-size:cover;background-position:center;background-repeat:no-repeat}
+#profile-avatar-preview{background-size:cover;background-position:center;background-repeat:no-repeat}

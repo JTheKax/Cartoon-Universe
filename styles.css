@@ -475,3 +475,34 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
   order:4;flex:1 1 100%;width:100%;max-width:100%;margin-left:0;
  }
 }
+
+/* Wider, shorter right-side portal: horizontal player summary. */
+.header .home-player-dashboard{
+ flex:0 0 440px;width:440px;max-width:440px;
+ padding:7px 11px;line-height:1.15;
+}
+.header .home-player-dashboard>.eyebrow{font-size:9px;line-height:1.1;margin:0 0 3px}
+.header .home-profile-identity{margin-bottom:3px;gap:8px}
+.header .home-profile-avatar{width:32px;height:32px;min-width:32px;flex-basis:32px;font-size:12px}
+.header .home-profile-identity h2{font-size:13px;line-height:1.15}
+.header #home-profile-handle{font-size:10px}
+.header .home-profile-role{font-size:8px;padding:1px 4px}
+.header .home-presence-control{margin-top:2px;font-size:10px}
+.header .home-presence-control select{padding:3px 5px;font-size:10px}
+.header .home-profile-stats{gap:6px;margin:4px 0}
+.header .home-profile-stats>div,.header .home-profile-stats>div:not(:first-child){padding:4px 5px;gap:1px}
+.header .home-profile-stats span{font-size:14px}
+.header .home-profile-stats strong{font-size:13px}
+.header .home-profile-stats small{font-size:9px}
+.header .home-profile-actions{gap:5px;margin:4px 0 0}
+.header .home-profile-actions .cta{font-size:10px;padding:5px 8px}
+.header .home-profile-status{margin:3px 0 0;font-size:9px}
+@media(min-width:1001px){
+ .header .home-player-dashboard{flex:0 0 440px;width:440px;max-width:440px}
+}
+@media(min-width:541px) and (max-width:1000px){
+ .header .home-player-dashboard{flex:0 1 440px;width:440px;max-width:min(440px,100%)}
+}
+@media(max-width:540px){
+ .header .home-player-dashboard{flex:1 1 100%;width:100%;max-width:100%}
+}

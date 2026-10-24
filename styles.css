@@ -452,3 +452,26 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
   font-size:16px;padding:12px 15px;min-height:44px;
  }
 }
+
+/* Right-side compact player portal, retaining all profile controls. */
+.header .brand{order:1}
+.header .menu{order:2}
+.header #nav{order:3}
+.header .home-player-dashboard{
+ order:4;flex:0 0 300px;width:300px;max-width:300px;
+ margin-left:auto;padding:9px 10px;
+}
+.header .home-profile-avatar{width:36px;height:36px;min-width:36px;flex-basis:36px}
+.header .home-profile-identity h2{font-size:14px}
+.header .home-profile-stats strong{font-size:14px}
+.header .home-profile-stats span{font-size:15px}
+@media(min-width:541px) and (max-width:1000px){
+ .header .home-player-dashboard{
+  order:4;flex:0 1 300px;width:300px;max-width:min(300px,100%);margin-left:auto;
+ }
+}
+@media(max-width:540px){
+ .header .home-player-dashboard{
+  order:4;flex:1 1 100%;width:100%;max-width:100%;margin-left:0;
+ }
+}

@@ -167,3 +167,40 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 .dashboard-home .home-player-dashboard{grid-column:1;grid-row:1;align-self:start}
 .dashboard-home .dashboard-feature{grid-column:2;grid-row:1}
 @media(max-width:800px){.dashboard-home .dashboard-main{grid-template-columns:minmax(0,1fr)}.dashboard-home .home-player-dashboard{grid-column:1;grid-row:1}.dashboard-home .dashboard-feature{grid-column:1;grid-row:2}}
+
+/* Compact player identity alongside the main navigation tabs */
+.dashboard-home .dashboard-main{display:block;max-width:1220px}
+.dashboard-home .dashboard-feature{grid-column:auto;grid-row:auto}
+.header{flex-wrap:wrap;gap:10px 14px;padding:10px max(2vw,14px)}
+.header .brand{margin-right:auto}
+.header #nav{flex:0 1 auto;gap:3px;justify-content:flex-end}
+.header #nav>a{padding:8px 9px;font-size:13px}
+.header #nav .nav-trigger{padding:9px 10px;font-size:13px}
+.header .home-player-dashboard{flex:0 0 auto;width:auto;max-width:250px;min-height:0;padding:8px 11px;margin:0;gap:4px;justify-content:center;border-radius:12px;box-shadow:0 0 14px #ff873e33}
+.header .home-player-dashboard>.eyebrow{display:none}
+.header .home-profile-identity{gap:8px}
+.header .home-profile-avatar{width:36px;height:36px;min-width:36px;font-size:13px}
+.header .home-profile-identity h2{font-size:14px;margin:0}
+.header .home-profile-identity p{font-size:11px;margin:0}
+.header .home-profile-role{font-size:10px;padding:2px 5px}
+.header .home-profile-stats{display:flex;gap:6px;margin:2px 0}
+.header .home-profile-stats>div{padding:0;background:none;border:0;min-width:0}
+.header .home-profile-stats>div:not(:first-child){display:none}
+.header .home-profile-stats>div:first-child{display:flex;align-items:center;gap:4px}
+.header .home-profile-stats small{font-size:10px}
+.header .home-profile-stats strong{font-size:13px}
+.header .home-profile-actions{gap:5px;margin:0}
+.header .home-profile-actions .cta{font-size:11px;padding:5px 8px;box-shadow:none}
+.header .home-profile-actions .cta.secondary{display:none}
+.header #home-profile-guest h2{font-size:13px;margin:0}
+.header #home-profile-guest>p{display:none}
+.header #home-profile-guest .home-profile-actions{display:flex}
+.header #home-profile-status{display:none}
+@media(max-width:1000px){
+ .header .home-player-dashboard{order:2;max-width:calc(100% - 85px);margin-left:auto}
+ .header #nav{order:3;flex-basis:100%;width:100%}
+ .header #nav:not(.open){display:none}
+ .header #nav.open{display:flex}
+ .header .menu{order:1}
+}
+@media(max-width:540px){.header .home-player-dashboard{max-width:100%;width:100%;order:3;margin:0}.header #nav{order:4}.header .brand{margin-right:0}}

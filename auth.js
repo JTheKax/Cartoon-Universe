@@ -19,7 +19,7 @@ else{
   authForms.hidden=!!user;account.hidden=!user;
   if(!user)return;
   const [{data:profile},{data:owner}]=await Promise.all([
-   client.from('profiles').select('username,display_name,avatar_color').eq('id',user.id).maybeSingle(),
+   client.from('profiles').select('username,display_name,avatar_color,avatar_path').eq('id',user.id).maybeSingle(),
    client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle()
   ]);
   $('account-email').textContent=user.email||'';
@@ -27,7 +27,7 @@ else{
 
   $('account-username').textContent=profile?.username||'new-player';
   $('profile-display-heading').textContent=profile?.display_name||profile?.username||'Your Profile';
-  const avatar=$('profile-avatar-preview');avatar.style.backgroundColor=profile?.avatar_color||'#ff4ca8';avatar.textContent=(profile?.display_name||profile?.username||'CU').trim().slice(0,2).toUpperCase();
+  const avatar=$('profile-avatar-preview');avatar.style.backgroundColor=profile?.avatar_color||'#ff4ca8';avatar.textContent=(profile?.display_name||profile?.username||'CU').trim().slice(0,2).toUpperCase();avatar.style.backgroundImage=profile?.avatar_path?'url("'+client.storage.from('player-avatars').getPublicUrl(profile.avatar_path).data.publicUrl+'")':'none';avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center';
   $('profile-name').value=profile?.display_name||'';
   $('profile-color').value=profile?.avatar_color||'#ff4ca8';
   $('profile-username').value=profile?.username||'';
@@ -74,7 +74,7 @@ else{
 });
  $('forgot').addEventListener('submit',async e=>{e.preventDefault();const {error}=await client.auth.resetPasswordForEmail($('forgot-email').value.trim(),{redirectTo:location.origin+'/login.html'});message(error?errorText(error):'If the address is registered, a reset email will arrive.')});
  $('password-update').addEventListener('submit',async e=>{e.preventDefault();const password=$('new-password').value;if(password.length<8){message('Use at least 8 characters.');return}const {error}=await client.auth.updateUser({password});message(error?errorText(error):'Password updated.');if(!error){params.delete('type');history.replaceState(null,'','/login.html');authForms.hidden=false;account.hidden=true;show('login');message('Password updated. You can now sign in.')}});
- $('profile').addEventListener('submit',async e=>{e.preventDefault();const {data:{user}}=await client.auth.getUser();if(!user)return;const username=$('profile-username').value.trim();if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){message('Username must be 3–20 letters, numbers or underscores.');return}const {error}=await client.from('profiles').upsert({id:user.id,username,display_name:$('profile-name').value.trim().slice(0,40),avatar_color:$('profile-color').value},{onConflict:'id'});message(error?errorText(error):'Profile saved!');if(!error){await render();document.dispatchEvent(new Event('cartoon-profile-updated'))}});
+ $('profile').addEventListener('submit',async e=>{e.preventDefault();const {data:{user}}=await client.auth.getUser();if(!user)return;const username=$('profile-username').value.trim();if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){message('Username must be 3–20 letters, numbers or underscores.');return}let avatarPath;const file=$('profile-avatar-file')?.files?.[0];if(file){if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>2097152){message('Choose a PNG, JPG or WebP image under 2 MB.');return}const ext={'image/png':'png','image/jpeg':'jpg','image/webp':'webp'}[file.type];avatarPath=user.id+'/'+crypto.randomUUID()+'.'+ext;const upload=await client.storage.from('player-avatars').upload(avatarPath,file,{contentType:file.type,upsert:false});if(upload.error){message(errorText(upload.error));return}}const payload={id:user.id,username,display_name:$('profile-name').value.trim().slice(0,40),avatar_color:$('profile-color').value};if(avatarPath)payload.avatar_path=avatarPath;const {error}=await client.from('profiles').upsert(payload,{onConflict:'id'});message(error?errorText(error):'Profile saved!');if(!error){if($('profile-avatar-file'))$('profile-avatar-file').value='';await render();document.dispatchEvent(new Event('cartoon-profile-updated'))}});
  $('logout').addEventListener('click',async()=>{const {error}=await client.auth.signOut();message(error?errorText(error):'Signed out.');if(!error)await render()});
 }
 document.querySelectorAll('[data-show]').forEach(button=>button.addEventListener('click',()=>show(button.dataset.show)));
@@ -82,3 +82,6 @@ document.querySelectorAll('[data-show]').forEach(button=>button.addEventListener
 // Local avatar preview; changes are only persisted after Save profile.
 const preview=()=>{const a=$('profile-avatar-preview');if(!a)return;a.style.backgroundColor=$('profile-color').value;a.textContent=($('profile-name').value.trim()||$('profile-username').value.trim()||'CU').slice(0,2).toUpperCase()};
 ['profile-color','profile-name','profile-username'].forEach(id=>$(id)?.addEventListener('input',preview));
+
+// Remove the current user's avatar without touching other profile fields.
+$('remove-avatar')?.addEventListener('click',async()=>{if(!client)return;const {data:{user}}=await client.auth.getUser();if(!user)return;const {data:profile}=await client.from('profiles').select('avatar_path').eq('id',user.id).maybeSingle();const {error}=await client.from('profiles').update({avatar_path:null}).eq('id',user.id);if(error){message(errorText(error));return}if(profile?.avatar_path)await client.storage.from('player-avatars').remove([profile.avatar_path]);message('Custom avatar removed.');await render();document.dispatchEvent(new Event('cartoon-profile-updated'))});

@@ -9,3 +9,31 @@
 #nav{gap:10px;flex-wrap:nowrap}#nav .nav-group{position:relative}#nav .nav-trigger{font:800 15px system-ui,sans-serif;color:#f9f3ff;background:linear-gradient(135deg,#33215e,#21153f);border:1px solid #7553b0;border-radius:13px;padding:12px 17px;cursor:pointer;white-space:nowrap;box-shadow:inset 0 1px #ffffff23,0 5px 15px #07041955;transition:transform .2s,box-shadow .2s,border-color .2s}#nav>.nav-group>.nav-trigger:hover,#nav>.nav-group>.nav-trigger[aria-expanded="true"]{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 18px #54f4ff35}#nav>.nav-group>.nav-trigger span{display:inline-block;margin-left:8px;transition:transform .2s}#nav>.nav-group>.nav-trigger[aria-expanded="true"] span{transform:rotate(180deg)}#nav>.nav-group>.nav-dropdown{position:absolute;right:0;top:calc(100% + 10px);width:max-content;min-width:205px;padding:9px;background:linear-gradient(160deg,#32205eeF,#160d35f7);border:1px solid #8c5bd3;border-radius:17px;box-shadow:0 18px 45px #05020ec9,0 0 24px #8c43ec35;display:none;z-index:30;animation:drop-in .18s ease-out}#nav>.nav-group>.nav-dropdown.open{display:grid;gap:4px}#nav>.nav-group>.nav-dropdown a{display:block;border-radius:10px;padding:12px 14px}#nav>.nav-group>.nav-dropdown a:hover{background:#51327d}#nav>a{border:1px solid transparent}#nav>a:hover{border-color:#7553b0}@keyframes drop-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:1000px){#nav{flex-wrap:nowrap;align-items:stretch}#nav .nav-group{width:100%}#nav .nav-trigger{width:100%;text-align:left}#nav>.nav-group>.nav-dropdown{position:static;display:none;width:100%;min-width:0;margin:5px 0 8px;box-shadow:none}#nav>.nav-group>.nav-dropdown.open{display:grid}#nav>a{width:100%}}
 @media(prefers-reduced-motion:reduce){#nav .nav-trigger,#nav .nav-dropdown{animation:none;transition:none}}
+
+/* Haunted Arcade visual theme — presentation only */
+:root{--bg:#0b0718;--panel:#211038;--pink:#ff7841;--cyan:#70fff0;--yellow:#ffd36b}
+body{background:radial-gradient(ellipse at 80% 5%,#351247 0%,transparent 42%),radial-gradient(ellipse at 5% 65%,#192b36 0%,transparent 45%),#0b0718}
+.header{border-bottom:2px solid #ff8c44;background:linear-gradient(100deg,#110a23f7,#31133df4);box-shadow:0 6px 35px #f8793030,0 10px 30px #0009}
+.brand{color:#fff0d0;text-shadow:0 0 12px #ff8c6688,3px 3px #4a185c}.brand span{color:#70fff0;text-shadow:0 0 12px #70fff099}
+.hero{min-height:700px;background:radial-gradient(ellipse at 50% 30%,#5b2366 0%,#241237 43%,#0b0718 82%);isolation:isolate}
+.hero:before{background-image:radial-gradient(#f4e8ff88 1px,transparent 1px);opacity:.7;animation:haunted-stars 9s ease-in-out infinite alternate}
+.hero:after{content:"";position:absolute;inset:auto -10% 0;height:190px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 35% 100%,#9a70ba44,transparent 60%),radial-gradient(ellipse at 75% 100%,#7df5e933,transparent 55%);filter:blur(22px);animation:haunted-fog 8s ease-in-out infinite alternate}
+.hero h1{color:#fff5db;text-shadow:0 0 28px #ff7e4b66,5px 5px #411458}.hero h1 em{color:#ffb74e;text-shadow:0 0 18px #ff8029aa}
+.eyebrow{color:#77ffee;text-shadow:0 0 12px #6effdf66}
+.cta{background:linear-gradient(135deg,#ffd36b,#ff8b3e 65%,#f34c80);border:2px solid #ffe3a0;box-shadow:0 6px 0 #773052,0 0 24px #ff813655;transition:transform .18s,filter .18s,box-shadow .18s}
+.cta:hover{transform:translateY(-4px);filter:brightness(1.12);box-shadow:0 10px 0 #773052,0 0 35px #ff813688}.cta:focus-visible,.nav-trigger:focus-visible,.menu:focus-visible{outline:3px solid #70fff0;outline-offset:4px}
+.machine{background:linear-gradient(145deg,#ff9d45,#a13de2 60%,#40145f);border-color:#ffc969;box-shadow:0 0 38px #ff8b4470,0 20px 60px #0008;animation:haunted-float 4s ease-in-out infinite}
+.screen{border-color:#70fff0;color:#ffdc75;box-shadow:inset 0 0 22px #70fff033,0 0 20px #70fff055}
+.section{position:relative}.section h2{color:#fff0d4;text-shadow:0 0 22px #ff853b33}
+.card{background:linear-gradient(160deg,#321747,#180e2c);border-color:#8b4a96;box-shadow:0 9px 0 #080411,0 0 24px #c953a11b;transition:transform .2s,border-color .2s,box-shadow .2s}
+.card:hover{transform:translateY(-6px);border-color:#ffae61;box-shadow:0 14px 0 #080411,0 0 30px #ff924b35}
+.card span{background:#4b245b;color:#ffcf73;border:1px solid #a75e89}
+.dark{background:linear-gradient(180deg,#150b27,#261337,#130b22)}
+.steps li{background:linear-gradient(90deg,#371c4a,#20112e);border-color:#ff9c53;box-shadow:0 5px 20px #0005}.steps li:nth-child(even){border-color:#70fff0}
+#nav .nav-trigger{background:linear-gradient(135deg,#422052,#211132);border-color:#945c9f}#nav .nav-trigger:hover{border-color:#ffad64;box-shadow:0 0 22px #ff8b4444}
+#nav>.nav-group>.nav-dropdown{background:linear-gradient(160deg,#3d1c51f5,#180d2df9);border-color:#b16cb4}
+footer{background:#0a0615;border-top:1px solid #6c355b}
+@keyframes haunted-float{50%{transform:translateY(-9px) rotate(-3deg)}}
+@keyframes haunted-fog{to{transform:translateX(6%)}}
+@keyframes haunted-stars{to{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.hero:before,.hero:after,.machine{animation:none}.card,.cta{transition:none}.card:hover,.cta:hover{transform:none}}

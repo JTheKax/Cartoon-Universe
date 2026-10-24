@@ -78,3 +78,13 @@ body{min-height:100vh;background:linear-gradient(180deg,#080412a6,#090514b8 55%,
 .header{background:linear-gradient(100deg,#10091df5,#29113bf0)}
 .card{background:linear-gradient(145deg,#32183eec,#10091eF2 85%)}
 @media(max-width:800px){html,body{background-attachment:scroll;background-position:center top}.hero{background-position:center top}}
+
+/* Consistent animated carnival backdrop on every page */
+html{min-height:100%;background:#080414}
+body{min-height:100vh;position:relative;isolation:isolate;background:transparent!important}
+body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:#080414 url("static/haunted-arcade.gif") center center / cover no-repeat}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#0804128c,#090514aa 55%,#070310c7)}
+main,.account-wrap,.owner-wrap{position:relative;background:transparent}
+.account-wrap section,.owner-stats article,.owner-tile,#owner-status{background:#1a0d2be8;backdrop-filter:blur(6px);border-color:#965e9b;box-shadow:0 12px 30px #0008}
+footer{background:#080414d9}
+@media(max-width:800px){body::before{background-position:center center}}

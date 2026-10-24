@@ -67,3 +67,14 @@ body{background-color:#07040e;background-image:radial-gradient(ellipse at 50% -1
 @keyframes nightmare-pulse{50%{box-shadow:0 6px 0 #773052,0 0 40px #ff8c3c99}}
 @media(max-width:700px){.hero{min-height:740px;padding-top:85px}.haunted-moon{right:4%;top:10%;opacity:.45}.ghost-one{left:-3%;top:54%}.ghost-two{right:-2%;top:60%}.haunted-pumpkin{right:4%;bottom:4%}.hero h1{letter-spacing:-.04em}}
 @media(prefers-reduced-motion:reduce){.haunted-bat,.haunted-ghost,.haunted-pumpkin,.hero .cta{animation:none}}
+
+/* User-supplied haunted carnival GIF background */
+html{background:#080414 url("static/haunted-arcade.gif") center center / cover fixed no-repeat}
+body{min-height:100vh;background:linear-gradient(180deg,#080412a6,#090514b8 55%,#070310d1),url("static/haunted-arcade.gif") center center / cover fixed no-repeat}
+.hero{background:linear-gradient(180deg,#10051db8,#140921a1 55%,#080413d9),url("static/haunted-arcade.gif") center center center / cover no-repeat}
+.section:not(.dark){background:linear-gradient(180deg,#0b0615db,#160a25e3)}
+.section.dark{background:linear-gradient(180deg,#13091feb,#25102be8)}
+.account-wrap section{background:#180d2bed;box-shadow:0 12px 36px #0009}
+.header{background:linear-gradient(100deg,#10091df5,#29113bf0)}
+.card{background:linear-gradient(145deg,#32183eec,#10091eF2 85%)}
+@media(max-width:800px){html,body{background-attachment:scroll;background-position:center top}.hero{background-position:center top}}

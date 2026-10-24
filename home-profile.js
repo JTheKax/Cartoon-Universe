@@ -15,9 +15,10 @@ if(panel&&SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30){
    const {data:{user},error}=await client.auth.getUser();
    if(id!==refreshId)return;
    if(error||!user){signedIn.hidden=true;guest.hidden=false;status.textContent='Sign in to view your player dashboard.';return}
-   const [profileResult,ownerResult]=await Promise.all([
+   const [profileResult,ownerResult,walletResult]=await Promise.all([
     client.from('profiles').select('username,display_name,avatar_color').eq('id',user.id).maybeSingle(),
-    client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle()
+    client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle(),
+    client.from('coin_wallets').select('balance').eq('user_id',user.id).maybeSingle()
    ]);
    if(id!==refreshId)return;
    const profile=profileResult.data;
@@ -29,6 +30,8 @@ if(panel&&SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30){
    avatar.textContent=name.trim().slice(0,2).toUpperCase()||'CU';
    const color=profile?.avatar_color;
    avatar.style.backgroundColor=/^#[0-9a-f]{6}$/i.test(color||'')?color:'#ff4ca8';
+   const balance=walletResult.data?.balance;
+   set('home-coins-balance',walletResult.error||balance==null?'—':Number(balance).toLocaleString());
    const owner=!ownerResult.error&&!!ownerResult.data;
    document.getElementById('home-profile-role').textContent=owner?'👑 Owner':'🎮 Player';
    document.getElementById('home-owner-link').hidden=!owner;

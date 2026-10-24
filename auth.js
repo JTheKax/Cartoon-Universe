@@ -5,7 +5,7 @@ const notice=$('notice'),authForms=$('auth-forms'),account=$('account-panel');
 const configured=SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30;
 let client=null;
 function message(text){notice.textContent=text;notice.hidden=!text}
-function show(form){document.querySelectorAll('[data-form]').forEach(el=>el.hidden=el.dataset.form!==form);const actions=$('login-actions');if(actions)actions.hidden=form!=='login';message('')}
+function show(form){document.querySelectorAll('[data-form]').forEach(el=>el.hidden=el.dataset.form!==form);const actions=$('login-actions');if(actions)actions.hidden=form!=='login';const back=$('reset-actions');if(back)back.hidden=form!=='forgot';message('')}
 function errorText(e){return e?.message||'Something went wrong. Try again.'}
 if(!configured){message('Accounts are not connected yet. The owner must configure a new Supabase project before signup is enabled.');document.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=true)}
 else{

@@ -20,9 +20,10 @@ if (header && SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.length > 
       const { data: { user }, error } = await client.auth.getUser();
       if (error || !user) { avatarLink.hidden = true; return; }
       const { data: profile } = await client.from('profiles')
-        .select('username,display_name,avatar_color').eq('id', user.id).maybeSingle();
+        .select('username,display_name,avatar_color,avatar_path').eq('id', user.id).maybeSingle();
       const displayName = profile?.display_name?.trim() || profile?.username || 'Player';
-      face.textContent = displayName.slice(0, 2).toUpperCase();
+      face.textContent = profile?.avatar_path ? '' : displayName.slice(0, 2).toUpperCase();
+      face.style.backgroundImage = profile?.avatar_path ? 'url("' + client.storage.from('player-avatars').getPublicUrl(profile.avatar_path).data.publicUrl + '")' : 'none';
       face.style.backgroundColor = /^#[0-9a-fA-F]{6}$/.test(profile?.avatar_color || '')
         ? profile.avatar_color : '#ff4ca8';
       name.textContent = displayName;

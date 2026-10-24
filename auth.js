@@ -22,7 +22,6 @@ else{
   ]);
   $('account-email').textContent=user.email||'';
   $('account-role').textContent=owner?'Owner':'Player';
-  $('owner-dashboard-link').hidden=!owner;
   $('account-username').textContent=profile?.username||'Profile not created yet';
   $('profile-name').value=profile?.display_name||'';
   $('profile-color').value=profile?.avatar_color||'#ff4ca8';

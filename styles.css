@@ -161,3 +161,9 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 .home-profile-actions .secondary{background:#64287e;color:#fff;border:1px solid #bf80e6}
 .home-profile-status{font-size:12px;color:#d6b9e5;margin:14px 0 0}
 @media(max-width:600px){.home-profile-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.home-profile-avatar{flex-basis:62px;height:62px}}
+
+/* Position player headquarters in the homepage's top-left column */
+.dashboard-home .dashboard-main{grid-template-columns:minmax(275px,1fr) minmax(0,2fr);align-items:start}
+.dashboard-home .home-player-dashboard{grid-column:1;grid-row:1;align-self:start}
+.dashboard-home .dashboard-feature{grid-column:2;grid-row:1}
+@media(max-width:800px){.dashboard-home .dashboard-main{grid-template-columns:minmax(0,1fr)}.dashboard-home .home-player-dashboard{grid-column:1;grid-row:1}.dashboard-home .dashboard-feature{grid-column:1;grid-row:2}}

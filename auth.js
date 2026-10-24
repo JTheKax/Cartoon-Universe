@@ -5,7 +5,7 @@ const notice=$('notice'),authForms=$('auth-forms'),account=$('account-panel');
 const configured=SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30;
 let client=null;
 function message(text){notice.textContent=text;notice.hidden=!text}
-function show(form){document.querySelectorAll('[data-form]').forEach(el=>el.hidden=el.dataset.form!==form);document.querySelectorAll('[data-show]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.show===form)));message('')}
+function show(form){const actions=$('login-actions');if(actions)actions.hidden=form==='signup'||form==='password-update';document.querySelectorAll('[data-form]').forEach(el=>el.hidden=el.dataset.form!==form);document.querySelectorAll('[data-show]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.show===form)));message('')}
 function errorText(e){return e?.message||'Something went wrong. Try again.'}
 if(!configured){message('Accounts are not connected yet. The owner must configure a new Supabase project before signup is enabled.');document.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=true)}
 else{
@@ -14,6 +14,7 @@ else{
  if(params.get('type')==='recovery'){show('password-update')}
  else if(params.get('view')==='signup'){show('signup')}
  else if(params.get('view')==='login'){show('login')}
+ else {show('login')}
  async function render(){
   const {data:{user}}=await client.auth.getUser();
   if(params.get('type')==='recovery'){authForms.hidden=false;account.hidden=true;show('password-update');return;}

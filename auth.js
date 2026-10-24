@@ -25,7 +25,9 @@ else{
   $('account-email').textContent=user.email||'';
   $('account-role').textContent=owner?'Owner':'Player';
 
-  $('account-username').textContent=profile?.username||'Profile not created yet';
+  $('account-username').textContent=profile?.username||'new-player';
+  $('profile-display-heading').textContent=profile?.display_name||profile?.username||'Your Profile';
+  const avatar=$('profile-avatar-preview');avatar.style.backgroundColor=profile?.avatar_color||'#ff4ca8';avatar.textContent=(profile?.display_name||profile?.username||'CU').trim().slice(0,2).toUpperCase();
   $('profile-name').value=profile?.display_name||'';
   $('profile-color').value=profile?.avatar_color||'#ff4ca8';
   $('profile-username').value=profile?.username||'';
@@ -76,3 +78,7 @@ else{
  $('logout').addEventListener('click',async()=>{const {error}=await client.auth.signOut();message(error?errorText(error):'Signed out.');if(!error)await render()});
 }
 document.querySelectorAll('[data-show]').forEach(button=>button.addEventListener('click',()=>show(button.dataset.show)));
+
+// Local avatar preview; changes are only persisted after Save profile.
+const preview=()=>{const a=$('profile-avatar-preview');if(!a)return;a.style.backgroundColor=$('profile-color').value;a.textContent=($('profile-name').value.trim()||$('profile-username').value.trim()||'CU').slice(0,2).toUpperCase()};
+['profile-color','profile-name','profile-username'].forEach(id=>$(id)?.addEventListener('input',preview));

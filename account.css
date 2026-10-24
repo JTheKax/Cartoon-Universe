@@ -1,1 +1,13 @@
 .account-wrap{max-width:540px;min-height:75vh;margin:50px auto;padding:0 20px 50px}.account-wrap h1{font-size:clamp(32px,6vw,55px);margin-bottom:0;color:#ffe15c}.account-wrap section{padding:26px;background:#211847;border:2px solid #58429c;border-radius:18px;margin-top:25px}.account-wrap section[hidden],form[hidden]{display:none}.account-wrap form{display:grid;gap:16px}.account-wrap label{display:grid;gap:7px;font-weight:700}.account-wrap input,.account-wrap select{width:100%;padding:13px;border:2px solid #7160aa;background:#120d29;color:white;border-radius:9px;font:inherit}.account-wrap button{background:#ff4ca8;color:#140a28;border:0;border-radius:9px;padding:12px 16px;font:inherit;font-weight:800;cursor:pointer}.account-wrap button:disabled{opacity:.4;cursor:not-allowed}.switch{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}.switch button{font-size:13px;background:#54f4ff}#notice{padding:15px;border:1px solid #54f4ff;border-radius:10px;background:#1b3150}#logout{margin-top:20px;background:#ffe15c}
+
+/* Halloween arcade account buttons */
+.account-wrap button{position:relative;isolation:isolate;min-height:46px;border:2px solid #ffbb63;border-radius:13px;background:linear-gradient(135deg,#ffac38 0%,#ff653c 55%,#d83a92 100%);color:#1b0b2e;font-weight:900;letter-spacing:.035em;text-shadow:0 1px #ffffff55;box-shadow:0 5px 0 #74305b,0 10px 22px #09041c99;transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;touch-action:manipulation}
+.account-wrap button:hover:not(:disabled){transform:translateY(-3px);filter:brightness(1.12);box-shadow:0 8px 0 #74305b,0 14px 28px #ff7c4544}
+.account-wrap button:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 #74305b,0 5px 12px #09041c99}
+.account-wrap button:focus-visible{outline:3px solid #54f4ff;outline-offset:4px}
+.account-wrap button:disabled{opacity:.55;filter:grayscale(.35);transform:none;box-shadow:0 3px 0 #74305b;cursor:not-allowed}
+.account-wrap .switch button{background:linear-gradient(135deg,#65f7ff,#8b8bff);border-color:#b8fbff;color:#170c35;box-shadow:0 4px 0 #393d90,0 9px 20px #09041c99}
+.account-wrap .switch button:hover:not(:disabled){box-shadow:0 7px 0 #393d90,0 12px 24px #54f4ff33}
+.account-wrap .switch button:active:not(:disabled){box-shadow:0 1px 0 #393d90}
+.account-wrap #logout{background:linear-gradient(135deg,#ffe77b,#ff9c46);border-color:#fff0a0;box-shadow:0 5px 0 #9b571e}
+@media(prefers-reduced-motion:reduce){.account-wrap button{transition:none}.account-wrap button:hover:not(:disabled),.account-wrap button:active:not(:disabled){transform:none}}

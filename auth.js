@@ -11,7 +11,7 @@ if(!configured){message('Accounts are not connected yet. The owner must configur
 else{
  client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
  const params=new URLSearchParams(location.search);
- if(params.has('code')){show('password-update')}
+ if(params.has('code') && params.get('type')==='recovery'){show('password-update')}
  async function render(){
   const {data:{user}}=await client.auth.getUser();
   authForms.hidden=!!user;account.hidden=!user;
@@ -27,7 +27,7 @@ else{
   $('profile-color').value=profile?.avatar_color||'#ff4ca8';
   $('profile-username').value=profile?.username||'';
  }
- client.auth.onAuthStateChange(()=>{setTimeout(()=>render().catch(e=>message(errorText(e))),0)});
+ client.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY'){authForms.hidden=false;account.hidden=true;show('password-update')}setTimeout(()=>render().catch(e=>message(errorText(e))),0)});
  render().catch(e=>message(errorText(e)));
  $('signup').addEventListener('submit',async e=>{
   e.preventDefault();message('');

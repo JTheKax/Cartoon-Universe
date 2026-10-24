@@ -384,3 +384,45 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 @media(max-width:540px){
  .header .home-player-dashboard{flex:1 1 100%;width:100%;max-width:100%;order:0}
 }
+
+/* Haunted player portal mockup styling: polished, functional header card. */
+.header .home-player-dashboard{
+ background:linear-gradient(135deg,rgba(54,21,63,.97),rgba(25,13,44,.97));
+ border:2px solid #ad63d7;border-radius:14px;
+ box-shadow:0 0 18px #ad63d733,0 5px 16px #10081b88;
+ padding:11px 12px;
+}
+.header .home-profile-identity{gap:10px;margin-bottom:8px}
+.header .home-profile-avatar{
+ width:42px;height:42px;min-width:42px;flex:0 0 42px;
+ font-size:15px;border:2px solid #ffb44c;
+ background:#ffb44c;color:#24102e;box-shadow:0 0 12px #ffb44c55;
+}
+.header .home-profile-identity h2{font-size:15px;color:#ffdc9c}
+.header #home-profile-handle{font-size:11px;color:#d9b6e9}
+.header .home-profile-role{font-size:9px;background:#54224f;color:#ffe0a9}
+.header .home-profile-stats{gap:7px;margin:8px 0}
+.header .home-profile-stats>div,
+.header .home-profile-stats>div:not(:first-child){
+ background:#261433;border:1px solid #67377b;
+ padding:7px 3px;gap:3px;border-radius:9px;
+}
+.header .home-profile-stats span{font-size:17px}
+.header .home-profile-stats strong{font-size:16px;color:#ffe0a9}
+.header .home-profile-stats small{font-size:10px;color:#dfc2ed}
+.header .home-presence-control{gap:7px;margin-top:6px;font-size:11px}
+.header .home-presence-control select{
+ max-width:170px;padding:5px 7px;
+ background:#2c173f;border:1px solid #8e5ba9;border-radius:7px;font-size:11px;
+}
+.header .home-profile-actions{gap:7px;margin:8px 0 2px}
+.header .home-profile-actions .cta{
+ background:#8e367a;border:1px solid #b65ba1;
+ border-radius:7px;padding:7px 10px;font-size:11px;
+}
+.header .home-profile-actions .cta.secondary{display:inline-flex;background:#4e276c;border-color:#8050a3}
+@media(max-width:540px){
+ .header .home-player-dashboard{padding:9px 10px}
+ .header .home-profile-stats{gap:4px}
+ .header .home-profile-stats small{font-size:9px}
+}

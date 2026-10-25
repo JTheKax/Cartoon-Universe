@@ -22,7 +22,7 @@
 
 ## Server-side enforcement inventory (GitHub-only review)
 
-- Daily Cartoon Coin reward: `public.claim_daily_cartoon_coins()` is the existing transactional RPC. The maintenance guard is currently injected only by `scripts/build-maintenance-reward-ci.mjs` into disposable CI; the production function is NOT updated by PR #51.
+- Daily Cartoon Coin reward: `public.claim_daily_cartoon_coins()` is the existing transactional RPC. The proposed guarded migration at `supabase/maintenance-daily-reward-guard.sql` is executed directly in disposable CI. The production function is NOT updated by PR #51.
 - Maintenance settings: `site_maintenance` uses owner-restricted RLS in the isolated fixture. Confirm live policy/grant parity separately before any deployment.
 - Player shops, purchases, trades, auctions, sticker/card packs, and game rewards: do not treat the front-end pages or future feature placeholders as enforcement. Inventory each real RPC, database write policy, and edge/server endpoint as features are implemented; require maintenance ON denial for nonowners, owner bypass, and transaction rollback tests for every money/inventory mutation.
 - Public static HTML, JavaScript, and assets: Render static hosting cannot prevent direct fetch. A server/edge gateway is required before claiming site-wide access restriction.

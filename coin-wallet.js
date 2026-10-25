@@ -1,0 +1,50 @@
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
+const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const balance=document.getElementById('wallet-balance');
+const claim=document.getElementById('wallet-claim');
+const status=document.getElementById('wallet-status');
+const next=document.getElementById('wallet-next-claim');
+const history=document.getElementById('wallet-transactions');
+let currentUser=null;
+const number=n=>Number(n).toLocaleString();
+function row(message){history.replaceChildren();const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=3;td.textContent=message;tr.append(td);history.append(tr)}
+function nextUtc(){const d=new Date();return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()+1)).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short',timeZone:'UTC'})+' UTC'}
+async function refresh(){
+ const {data:{user},error:authError}=await client.auth.getUser();
+ if(authError||!user){currentUser=null;claim.disabled=true;claim.textContent='Log in to claim';status.replaceChildren();status.append('Please ');const a=document.createElement('a');a.href='login.html';a.textContent='log in';status.append(a,' to see your Cartoon Coins.');balance.textContent='—';row('Sign in to see transactions.');return}
+ currentUser=user.id;
+ const [wallet,transactions]=await Promise.all([
+  client.from('coin_wallets').select('balance').eq('user_id',user.id).maybeSingle(),
+  client.from('coin_transactions').select('id,amount,reason,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(30)
+ ]);
+ if(wallet.error){status.textContent='Unable to load your wallet. Please try again.';balance.textContent='—'}
+ else{balance.textContent=number(wallet.data?.balance??0);status.textContent='Wallet ready.'}
+ if(transactions.error){row('Unable to load transactions.');claim.disabled=true;claim.textContent='Reward unavailable';return}
+ history.replaceChildren();
+ if(!transactions.data?.length)row('No transactions yet.');
+ for(const item of transactions.data||[]){
+  const tr=document.createElement('tr');
+  const date=document.createElement('td');date.textContent=new Date(item.created_at).toLocaleString();
+  const reason=document.createElement('td');reason.textContent=item.reason==='daily_reward'?'🎁 Daily reward':item.reason.replaceAll('_',' ');
+  const amount=document.createElement('td');amount.textContent=(Number(item.amount)>0?'+':'')+number(item.amount);
+  amount.className=Number(item.amount)>=0?'coin-positive':'coin-negative';
+  tr.append(date,reason,amount);history.append(tr);
+ }
+ const today=new Date().toISOString().slice(0,10);
+ const already=transactions.data?.some(x=>x.reason==='daily_reward'&&x.created_at.slice(0,10)===today);
+ // The server enforces daily limits even if the 30-entry history omits a claim.
+ claim.disabled=false;claim.textContent=already?'Already claimed today':'Claim 25 Coins';
+ claim.disabled=Boolean(already);
+ next.textContent='Next reset: '+nextUtc();
+}
+claim.addEventListener('click',async()=>{
+ if(!currentUser)return;
+ claim.disabled=true;claim.textContent='Claiming…';
+ const {data,error}=await client.rpc('claim_daily_cartoon_coins');
+ if(error){status.textContent='Reward unavailable: '+error.message}
+ else status.textContent=data.claimed?'You earned 25 Cartoon Coins!':'You already claimed today. Come back after the UTC reset.';
+ await refresh();
+});
+client.auth.onAuthStateChange(()=>setTimeout(refresh,0));
+refresh();

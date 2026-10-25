@@ -85,3 +85,17 @@ test('switching to a different owner token revokes the old token and invalidates
  const newCookie=second.headers.get('set-cookie').split(';')[0];
  assert.equal((await (await fetch(base+'/__maintenance/owner-status',{headers:{Cookie:newCookie}})).json()).ownerVerified,true);
 });
+
+test('arcade routes fail closed for anonymous and nonowner sessions',async t=>{
+ const {base,verify}=await fixture(t);
+ const anonymous=await fetch(base+'/__maintenance/arcade/');
+ assert.equal(anonymous.status,503);
+ const nonowner=await verify('player-token');
+ assert.equal(nonowner.status,403);
+ const cookie=nonowner.headers.get('set-cookie').split(';')[0];
+ for(const path of ['/__maintenance/arcade/','/__maintenance/arcade/index.html','/index.html']){
+  const response=await fetch(base+path,{headers:{Cookie:cookie}});
+  assert.equal(response.status,503,path);
+  assert.doesNotMatch(await response.text(),/Welcome to the arcade/);
+ }
+});

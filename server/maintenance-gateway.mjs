@@ -50,7 +50,7 @@ export function createGateway({config,root=resolve(fileURLToPath(new URL('..',im
   if(!token)return false;
   try{
    const user=await api('/auth/v1/user',token);
-   if(!/^[0-9a-f-]{36}$/i.test(user.id||'')||user.is_anonymous===true)return false;
+   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id||'')||user.is_anonymous===true)return false;
    const rows=await api('/rest/v1/owner_members?select=user_id&user_id=eq.'+encodeURIComponent(user.id),token);
    return Array.isArray(rows)&&rows.some(row=>row.user_id===user.id);
   }catch{return false;}
@@ -72,6 +72,7 @@ export function createGateway({config,root=resolve(fileURLToPath(new URL('..',im
    if(path==='/__maintenance/session'){
     if(!['POST','DELETE'].includes(req.method))return send(405,'Method not allowed',undefined,{Allow:'POST, DELETE'});
     if(req.headers.origin!==config.siteOrigin)return send(403,'Same-origin request required');
+    if(Number(req.headers['content-length']||0)>0||req.headers['transfer-encoding'])return send(400,'This endpoint accepts an access-token header only.');
     const id=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName+'='))?.slice(cookieName.length+1);
     if(id)sessions.delete(id);
     if(req.method==='DELETE')return send(204,'',undefined,{'Set-Cookie':cookie('',0)});

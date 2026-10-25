@@ -41,3 +41,12 @@
 - `owner.js` reads `owner_members` and the profile count. Its owner UI is not a substitute for database RLS.
 - `script.js` is a small static site script. Do not infer that the planned player shops, auctions, card packs, or game rewards are deployed from the feature roadmap.
 - Before unlocking maintenance, enumerate actual deployed Supabase functions, policies, and any Render/edge API routes using read-only inspection. Apply server-side guards only to confirmed active mutation paths and test each with disposable accounts and wallets.
+
+### Read-only production Supabase inspection (2026-10-25)
+
+- Public tables observed: `profiles`, `owner_members`, `coin_wallets`, `coin_transactions`, `coin_daily_claims`, `site_maintenance`. RLS was enabled on all six at inspection time.
+- Active Edge Function observed: `username-login` (version 3, `verify_jwt=false`). It checks POST and Origin, resolves a username via service-role profile lookup, then validates the supplied password through Supabase Auth. Review brute-force protection, throttling, and abuse monitoring before changing this authentication endpoint. Do not assume an Origin header is an authentication control.
+- Supabase security advisor warned about `public.claim_daily_cartoon_coins()` being an executable SECURITY DEFINER function for authenticated users. This may be intentional for atomic rewards; verify its auth checks, execution grants, and maintenance guard before release.
+- Supabase security advisor also reported leaked-password protection disabled; configure separately with owner approval.
+- The read-only SQL catalog/function-body query was unavailable through the connector safety gate. Do not claim all deployed RPCs or the production `site_maintenance.enabled` value were independently checked.
+- No production mutation, deployment, toggle, or merge was performed during this inspection.

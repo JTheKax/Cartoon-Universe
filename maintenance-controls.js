@@ -10,7 +10,6 @@ const save=document.getElementById('maintenance-save');
 const toggle=document.getElementById('maintenance-toggle');
 let enabled=false;
 let verifiedOwnerId=null;
-let loading=false;
 async function load(){
  verifiedOwnerId=null;
  save.disabled=true;

@@ -23,6 +23,12 @@ jobs:
           if [ -f auth.js ]; then node --check auth.js; fi
       - name: Validate Cartoon Coin migration security contract
         run: node --test tests/cartoon-coins.test.mjs
+      - name: Validate maintenance UI safety checks
+        run: node --test tests/maintenance-ui.test.mjs
+      - name: Validate maintenance JavaScript syntax
+        run: |
+          node --check maintenance-controls.js
+          node --check maintenance-notice.js
       - name: Validate wallet JavaScript syntax
         run: node --check coin-wallet.js
   coin-database:

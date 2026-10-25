@@ -89,3 +89,11 @@ test('review-only migration preserves the complete reward function and inserts g
  assert.match(migration.slice(guardStart,guardEnd),/owner_members/);
  assert.match(migration.slice(guardStart,guardEnd),/errcode = 'P0001'/);
 });
+
+test('release checklist requires complete reward rollback verification',()=>{
+ const checks=file('tests/maintenance-checks.md');
+ const reward=file('sql/tests/maintenance_reward_guard_test.sql');
+ assert.match(checks,/daily-claim history/);
+ assert.match(reward,/claims_before<>claims_after/);
+ assert.match(reward,/before_balance<>after_balance/);
+});

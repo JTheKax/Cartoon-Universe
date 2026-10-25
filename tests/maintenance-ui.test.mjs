@@ -53,3 +53,21 @@ test('release documents remaining server and static-hosting gaps',()=>{
  assert.match(checks,/production maintenance OFF/i);
  assert.match(file('maintenance-notice.js'),/does not secure static assets/i);
 });
+
+test('maintenance reward guard is inserted after authentication and before wallet writes',()=>{
+ const original=file('sql/cartoon_coin_daily_reward.sql');
+ const generator=file('scripts/build-maintenance-reward-ci.mjs');
+ const auth=original.indexOf('if player_id is null');
+ const wallet=original.indexOf('insert into public.coin_wallets');
+ const marker=original.indexOf('-- The wallet row is the per-user lock;');
+ assert.ok(auth>=0 && wallet>auth && marker>auth && marker<wallet);
+ assert.match(generator,/original\.replace\(marker,guard\+marker\)/);
+ assert.match(generator,/enabled=true/);
+ assert.match(generator,/not exists\(select 1 from public\.owner_members/);
+ assert.match(generator,/errcode='P0001'/);
+});
+test('no client-side maintenance switch can write the enabled flag',()=>{
+ const js=file('maintenance-controls.js');
+ assert.doesNotMatch(js,/update\(\{[^}]*enabled\s*:/);
+ assert.match(js,/toggle\.disabled=true/);
+});

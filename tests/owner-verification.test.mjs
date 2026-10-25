@@ -99,3 +99,32 @@ test('arcade routes fail closed for anonymous and nonowner sessions',async t=>{
   assert.doesNotMatch(await response.text(),/Welcome to the arcade/);
  }
 });
+
+test('verified owner can load only allowlisted arcade assets; revocation closes access',async t=>{
+ const {base,state,verify}=await fixture(t);
+ const response=await verify('owner-token');assert.equal(response.status,200);
+ const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
+ const page=await fetch(base+'/__maintenance/arcade/',{headers});
+ assert.equal(page.status,200);
+ assert.match(page.headers.get('content-type'),/text\/html/);
+ for(const path of ['/__maintenance/arcade/server/gateway-candidate.mjs','/__maintenance/arcade/package.json','/__maintenance/arcade/%2e%2e/owner.html']){
+  const denied=await fetch(base+path,{headers,redirect:'manual'});
+  assert.notEqual(denied.status,200,path);
+ }
+ assert.equal((await fetch(base+'/index.html',{headers})).status,503);
+ state.member=false;
+ assert.equal((await fetch(base+'/__maintenance/arcade/',{headers})).status,503);
+});
+test('owner arcade session expires and cannot be reused after logout',async t=>{
+ const {base,state,verify}=await fixture(t);
+ const response=await verify('owner-token');
+ const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
+ state.time+=300001;
+ assert.equal((await fetch(base+'/__maintenance/arcade/',{headers})).status,503);
+ state.time=1000;
+ const again=await verify('owner-token');
+ const fresh={Cookie:again.headers.get('set-cookie').split(';')[0]};
+ assert.equal((await fetch(base+'/__maintenance/arcade/',{headers:fresh})).status,200);
+ await fetch(base+'/__maintenance/verify-session',{method:'DELETE',headers:{...fresh,Origin:origin}});
+ assert.equal((await fetch(base+'/__maintenance/arcade/',{headers:fresh})).status,503);
+});

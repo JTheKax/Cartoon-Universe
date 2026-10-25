@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#190c2b"><title>Cartoon Coin Wallet | Cartoon Universe</title><link rel="stylesheet" href="styles.css"></head>
+<body><main class="coin-page"><a class="coin-back" href="index.html">← Back to Haunted Arcade</a><section class="coin-wallet" aria-labelledby="wallet-title">
+<p class="eyebrow">🪙 CARTOON UNIVERSE ARCADE</p><h1 id="wallet-title">CARTOON COIN WALLET</h1>
+<p>Track your arcade currency and claim your daily reward. All balances and rewards are verified by the server.</p>
+<div class="coin-wallet-balance"><span>AVAILABLE COINS</span><strong id="wallet-balance">—</strong></div>
+<div class="coin-reward"><div><h2>🎁 Daily Reward</h2><p>Claim <strong>25 Cartoon Coins</strong> once per UTC day.</p><p id="wallet-next-claim"></p></div><button class="cta" type="button" id="wallet-claim" disabled>Checking reward…</button></div>
+<p id="wallet-status" role="status" aria-live="polite">Checking your account…</p>
+<h2>📜 Transaction History</h2><p>Recent rewards and purchases appear here.</p>
+<div class="coin-history-wrap"><table class="coin-history"><thead><tr><th>Date</th><th>Activity</th><th>Coins</th></tr></thead><tbody id="wallet-transactions"><tr><td colspan="3">Loading transactions…</td></tr></tbody></table></div>
+<p class="coin-wallet-footnote">Your existing coins are preserved. Game prizes and purchases will use server-authorized transactions as new features launch.</p>
+</section></main><script type="module" src="coin-wallet.js"></script></body></html>

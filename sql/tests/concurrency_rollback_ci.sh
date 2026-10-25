@@ -26,8 +26,8 @@ b=$!
 wait "$a" || { cat "$tmp/first.err"; exit 1; }
 wait "$b" || { cat "$tmp/second.err"; exit 1; }
 # psql -At also prints BEGIN/COMMIT and set_config output; select only booleans.
-results="$(grep -h -E '^(true|false)$' "$tmp/first" "$tmp/second" | sort | tr '\\n' ' ')"
-if [[ "$results" != "false true " ]]; then
+results="$(grep -h -E '^(true|false)$' "$tmp/first" "$tmp/second" | sort | paste -sd ' ' -)"
+if [[ "$results" != "false true" ]]; then
   echo "Expected exactly one successful and one duplicate claim; got: $results"
   cat "$tmp/first" "$tmp/second"; exit 1
 fi

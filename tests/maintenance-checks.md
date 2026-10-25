@@ -63,3 +63,9 @@
 - `supabase/maintenance-controls-review.sql` now includes proposed restrictive INSERT/UPDATE policies. They preserve the existing own-profile policies and public profile reads, allow owner self-editing during maintenance, and deny nonowner writes if maintenance state is missing.
 - CI loads the actual `supabase/schema.sql` and the exact proposed policies before testing player INSERT, UPDATE, and UPSERT blocking; unchanged profile data; owner bypass without cross-player privileges; missing-state denial; and maintenance OFF recovery.
 - These policies have not been applied to production. Auth registration, password recovery, privileged triggers/functions, and site-wide static access still require separate review; profile RLS does not gate Supabase Auth.
+
+### Staging HTTP gateway prototype
+
+- `server/maintenance-gateway.mjs` provides a staging-only request gate with fresh maintenance checks, verified owner bypass, a short-lived opaque session cookie, noncacheable 503 responses, and an explicit published-file list.
+- CI tests real local HTTP requests with mocked Supabase responses; no production or staging Supabase account is used. Owner sign-in remains reachable and staging `/config.js` is generated from separate staging environment values.
+- See `tests/maintenance-gateway-staging.md` for launch settings, access behavior, exclusions, and the required real browser/Supabase verification. This prototype is not deployed and does not unlock the owner ON/OFF control.

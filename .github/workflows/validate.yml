@@ -29,6 +29,12 @@ jobs:
         run: |
           node --check maintenance-controls.js
           node --check maintenance-notice.js
+      - name: Test staging maintenance HTTP gateway
+        run: node --test tests/maintenance-gateway.test.mjs
+      - name: Validate staging gateway syntax
+        run: |
+          node --check server/maintenance-gateway.mjs
+          node --check server/staging-owner-bridge.js
       - name: Validate wallet JavaScript syntax
         run: node --check coin-wallet.js
   coin-database:

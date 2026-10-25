@@ -22,3 +22,10 @@ test('notice avoids HTML injection and checks owner membership',()=>{
  assert.match(js,/from\('owner_members'\)/);
  assert.doesNotMatch(js,/innerHTML/);
 });
+
+test('maintenance SQL audit is read-only',()=>{
+ const sql=file('sql/tests/maintenance_readonly_audit.sql').replace(/--[^\n]*/g,'');
+ assert.doesNotMatch(sql,/\b(?:insert|update|delete|alter|drop|truncate|create)\b/i);
+ assert.match(sql,/pg_policies/);
+ assert.match(sql,/role_table_grants/);
+});

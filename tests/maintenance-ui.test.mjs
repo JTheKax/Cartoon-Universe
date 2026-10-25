@@ -35,3 +35,21 @@ test('maintenance editor clears stale owner authorization on reload',()=>{
  assert.match(js,/async function load\(\)\{\s*verifiedOwnerId=null;/);
  assert.match(js,/save\.disabled=true;\s*toggle\.disabled=true;/);
 });
+
+test('reward guard is generated only for isolated CI and protects nonowners',()=>{
+ const generator=file('scripts/build-maintenance-reward-ci.mjs');
+ const workflow=file('.github/workflows/validate.yml');
+ assert.match(generator,/site_maintenance/);
+ assert.match(generator,/owner_members/);
+ assert.match(generator,/claim_daily_cartoon_coins|cartoon_coin_daily_reward/);
+ assert.match(workflow,/postgres:17/);
+ assert.match(workflow,/maintenance_reward_guard_test\.sql/);
+ assert.match(workflow,/maintenance_rls_test\.sql/);
+});
+test('release documents remaining server and static-hosting gaps',()=>{
+ const checks=file('tests/maintenance-checks.md');
+ assert.match(checks,/server\/edge gateway/i);
+ assert.match(checks,/purchases, trades, auctions/i);
+ assert.match(checks,/production maintenance OFF/i);
+ assert.match(file('maintenance-notice.js'),/does not secure static assets/i);
+});

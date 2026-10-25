@@ -506,3 +506,64 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 @media(max-width:540px){
  .header .home-player-dashboard{flex:1 1 100%;width:100%;max-width:100%}
 }
+
+/* Two-row haunted arcade header: branding + player portal, then navigation. */
+.header{
+ display:flex;flex-direction:column;align-items:stretch;
+ justify-content:flex-start;gap:0;padding:0;
+}
+.header .header-top{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:20px;width:100%;min-width:0;
+ padding:10px max(2vw,14px);
+}
+.header .header-top .brand{
+ order:0;flex:0 1 auto;max-width:none;width:auto;margin:0;
+}
+.header .header-top .home-player-dashboard{
+ order:0;flex:0 0 440px;width:440px;max-width:440px;
+ margin:0 0 0 auto;min-height:0;
+}
+.header .header-top .menu{order:0;margin:0;flex-shrink:0}
+.header .header-nav-row{
+ display:block;width:100%;min-width:0;
+ padding:10px max(2vw,14px) 12px;
+ border-top:1px solid #9b4d8d66;
+ background:linear-gradient(90deg,#190c2ad9,#2e1139df);
+}
+.header .header-nav-row #nav{
+ display:flex;flex:1 1 auto;width:100%;min-width:0;
+ align-items:center;justify-content:center;
+ flex-wrap:wrap;gap:10px 12px;padding:0;margin:0;
+}
+.header .header-nav-row #nav>a,
+.header .header-nav-row #nav .nav-trigger{
+ font-size:16px;min-height:44px;padding:12px 16px;
+}
+@media(max-width:1000px){
+ .header .header-top{flex-wrap:wrap;gap:10px}
+ .header .header-top .brand{flex:1 1 auto;max-width:none;width:auto}
+ .header .header-top .home-player-dashboard{
+  order:2;flex:0 1 440px;width:440px;max-width:100%;
+  margin:0 0 0 auto;
+ }
+ .header .header-top .menu{
+  display:block;order:1;margin-left:auto;
+  min-width:44px;min-height:44px;
+ }
+ .header .header-nav-row{padding:0 max(2vw,14px)}
+ .header .header-nav-row #nav{display:none;flex-direction:column;align-items:stretch;gap:6px;padding:12px 0}
+ .header .header-nav-row #nav.open{display:flex}
+ .header .header-nav-row #nav>a,
+ .header .header-nav-row #nav .nav-group,
+ .header .header-nav-row #nav .nav-trigger{width:100%;text-align:left}
+ .header .header-nav-row #nav>.nav-group>.nav-dropdown{position:static;width:100%;min-width:0;margin:6px 0}
+}
+@media(max-width:540px){
+ .header .header-top{gap:8px}
+ .header .header-top .brand{width:auto;max-width:calc(100% - 66px)}
+ .header .header-top .home-player-dashboard{
+  order:2;flex:1 1 100%;width:100%;max-width:100%;margin:0;
+ }
+ .header .header-top .menu{order:1}
+}

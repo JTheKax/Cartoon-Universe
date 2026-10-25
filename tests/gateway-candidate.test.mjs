@@ -20,3 +20,16 @@ test('candidate CLI cannot launch in production-enabled mode',()=>{
  const path=fileURLToPath(new URL('../server/gateway-candidate.mjs',import.meta.url));
  const result=spawnSync(process.execPath,[path],{env:{GATEWAY_CANDIDATE_MODE:'true',PRODUCTION_GATEWAY_ENABLED:'true'},encoding:'utf8',timeout:5000});assert.equal(result.status,1);assert.match(result.stderr,/Only isolated candidate mode/);assert.doesNotMatch(result.stdout,/listening/);
 });
+test('probe uses secure host cookies, expires, and never authorizes application pages',async t=>{
+ let time=1000;const origin='https://cartoon-universe-gateway.onrender.com';
+ const server=createCandidateServer({origin,now:()=>time});server.listen(0,'127.0.0.1');await once(server,'listening');
+ t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));const base='http://127.0.0.1:'+server.address().port;
+ assert.equal((await fetch(base+'/__maintenance/cookie-probe',{method:'POST',headers:{Origin:'https://other.example'}})).status,403);
+ const response=await fetch(base+'/__maintenance/cookie-probe',{method:'POST',headers:{Origin:origin}});assert.equal(response.status,204);
+ const header=response.headers.get('set-cookie');assert.match(header,/^__Host-cu_probe=[0-9a-f]{48}; Path=\/; HttpOnly; SameSite=Strict; Max-Age=60; Secure$/);
+ const headers={Cookie:header.split(';')[0]};
+ assert.deepEqual(await (await fetch(base+'/__maintenance/cookie-check',{headers})).json(),{received:true,authority:'none'});
+ assert.equal((await fetch(base+'/owner.html',{headers})).status,503);
+ time+=60001;assert.equal((await (await fetch(base+'/__maintenance/cookie-check',{headers})).json()).received,false);
+ const cleared=await fetch(base+'/__maintenance/cookie-probe',{method:'DELETE',headers:{...headers,Origin:origin}});assert.match(cleared.headers.get('set-cookie'),/Max-Age=0; Secure$/);
+});

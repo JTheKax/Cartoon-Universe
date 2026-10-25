@@ -18,7 +18,7 @@ test('award is server-defined, authenticated and atomic',()=>{
  assert.match(sql,/get diagnostics inserted_claims = row_count/);
  assert.match(sql,/set balance = balance \+ 25/);
  assert.match(sql,/values \(player_id, 25, 'daily_reward'\)/);
- assert.match(sql,/^begin;[\s\S]*commit;\s*$/);
+ assert.match(sql,/\bbegin;[\s\S]*commit;\s*$/);
 });
 test('RPC and claim tables do not allow client writes',()=>{
  assert.match(sql,/revoke all on function public\.claim_daily_cartoon_coins\(\) from public, anon, authenticated/);

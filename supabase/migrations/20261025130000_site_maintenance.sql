@@ -65,7 +65,7 @@ for each row execute function public.prevent_unprotected_maintenance_activation(
 -- Restrict daily rewards at the database boundary. This is only one write path;
 -- activation remains locked until ALL mutations have been audited.
 create or replace function public.maintenance_guard_daily_claim()
-returns trigger language plpgsql security invoker set search_path = ''
+returns trigger language plpgsql security definer set search_path = ''
 as $$
 begin
  if exists (select 1 from public.site_maintenance where id=true and enabled=true)
@@ -95,6 +95,8 @@ begin
 end;
 $$;
 revoke all on function public.maintenance_guard_profile_write() from public,anon,authenticated;
+-- INSERT is intentionally allowed: Supabase Auth may create a profile during signup.
+-- Blocking signup requires separate Auth-side controls; do not claim full lockdown.
 create trigger maintenance_guard_profile_write
-before insert or update or delete on public.profiles
+before update or delete on public.profiles
 for each row execute function public.maintenance_guard_profile_write();

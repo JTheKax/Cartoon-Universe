@@ -58,8 +58,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Prepare disposable database fixture
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/ci_bootstrap.sql
+      - name: Prepare real profile and owner schema in disposable database
+        run: psql -v ON_ERROR_STOP=1 -f supabase/schema.sql
       - name: Prepare isolated maintenance RLS fixture
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_ci_fixture.sql
+      - name: Apply proposed profile maintenance policies in disposable database
+        run: psql -v ON_ERROR_STOP=1 -f supabase/maintenance-controls-review.sql
+      - name: Verify profile maintenance enforcement
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_profile_guard_test.sql
       - name: Test owner and nonowner maintenance permissions
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_rls_test.sql
       - name: Apply proposed migration to disposable database

@@ -56,3 +56,10 @@
 - The disposable CI database injects a ledger INSERT failure after wallet update and daily-claim insertion. It verifies rollback of all three records and a successful retry afterward.
 - Two authenticated RPC sessions are held behind the same wallet row lock. CI verifies both are waiting before releasing the lock, then requires one 25-coin award, one duplicate response, a 125-coin balance, and exactly one linked ledger/claim pair.
 - These checks use only the local GitHub Actions PostgreSQL fixture. They do not replace full Supabase staging login tests or the site-wide server/edge gateway requirement.
+
+### Profile mutation enforcement (review only)
+
+- Read-only production inspection confirmed `profiles` currently permits authenticated users to insert/update their own profile without a maintenance check. Production maintenance was independently read as OFF on 2026-10-25.
+- `supabase/maintenance-controls-review.sql` now includes proposed restrictive INSERT/UPDATE policies. They preserve the existing own-profile policies and public profile reads, allow owner self-editing during maintenance, and deny nonowner writes if maintenance state is missing.
+- CI loads the actual `supabase/schema.sql` and the exact proposed policies before testing player INSERT, UPDATE, and UPSERT blocking; unchanged profile data; owner bypass without cross-player privileges; missing-state denial; and maintenance OFF recovery.
+- These policies have not been applied to production. Auth registration, password recovery, privileged triggers/functions, and site-wide static access still require separate review; profile RLS does not gate Supabase Auth.

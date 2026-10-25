@@ -23,16 +23,28 @@ jobs:
             echo "::error::Configure SUPABASE_BACKUP_DATABASE_URL and SUPABASE_BACKUP_PASSPHRASE as GitHub Actions secrets."
             exit 1
           fi
+      - name: Install PostgreSQL 17 client to match Supabase server
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates curl gnupg
+          sudo install -d /usr/share/postgresql-common/pgdg
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor --yes -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+          . /etc/os-release
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+          /usr/lib/postgresql/17/bin/pg_dump --version
       - name: Export full logical database backup
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p backup
           # The Ubuntu runner's pg_dump client is installed from its PostgreSQL packages.
-          pg_dump --version
-          pg_dump --dbname="$DATABASE_URL" --format=custom --no-owner --no-acl --file=backup/cartoon-universe.dump
+          /usr/lib/postgresql/17/bin/pg_dump --dbname="$DATABASE_URL" --format=custom --no-owner --no-acl --file=backup/cartoon-universe.dump
           test -s backup/cartoon-universe.dump
-          pg_restore --list backup/cartoon-universe.dump > backup/contents.txt
+          /usr/lib/postgresql/17/bin/pg_restore --list backup/cartoon-universe.dump > backup/contents.txt
           test -s backup/contents.txt
       - name: Encrypt backup before upload
         shell: bash
@@ -50,7 +62,7 @@ jobs:
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
             -in backup/cartoon-universe.dump.enc -out backup/verify.dump \
             -pass env:BACKUP_PASSPHRASE
-          pg_restore --list backup/verify.dump > /dev/null
+          /usr/lib/postgresql/17/bin/pg_restore --list backup/verify.dump > /dev/null
           rm -f backup/verify.dump
       - name: Upload encrypted backup artifact
         uses: actions/upload-artifact@v4

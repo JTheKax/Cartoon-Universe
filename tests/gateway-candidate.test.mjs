@@ -39,3 +39,20 @@ test('probe uses secure host cookies, expires, and never authorizes application 
  time+=60001;assert.equal((await (await fetch(base+'/__maintenance/cookie-check',{headers})).json()).received,false);
  const cleared=await fetch(base+'/__maintenance/cookie-probe',{method:'DELETE',headers:{...headers,Origin:origin}});assert.match(cleared.headers.get('set-cookie'),/Max-Age=0; Secure$/);
 });
+
+test('enabled owner verification exposes sign-in while keeping arcade paths blocked',async t=>{
+ const origin='https://cartoon-universe-gateway.onrender.com';
+ const server=createCandidateServer({origin,ownerVerification:{supabaseUrl:'https://gjfyemvcrgrthbrlqqnz.supabase.co',publishableKey:'sb_publishable_test_only_mock_key_1234567890'}});
+ server.listen(0,'127.0.0.1');await once(server,'listening');
+ t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
+ const base='http://127.0.0.1:'+server.address().port;
+ const setup=await fetch(base+'/');assert.equal(setup.status,503);
+ const html=await setup.text();assert.match(html,/href="\/__maintenance\/owner-signin">Owner Login<\/a>/);
+ assert.doesNotMatch(html,/Continue to the current arcade|href=["']https:\/\/cartoon-universe-3\.onrender\.com/);
+ const login=await fetch(base+'/__maintenance/owner-signin');assert.equal(login.status,200);
+ const loginHtml=await login.text();assert.match(loginHtml,/Verify owner sign-in/);
+ assert.match(loginHtml,/id="verify-form"/);
+ const status=await fetch(base+'/__maintenance/owner-status');assert.equal(status.status,200);
+ assert.deepEqual(await status.json(),{ownerVerified:false,readOnly:true});
+ for(const path of ['/owner.html','/coin-wallet.html'])assert.equal((await fetch(base+path)).status,503);
+});

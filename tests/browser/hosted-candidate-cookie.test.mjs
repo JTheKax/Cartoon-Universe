@@ -9,7 +9,9 @@ test('hosted candidate proves Secure HttpOnly cookie round-trip without granting
  try{
   const deadline=Date.now()+120000;
   while(true){
-   const response=await context.request.post(origin+'/__maintenance/cookie-probe',{headers:{Origin:origin},timeout:15000});
+   let response;
+   try{response=await context.request.post(origin+'/__maintenance/cookie-probe',{headers:{Origin:origin},timeout:15000});}
+   catch(error){if(Date.now()>=deadline)throw error;await pause();continue;}
    if(response.status()===204)break;
    if(Date.now()>=deadline)throw new Error('Hosted candidate cookie probe did not become available');
    await pause();

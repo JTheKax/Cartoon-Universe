@@ -1,0 +1,152 @@
+name: Daily Rewards PostgreSQL integration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'sql/cartoon_coin_daily_reward.sql'
+      - '.github/workflows/daily-rewards-postgres-integration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  daily-reward-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: disposable-test-password
+          POSTGRES_DB: daily_rewards_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test -d daily_rewards_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: test
+      PGPASSWORD: disposable-test-password
+      PGDATABASE: daily_rewards_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Prepare disposable Supabase-compatible schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          create role anon nologin;
+          create role authenticated nologin;
+          create role service_role nologin;
+          create schema auth;
+          create table auth.users (id uuid primary key);
+          create function auth.uid() returns uuid language sql stable as $$
+            select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
+          $$;
+          create function auth.role() returns text language sql stable as $$
+            select nullif(current_setting('request.jwt.claim.role', true), '')
+          $$;
+          create function auth.jwt() returns jsonb language sql stable as $$
+            select jsonb_build_object('is_anonymous', coalesce(nullif(current_setting('request.jwt.claim.is_anonymous', true), '')::boolean, false))
+          $$;
+          grant usage on schema auth to anon, authenticated;
+          grant execute on function auth.uid(), auth.role(), auth.jwt() to anon, authenticated;
+          create table public.coin_wallets (
+            user_id uuid primary key references auth.users(id) on delete cascade,
+            balance bigint not null default 0 check (balance >= 0),
+            updated_at timestamptz not null default now()
+          );
+          alter table public.coin_wallets enable row level security;
+          create policy "Players view own wallet" on public.coin_wallets for select to authenticated using ((select auth.uid()) = user_id);
+          create table public.coin_transactions (
+            id bigint generated always as identity primary key,
+            user_id uuid not null references auth.users(id),
+            amount bigint not null check (amount <> 0),
+            reason text not null,
+            created_at timestamptz not null default now()
+          );
+          alter table public.coin_transactions enable row level security;
+          create policy "Players view own transactions" on public.coin_transactions for select to authenticated using ((select auth.uid()) = user_id);
+          insert into auth.users (id) values
+            ('00000000-0000-0000-0000-000000000001'),
+            ('00000000-0000-0000-0000-000000000002');
+          insert into public.coin_wallets(user_id,balance) values
+            ('00000000-0000-0000-0000-000000000001',100),
+            ('00000000-0000-0000-0000-000000000002',200);
+          SQL
+      - name: Apply daily reward migration to disposable database
+        run: psql -v ON_ERROR_STOP=1 -f sql/cartoon_coin_daily_reward.sql
+      - name: Verify authenticated award and concurrent duplicate claims
+        shell: bash
+        run: |
+          set -euo pipefail
+          claim="select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',false); select set_config('request.jwt.claim.role','authenticated',false); select public.claim_daily_cartoon_coins();"
+          (psql -v ON_ERROR_STOP=1 -c "$claim" > /tmp/claim-a.log) &
+          p1=$!
+          (psql -v ON_ERROR_STOP=1 -c "$claim" > /tmp/claim-b.log) &
+          p2=$!
+          wait "$p1"
+          wait "$p2"
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          declare b bigint; c integer; tx integer; initial_balance bigint;
+          begin
+            select balance into b from public.coin_wallets where user_id='00000000-0000-0000-0000-000000000001';
+            select count(*) into c from public.coin_daily_claims where user_id='00000000-0000-0000-0000-000000000001' and reward_date=(now() at time zone 'UTC')::date;
+            select count(*) into tx from public.coin_transactions where user_id='00000000-0000-0000-0000-000000000001' and reason='daily_reward' and created_at >= ((now() at time zone 'UTC')::date::timestamp at time zone 'UTC');
+            if b <> 125 or c <> 1 or tx <> 1 then raise exception 'Concurrent claim invariant failed: balance %, claims %, reward transactions %',b,c,tx; end if;
+          end $$;
+          SQL
+      - name: Verify failed transaction rolls back claim and wallet
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          create function public.fail_daily_reward_insert() returns trigger language plpgsql as $$
+          begin
+            if new.reason = 'daily_reward' then raise exception 'intentional integration-test failure'; end if;
+            return new;
+          end $$;
+          create trigger fail_daily_reward_insert before insert on public.coin_transactions for each row execute function public.fail_daily_reward_insert();
+          SQL
+          if psql -v ON_ERROR_STOP=1 -c "select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false); select set_config('request.jwt.claim.role','authenticated',false); select public.claim_daily_cartoon_coins();" >/tmp/rollback-test.log 2>&1; then
+            echo "::error::Injected transaction failure unexpectedly succeeded"
+            exit 1
+          fi
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          declare b bigint; c integer; tx integer;
+          begin
+            select balance into b from public.coin_wallets where user_id='00000000-0000-0000-0000-000000000002';
+            select count(*) into c from public.coin_daily_claims where user_id='00000000-0000-0000-0000-000000000002' and reward_date=(now() at time zone 'UTC')::date;
+            select count(*) into tx from public.coin_transactions where user_id='00000000-0000-0000-0000-000000000002' and reason='daily_reward';
+            if b <> 200 or c <> 0 or tx <> 0 then raise exception 'Rollback invariant failed: balance %, claims %, reward transactions %',b,c,tx; end if;
+          end $$;
+          drop trigger fail_daily_reward_insert on public.coin_transactions;
+          drop function public.fail_daily_reward_insert();
+          SQL
+      - name: Verify anonymous denial and client write restrictions
+        shell: bash
+        run: |
+          set -euo pipefail
+          if psql -v ON_ERROR_STOP=1 -c "select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false); select set_config('request.jwt.claim.role','anon',false); select public.claim_daily_cartoon_coins();" >/tmp/anon-test.log 2>&1; then
+            echo "::error::Anonymous reward claim unexpectedly succeeded"
+            exit 1
+          fi
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          begin
+            if has_function_privilege('anon','public.claim_daily_cartoon_coins()','EXECUTE') then raise exception 'anon can execute reward RPC'; end if;
+            if not has_function_privilege('authenticated','public.claim_daily_cartoon_coins()','EXECUTE') then raise exception 'authenticated cannot execute reward RPC'; end if;
+            if has_table_privilege('authenticated','public.coin_daily_claims','INSERT') or has_table_privilege('authenticated','public.coin_daily_claims','UPDATE') or has_table_privilege('authenticated','public.coin_daily_claims','DELETE') then raise exception 'authenticated has direct write privileges on claims'; end if;
+          end $$;
+          SQL

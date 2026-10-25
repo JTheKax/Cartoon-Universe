@@ -7,7 +7,7 @@ import {createOwnerVerification} from './owner-verification.mjs';
 import {productionSiteOrigin} from './production-maintenance-gateway.mjs';
 import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
-const ARCADE_FILES=new Set(['index.html','login.html','register.html','account.html','coin-wallet.html','owner.html','styles.css','account.css','owner.css','script.js','auth.js','supabase-config.js','theme.js','admin-nav.js','home-profile.js','coin-wallet.js','owner.js','maintenance-preview.js','maintenance-controls.js','maintenance-notice.js','static/cartoon-carnival.png','static/haunted-arcade.gif']);
+const ARCADE_FILES=new Set(['index.html','login.html','register.html','account.html','coin-wallet.html','owner.html','styles.css','account.css','owner.css','script.js','auth.js','config.js','supabase-config.js','theme.js','admin-nav.js','home-profile.js','coin-wallet.js','owner.js','maintenance-preview.js','maintenance-controls.js','maintenance-notice.js','static/cartoon-carnival.png','static/haunted-arcade.gif']);
 const ARCADE_TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.gif':'image/gif'};
 const html=ownerLoginLink=>`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cartoon Universe Gateway Setup</title><body><main><h1>Cartoon Universe gateway setup</h1><p>This address is being prepared.</p><p>Arcade access is unavailable from this setup page. Verified owners should use the approved owner access flow.</p>${ownerLoginLink}</main></body></html>`;
 export function createCandidateServer({origin,now=Date.now,ownerVerification,fetchImpl=fetch,onOwnerVerified,arcadeRoot=resolve(fileURLToPath(new URL('..',import.meta.url)))}={}){
@@ -38,7 +38,7 @@ export function createCandidateServer({origin,now=Date.now,ownerVerification,fet
      // Relative arcade URLs resolve under the protected prefix. Absolute site paths remain blocked.
      body=body.toString().replace(/<head([^>]*)>/i,'<head$1><base href="/__maintenance/arcade/">');
     }
-    return send(200,body,ARCADE_TYPES[extname(name)]||'application/octet-stream',{'Content-Security-Policy':"default-src 'self'; img-src 'self' data:; connect-src 'self' https://gjfyemvcrgrthbrlqqnz.supabase.co; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'self'; frame-ancestors 'none'"});
+    return send(200,body,ARCADE_TYPES[extname(name)]||'application/octet-stream',{'Content-Security-Policy':"default-src 'self'; img-src 'self' data:; connect-src 'self' https://gjfyemvcrgrthbrlqqnz.supabase.co; style-src 'self' 'unsafe-inline'; script-src 'self' https://esm.sh; base-uri 'self'; frame-ancestors 'none'"});
    }catch{return send(503,'Arcade asset unavailable');}
   }
   const nonce=(req.headers.cookie||'').split(';').map(value=>value.trim()).find(value=>value.startsWith(cookieName+'='))?.slice(cookieName.length+1);

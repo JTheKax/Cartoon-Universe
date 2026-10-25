@@ -14,13 +14,14 @@ async function refresh(){
  const {data:{user},error:authError}=await client.auth.getUser();
  if(authError||!user){currentUser=null;claim.disabled=true;claim.textContent='Log in to claim';status.replaceChildren();status.append('Please ');const a=document.createElement('a');a.href='login.html';a.textContent='log in';status.append(a,' to see your Cartoon Coins.');balance.textContent='—';row('Sign in to see transactions.');return}
  currentUser=user.id;
- const [wallet,transactions]=await Promise.all([
+ const [wallet,transactions,dailyClaim]=await Promise.all([
   client.from('coin_wallets').select('balance').eq('user_id',user.id).maybeSingle(),
-  client.from('coin_transactions').select('id,amount,reason,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(30)
+  client.from('coin_transactions').select('id,amount,reason,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(30),
+  client.from('coin_daily_claims').select('reward_date').eq('user_id',user.id).eq('reward_date',new Date().toISOString().slice(0,10)).maybeSingle()
  ]);
  if(wallet.error){status.textContent='Unable to load your wallet. Please try again.';balance.textContent='—'}
  else{balance.textContent=number(wallet.data?.balance??0);status.textContent='Wallet ready.'}
- if(transactions.error){row('Unable to load transactions.');claim.disabled=true;claim.textContent='Reward unavailable';return}
+ if(wallet.error||transactions.error||dailyClaim.error){row(transactions.error?'Unable to load transactions.':wallet.error?'Wallet unavailable.':'Reward status unavailable.');claim.disabled=true;claim.textContent='Reward unavailable';return}
  history.replaceChildren();
  if(!transactions.data?.length)row('No transactions yet.');
  for(const item of transactions.data||[]){
@@ -31,9 +32,8 @@ async function refresh(){
   amount.className=Number(item.amount)>=0?'coin-positive':'coin-negative';
   tr.append(date,reason,amount);history.append(tr);
  }
- const today=new Date().toISOString().slice(0,10);
- const already=transactions.data?.some(x=>x.reason==='daily_reward'&&x.created_at.slice(0,10)===today);
- // The server enforces daily limits even if the 30-entry history omits a claim.
+ const already=Boolean(dailyClaim.data)||Boolean(transactions.data?.some(item=>item.reason==='daily_reward'&&item.created_at?.slice(0,10)===new Date().toISOString().slice(0,10)));
+ // The daily-claim table is authoritative even when recent history is truncated.
  claim.disabled=false;claim.textContent=already?'Already claimed today':'Claim 25 Coins';
  claim.disabled=Boolean(already);
  next.textContent='Next reset: '+nextUtc();
@@ -44,7 +44,9 @@ claim.addEventListener('click',async()=>{
  const {data,error}=await client.rpc('claim_daily_cartoon_coins');
  if(error){status.textContent='Reward unavailable: '+error.message}
  else status.textContent=data.claimed?'You earned 25 Cartoon Coins!':'You already claimed today. Come back after the UTC reset.';
+ const feedback=status.textContent;
  await refresh();
+ if(currentUser)status.textContent=feedback;
 });
 client.auth.onAuthStateChange(()=>setTimeout(refresh,0));
 refresh();

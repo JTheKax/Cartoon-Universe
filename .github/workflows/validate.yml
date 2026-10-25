@@ -85,3 +85,21 @@ jobs:
       - name: Verify overlapping reward claims award once
         timeout-minutes: 2
         run: python3 scripts/test-reward-concurrency.py
+  maintenance-browser:
+    name: Test maintenance browser (simulated identities)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser test dependencies
+        working-directory: tests/browser
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium and system dependencies
+        working-directory: tests/browser
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Test browser sign-in, navigation, expiry and logout with simulated identities
+        working-directory: tests/browser
+        run: npm test

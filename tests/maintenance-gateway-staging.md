@@ -40,3 +40,9 @@ Still required before release:
 5. Review the eventual production routing plan. A separately deployed gateway does not protect the existing Render static URL, public authentication dependencies, cached/downloaded content, or direct Supabase endpoints. Do not claim complete site-wide protection until every relevant production origin and mutation is covered.
 
 PR #51 stays draft. Production maintenance remains OFF. No production SQL, hosting change, or merge is authorized by running these local tests.
+
+## Local browser coverage without a staging project
+
+`tests/browser` contains a pinned Playwright dependency and lockfile. Run `npm ci --ignore-scripts`, `npx --no-install playwright install chromium`, and `npm test` from that directory. The separate GitHub browser job also installs required system libraries.
+
+This suite drives Chromium through the actual login form, staging bridge, gateway cookie flow, and owner dashboard. It checks owner navigation, player denial, logout, cookie expiry, maintenance OFF, and an upstream outage. Browser identity calls and server Supabase responses are simulated; all other external browser requests are blocked. It creates no accounts, projects, or hosting resources. Passing it does not satisfy the separate real-Supabase staging release requirement.

@@ -31,8 +31,13 @@ document.getElementById('maintenance-close')?.addEventListener('click',()=>{pane
 document.getElementById('maintenance-preview')?.addEventListener('click',()=>{output.textContent=message.value.trim()||'We will be back soon!';preview.hidden=false;});
 save?.addEventListener('click',async()=>{
  save.disabled=true;
- const {data:{user},error:authError}=await client.auth.getUser();
- if(authError||!user||user.id!==verifiedOwnerId){status.textContent='Owner session changed. Reload before saving.';save.disabled=false;return;}
+ let user;
+ try {
+  const result=await client.auth.getUser();
+  user=result.data?.user;
+  if(result.error||!user||user.id!==verifiedOwnerId){status.textContent='Owner session changed. Reload before saving.';return;}
+ } catch {status.textContent='Unable to verify owner session.';return;}
+ finally {if(!user)save.disabled=false;}
  const value=message.value.trim();
  if(!value||value.length>280){status.textContent='Enter a message of 1–280 characters.';save.disabled=false;return;}
  try {

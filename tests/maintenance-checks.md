@@ -33,3 +33,11 @@
 - Covered: maintenance UI safety, syntax, disposable owner/nonowner RLS, daily-reward maintenance ON/OFF and owner bypass.
 - Not covered: live production RLS parity, real player transaction endpoints beyond the daily reward, site-wide static-asset gating, end-to-end staging login, and production state readback.
 - No production Supabase data or settings should be modified to satisfy these checks.
+
+### Verified repository call-site inventory (2026-10-25)
+
+- `coin-wallet.js` calls `client.rpc('claim_daily_cartoon_coins')`; the daily reward RPC is a real server-side mutation requiring the guard before production activation.
+- `coin-wallet.js` reads `coin_wallets`, `coin_transactions`, and `coin_daily_claims`. These are read paths, not evidence that shop/trade/auction mutation endpoints exist.
+- `owner.js` reads `owner_members` and the profile count. Its owner UI is not a substitute for database RLS.
+- `script.js` is a small static site script. Do not infer that the planned player shops, auctions, card packs, or game rewards are deployed from the feature roadmap.
+- Before unlocking maintenance, enumerate actual deployed Supabase functions, policies, and any Render/edge API routes using read-only inspection. Apply server-side guards only to confirmed active mutation paths and test each with disposable accounts and wallets.

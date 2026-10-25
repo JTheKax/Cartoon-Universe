@@ -47,6 +47,8 @@ if(panel&&SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30){
    avatar.style.backgroundColor=/^#[0-9a-f]{6}$/i.test(color||'')?color:'#ff4ca8';
    const balance=walletResult.data?.balance;
    set('home-coins-balance',walletResult.error||balance==null?'—':Number(balance).toLocaleString());
+   // Collection and achievement counts remain unavailable until backed by live tables.
+   set('home-cards-total','—');set('home-achievements-total','—');
    const owner=!ownerResult.error&&!!ownerResult.data;
    document.getElementById('home-profile-role').textContent=owner?'👑 Owner':'🎮 Player';
    document.getElementById('home-owner-link').hidden=!owner;

@@ -12,6 +12,6 @@ async function init(){
  if(!membership){setStatus('Access denied. This page is reserved for the Cartoon Universe owner.');return;}
  const {count,error:countError}=await client.from('profiles').select('id',{count:'exact',head:true});
  document.getElementById('player-count').textContent=countError?'Unavailable':String(count??0);
- content.hidden=false;status.hidden=true;
+ content.hidden=false;status.hidden=true;\n window.dispatchEvent(new CustomEvent("cartoon-owner-authorized",{detail:{client}}));
 }
 init().catch(()=>setStatus('Unable to load the dashboard. Check your connection and try again.'));

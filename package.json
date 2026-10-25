@@ -1,0 +1,8 @@
+{
+  "name": "cartoon-universe-maintenance-gateway",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {"start": "node gateway/server.mjs", "test:gateway": "node --test gateway/server.test.mjs"},
+  "engines": {"node": ">=20"}
+}

@@ -16,3 +16,31 @@ create policy "Anyone can read maintenance state" on public.site_maintenance for
 create policy "Only owners can update maintenance" on public.site_maintenance for update to authenticated
  using (exists(select 1 from public.owner_members where user_id=(select auth.uid())))
  with check (id=true and exists(select 1 from public.owner_members where user_id=(select auth.uid())));
+
+-- Audit every maintenance setting change without exposing the audit log to clients.
+create table if not exists public.site_maintenance_audit (
+ id bigint generated always as identity primary key,
+ changed_at timestamptz not null default now(),
+ actor_id uuid,
+ old_enabled boolean not null,
+ new_enabled boolean not null,
+ old_message text not null,
+ new_message text not null
+);
+alter table public.site_maintenance_audit enable row level security;
+revoke all on public.site_maintenance_audit from anon,authenticated;
+create or replace function public.record_site_maintenance_change()
+returns trigger language plpgsql security definer set search_path = ''
+as $$
+begin
+  insert into public.site_maintenance_audit(actor_id,old_enabled,new_enabled,old_message,new_message)
+  values(auth.uid(),old.enabled,new.enabled,old.message,new.message);
+  new.updated_at := now();
+  new.updated_by := auth.uid();
+  return new;
+end;
+$$;
+revoke all on function public.record_site_maintenance_change() from public,anon,authenticated;
+create trigger audit_site_maintenance_changes
+before update on public.site_maintenance
+for each row execute function public.record_site_maintenance_change();

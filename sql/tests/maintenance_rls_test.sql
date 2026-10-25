@@ -24,10 +24,10 @@ begin
 end $$;
 reset role;
 -- Ensure anonymous sessions have no maintenance write privilege.
-do $
+do $guard$
 begin
  if has_table_privilege('anon','public.site_maintenance','UPDATE') then
   raise exception 'Anonymous role can update maintenance';
  end if;
-end $;
+end $guard$;
 rollback;

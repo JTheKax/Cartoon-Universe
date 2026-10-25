@@ -1,0 +1,90 @@
+name: Verify encrypted Supabase backup restore
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  restore-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: restore_test
+          POSTGRES_PASSWORD: disposable-only-password
+          POSTGRES_DB: cartoon_universe_restore
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U restore_test -d cartoon_universe_restore"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      BACKUP_PASSPHRASE: ${{ secrets.SUPABASE_BACKUP_PASSPHRASE }}
+      GH_TOKEN: ${{ github.token }}
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: restore_test
+      PGPASSWORD: disposable-only-password
+      PGDATABASE: cartoon_universe_restore
+    steps:
+      - name: Check required secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$BACKUP_PASSPHRASE" || { echo "::error::Missing SUPABASE_BACKUP_PASSPHRASE secret."; exit 1; }
+      - name: Install PostgreSQL 17 client
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+      - name: Download existing encrypted backup artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p restore-test
+          gh api -H "Accept: application/vnd.github+json" \
+            /repos/${GITHUB_REPOSITORY}/actions/artifacts/12581877045/zip > restore-test/artifact.zip
+          unzip -q restore-test/artifact.zip -d restore-test/artifact
+          test -s restore-test/artifact/cartoon-universe-encrypted-db-backup/cartoon-universe.dump.enc || \
+            test -s restore-test/artifact/cartoon-universe.dump.enc
+          find restore-test/artifact -type f -maxdepth 3 -print
+      - name: Decrypt backup in ephemeral runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          encrypted="$(find restore-test/artifact -name 'cartoon-universe.dump.enc' -print -quit)"
+          test -n "$encrypted"
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
+            -in "$encrypted" -out restore-test/cartoon-universe.dump \
+            -pass env:BACKUP_PASSPHRASE
+          /usr/lib/postgresql/17/bin/pg_restore --list restore-test/cartoon-universe.dump > restore-test/toc.txt
+          test -s restore-test/toc.txt
+      - name: Restore into disposable PostgreSQL 17 database
+        shell: bash
+        run: |
+          set -euo pipefail
+          /usr/lib/postgresql/17/bin/pg_restore \
+            --exit-on-error --no-owner --no-acl \
+            --dbname=cartoon_universe_restore restore-test/cartoon-universe.dump
+      - name: Verify restored application schema and report table counts
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -Atc "select current_database(), current_setting('server_version');"
+          psql -v ON_ERROR_STOP=1 -Atc "select schemaname || '.' || tablename from pg_tables where schemaname='public' order by tablename;" > restore-test/restored-public-tables.txt
+          test -s restore-test/restored-public-tables.txt
+          grep -E 'coin_wallets|coin_transactions' restore-test/restored-public-tables.txt
+          psql -v ON_ERROR_STOP=1 -c "select count(*) as wallet_count from public.coin_wallets;"
+          psql -v ON_ERROR_STOP=1 -c "select count(*) as transaction_count from public.coin_transactions;"
+      - name: Remove decrypted dump
+        if: always()
+        shell: bash
+        run: rm -rf restore-test

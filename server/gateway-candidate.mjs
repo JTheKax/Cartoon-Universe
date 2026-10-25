@@ -33,7 +33,12 @@ export function createCandidateServer({origin,now=Date.now,ownerVerification,fet
     const base=await realpath(arcadeRoot);
     const file=await realpath(resolve(base,name));
     if(!file.startsWith(base+sep))return send(404,'Not found');
-    return send(200,await readFile(file),ARCADE_TYPES[extname(name)]||'application/octet-stream',{'Content-Security-Policy':"default-src 'self'; img-src 'self' data:; connect-src 'self' https://gjfyemvcrgrthbrlqqnz.supabase.co; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'self'; frame-ancestors 'none'"});
+    let body=await readFile(file);
+    if(extname(name)==='.html'){
+     // Relative arcade URLs resolve under the protected prefix. Absolute site paths remain blocked.
+     body=body.toString().replace(/<head([^>]*)>/i,'<head$1><base href="/__maintenance/arcade/">');
+    }
+    return send(200,body,ARCADE_TYPES[extname(name)]||'application/octet-stream',{'Content-Security-Policy':"default-src 'self'; img-src 'self' data:; connect-src 'self' https://gjfyemvcrgrthbrlqqnz.supabase.co; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'self'; frame-ancestors 'none'"});
    }catch{return send(503,'Arcade asset unavailable');}
   }
   const nonce=(req.headers.cookie||'').split(';').map(value=>value.trim()).find(value=>value.startsWith(cookieName+'='))?.slice(cookieName.length+1);

@@ -79,8 +79,8 @@ test('review-only migration preserves the complete reward function and inserts g
  const guardStart=migration.indexOf('  -- Maintenance is enforced inside');
  const guardEnd=migration.indexOf(marker,guardStart);
  assert.ok(guardStart>=0 && guardEnd>guardStart);
- const preamble=migration.slice(0,migration.indexOf('begin;'));
- const restored=migration.slice(migration.indexOf('begin;')).slice(0,guardStart-migration.indexOf('begin;'))+migration.slice(guardEnd);
+ const preamble=migration.slice(0,migration.indexOf(base));
+ const restored=migration.slice(preamble.length,guardStart)+migration.slice(guardEnd);
  assert.equal(restored,base);
  assert.match(preamble,/REVIEW-ONLY MIGRATION/);
  assert.match(migration.slice(guardStart,guardEnd),/site_maintenance/);

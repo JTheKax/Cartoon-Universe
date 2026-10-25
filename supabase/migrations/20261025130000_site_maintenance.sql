@@ -80,3 +80,21 @@ revoke all on function public.maintenance_guard_daily_claim() from public,anon,a
 create trigger maintenance_guard_daily_claim
 before insert on public.coin_daily_claims
 for each row execute function public.maintenance_guard_daily_claim();
+
+-- Protect profile writes as well as reward claims.
+create or replace function public.maintenance_guard_profile_write()
+returns trigger language plpgsql security definer set search_path = ''
+as $$
+begin
+ if exists(select 1 from public.site_maintenance where id=true and enabled=true)
+    and not exists(select 1 from public.owner_members where user_id=auth.uid()) then
+  raise exception 'Cartoon Universe is under maintenance. Profile changes are temporarily disabled'
+    using errcode='55000';
+ end if;
+ return new;
+end;
+$$;
+revoke all on function public.maintenance_guard_profile_write() from public,anon,authenticated;
+create trigger maintenance_guard_profile_write
+before insert or update or delete on public.profiles
+for each row execute function public.maintenance_guard_profile_write();

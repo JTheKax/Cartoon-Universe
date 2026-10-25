@@ -102,3 +102,14 @@ test('repository internals and path tricks are never served even when maintenanc
   assert.equal(status,400,path);
  }
 });
+
+test('local Supabase requires explicit opt-in and exactly the loopback API port',()=>{
+ const local={...env,STAGING_SUPABASE_URL:'http://127.0.0.1:54321'};
+ assert.throws(()=>stagingConfig(local));
+ assert.equal(stagingConfig({...local,STAGING_LOCAL_CONTAINERS:'true'}).supabaseUrl,local.STAGING_SUPABASE_URL);
+ assert.throws(()=>stagingConfig({...local,STAGING_LOCAL_CONTAINERS:'true',STAGING_SUPABASE_URL:'http://127.0.0.1:9999'}));
+ assert.throws(()=>stagingConfig({...env,STAGING_LOCAL_CONTAINERS:'true',STAGING_SUPABASE_URL:'https://gjfyemvcrgrthbrlqqnz.supabase.co'}));
+ const token=role=>'header.'+Buffer.from(JSON.stringify({role})).toString('base64url')+'.signature';
+ assert.equal(stagingConfig({...local,STAGING_LOCAL_CONTAINERS:'true',STAGING_SUPABASE_PUBLISHABLE_KEY:token('anon')}).key,token('anon'));
+ assert.throws(()=>stagingConfig({...local,STAGING_LOCAL_CONTAINERS:'true',STAGING_SUPABASE_PUBLISHABLE_KEY:token('service_role')}));
+});

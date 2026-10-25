@@ -15,11 +15,16 @@ const escape=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','
 
 export function stagingConfig(env){
  const url=new URL(env.STAGING_SUPABASE_URL);
- if(url.protocol!=='https:' || !/^[a-z0-9]{20}\.supabase\.co$/.test(url.hostname)
+ const local=env.STAGING_LOCAL_CONTAINERS==='true' && url.origin==='http://127.0.0.1:54321';
+ if((!local && (url.protocol!=='https:' || !/^[a-z0-9]{20}\.supabase\.co$/.test(url.hostname)))
     || url.hostname===PRODUCTION_REF+'.supabase.co' || url.origin!==url.href.replace(/\/$/,''))
   throw new Error('A separate staging Supabase project URL is required. Production is forbidden.');
  const key=env.STAGING_SUPABASE_PUBLISHABLE_KEY;
- if(!key?.startsWith('sb_publishable_'))throw new Error('A staging publishable key is required; secret/service-role keys are forbidden.');
+ let localAnon=false;
+ if(local && key?.split('.').length===3){
+  try{localAnon=JSON.parse(Buffer.from(key.split('.')[1],'base64url').toString()).role==='anon';}catch{}
+ }
+ if(!key?.startsWith('sb_publishable_') && !localAnon)throw new Error('A staging publishable key is required; secret/service-role keys are forbidden.');
  const site=new URL(env.STAGING_SITE_ORIGIN);
  if(site.username||site.password||site.origin!==site.href.replace(/\/$/,''))throw new Error('Use a site origin without path, credentials, query, or fragment.');
  if(site.protocol!=='https:' && !(site.protocol==='http:' && ['localhost','127.0.0.1'].includes(site.hostname)))

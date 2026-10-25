@@ -2,6 +2,12 @@
   "name": "cartoon-universe-maintenance-browser-tests",
   "private": true,
   "type": "module",
-  "scripts": {"test": "node --test maintenance-browser.test.mjs"},
-  "devDependencies": {"playwright": "1.62.1"}
+  "scripts": {
+    "test": "node --test maintenance-browser.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1",
+    "@supabase/supabase-js": "2.118.0",
+    "esbuild": "0.28.2"
+  }
 }

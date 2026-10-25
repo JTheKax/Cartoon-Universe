@@ -46,3 +46,13 @@ PR #51 stays draft. Production maintenance remains OFF. No production SQL, hosti
 `tests/browser` contains a pinned Playwright dependency and lockfile. Run `npm ci --ignore-scripts`, `npx --no-install playwright install chromium`, and `npm test` from that directory. The separate GitHub browser job also installs required system libraries.
 
 This suite drives Chromium through the actual login form, staging bridge, gateway cookie flow, and owner dashboard. It checks owner navigation, player denial, logout, cookie expiry, maintenance OFF, and an upstream outage. Browser identity calls and server Supabase responses are simulated; all other external browser requests are blocked. It creates no accounts, projects, or hosting resources. Passing it does not satisfy the separate real-Supabase staging release requirement.
+
+## Real Supabase integration without a hosted staging project
+
+The `Test real local Supabase integration` CI job starts temporary Supabase Auth, PostgREST, Kong, and PostgreSQL containers on the GitHub runner, bound to loopback. It uses Supabase CLI 2.122.0 in a fresh unlinked temporary directory; it never logs in, links to a cloud project, pulls production data, or uses cloud credentials. The CLI generates a local migration from the repository's initial profile schema, disposable wallet fixture, and the proposed reward/profile guards.
+
+The test creates confirmed disposable owner/player accounts through the local Auth admin API, signs in against real Auth, tests real PostgREST/RLS reward and profile behavior, and drives Chromium through login, dashboard navigation, logout, player denial, and maintenance OFF recovery. The browser receives a pinned bundled Supabase client, and may contact only the local gateway and local Supabase API. Generated credentials stay in memory and are redacted from errors. Local containers and volumes are removed afterward.
+
+Local access requires `STAGING_LOCAL_CONTAINERS=true` and exactly `http://127.0.0.1:54321`. Only this explicit mode permits a legacy local anon JWT if the CLI does not supply a modern publishable key; service-role/secret keys remain forbidden in browser configuration. Production URLs remain blocked even with local mode enabled.
+
+This test uses real Supabase services but a disposable public schema fixture, and is not proof of production schema, hosted TLS/routing, username-login Edge Function, signup trigger, email recovery, or immediate session revocation parity. Production release still requires those specific reviews. No hosted staging project is created.

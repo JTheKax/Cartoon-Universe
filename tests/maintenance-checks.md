@@ -88,3 +88,7 @@ Both `anon` and `authenticated` had effective TRUNCATE privileges on `profiles` 
 The review-only SQL now revokes broad table grants from PUBLIC/anon/authenticated, restoring public profile reads, authenticated profile INSERT/UPDATE, and authenticated owner-membership SELECT. It changes no rows. CI reproduces the broad grants first, verifies the exact resulting privilege matrix, attempts TRUNCATE as both client roles in a disposable rollback transaction, and reruns all profile, owner, and reward tests.
 
 No production function, trigger, grant, policy, record, or maintenance setting was changed. The separate staging project was declined; real Supabase staging verification remains pending and the activation interlock stays locked.
+
+### Real local Supabase integration path
+
+A separate CI job now uses disposable local Supabase containers to test actual Auth, PostgREST/RLS, the proposed SQL guards, and Chromium together. It creates only local test identities, never a hosted project. The staging gateway's explicit loopback mode is covered by unit tests and cannot accept the production project URL. See `tests/maintenance-gateway-staging.md` for the execution boundary and remaining production-parity exclusions. A configured test is not a passing result until its CI run succeeds.

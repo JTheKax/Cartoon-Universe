@@ -105,3 +105,24 @@ jobs:
       - name: Test browser sign-in, navigation, expiry and logout with simulated identities
         working-directory: tests/browser
         run: npm test
+  local-supabase-integration:
+    name: Test real local Supabase integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: supabase/setup-cli@v1
+        with:
+          version: '2.122.0'
+      - name: Install pinned integration dependencies
+        working-directory: tests/browser
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium and system dependencies
+        working-directory: tests/browser
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Test real disposable Supabase Auth, database enforcement and browser navigation
+        working-directory: tests/browser
+        run: node local-supabase-integration.mjs

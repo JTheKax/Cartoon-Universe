@@ -70,12 +70,16 @@ jobs:
             -pass env:BACKUP_PASSPHRASE
           docker run --rm --network host -v "$PWD/restore-test:/backup:ro" postgres:17 pg_restore --list /backup/cartoon-universe.dump > restore-test/toc.txt
           test -s restore-test/toc.txt
+          # Supabase-managed vault extension is not shipped in vanilla PostgreSQL.
+          # Exclude its extension registration and its managed schema objects only.
+          grep -vE ' EXTENSION - supabase_vault($| )| COMMENT - EXTENSION supabase_vault($| )| SCHEMA - vault($| )| TABLE .* vault\.| FUNCTION .* vault\.| VIEW .* vault\.| MATERIALIZED VIEW .* vault\.| SEQUENCE .* vault\.| TYPE .* vault\.| ACL .* vault\.' restore-test/toc.txt > restore-test/restore-list.txt
+          test -s restore-test/restore-list.txt
       - name: Restore into disposable PostgreSQL 17 database
         shell: bash
         run: |
           set -euo pipefail
           docker run --rm --network host -e PGHOST=127.0.0.1 -e PGPORT=5432 -e PGUSER=restore_test -e PGPASSWORD=disposable-only-password -e PGDATABASE=cartoon_universe_restore -v "$PWD/restore-test:/backup:ro" postgres:17 \
-            pg_restore --exit-on-error --no-owner --no-acl --dbname=cartoon_universe_restore /backup/cartoon-universe.dump
+            pg_restore --exit-on-error --no-owner --no-acl --use-list=/backup/restore-list.txt --dbname=cartoon_universe_restore /backup/cartoon-universe.dump
       - name: Verify restored application schema and report table counts
         shell: bash
         run: |

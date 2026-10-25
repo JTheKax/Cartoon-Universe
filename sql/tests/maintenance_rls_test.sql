@@ -16,6 +16,17 @@ set local role authenticated;
 do $$
 begin
  if (select count(*) from public.owner_members)<>1 then raise exception 'Owner membership missing'; end if;
+ -- An owner may not attribute maintenance changes to another user.
+ begin
+  update public.site_maintenance
+    set updated_by='00000000-0000-0000-0000-000000000001'
+    where id=true;
+  raise exception 'Spoofed updater was accepted';
+ exception when insufficient_privilege then null;
+ end;
+ if (select enabled from public.site_maintenance where id=true) then
+  raise exception 'Rejected updater changed maintenance status';
+ end if;
  update public.site_maintenance set enabled=true,updated_by='00000000-0000-0000-0000-000000000002';
  if not found then raise exception 'Owner update failed'; end if;
  if not (select enabled from public.site_maintenance where id=true) then raise exception 'Maintenance not enabled'; end if;

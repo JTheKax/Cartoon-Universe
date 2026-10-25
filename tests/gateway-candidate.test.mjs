@@ -9,7 +9,7 @@ test('candidate health is reachable but all application paths remain setup-only'
  const base=await fixture(t);assert.equal((await fetch(base+'/__maintenance/health')).status,200);
  for(const path of ['/','/owner.html','/config.js','/coin-wallet.html','/server/gateway-candidate.mjs']){
   const response=await fetch(base+path);assert.equal(response.status,503,path);assert.equal(response.headers.get('cache-control'),'no-store');
-  const body=await response.text();assert.match(body,/This address is being prepared/);assert.match(body,/https:\/\/cartoon-universe-3.onrender.com/);assert.doesNotMatch(body,/sb_publishable_|sb_secret_|createClient/);
+  const body=await response.text();assert.match(body,/This address is being prepared/);assert.match(body,/Arcade access is unavailable from this setup page/);assert.doesNotMatch(body,/Continue to the current arcade|href=["']https:\/\/cartoon-universe-3\.onrender\.com/);assert.doesNotMatch(body,/sb_publishable_|sb_secret_|createClient/);
  }
 });
 test('candidate has no write endpoint and HEAD has no response body',async t=>{

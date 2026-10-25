@@ -11,8 +11,8 @@ async function fixture(t){
  const state={time:1000,member:true,calls:[]};
  const fetchImpl=async(url,options)=>{
   state.calls.push({url,options});const token=options.headers.Authorization;
-  if(url.endsWith('/auth/v1/user'))return Response.json({id:token==='Bearer owner-token'?owner:player});
-  if(url.includes('/owner_members?'))return Response.json(token==='Bearer owner-token'&&state.member?[{user_id:owner}]:[]);
+  if(url.endsWith('/auth/v1/user'))return Response.json({id:['Bearer owner-token','Bearer alternate-owner-token'].includes(token)?owner:player});
+  if(url.includes('/owner_members?'))return Response.json(['Bearer owner-token','Bearer alternate-owner-token'].includes(token)&&state.member?[{user_id:owner}]:[]);
   if(url.endsWith('/auth/v1/logout?scope=local'))return new Response(null,{status:204});
   throw new Error('Unexpected upstream path');
  };
@@ -70,4 +70,18 @@ test('replacing an owner verification session revokes the previous distinct toke
  const third=await fetch(base+'/__maintenance/verify-session',{method:'POST',headers:{Origin:origin,Authorization:'Bearer owner-token',Cookie:old}});
  assert.equal(third.status,200);
  assert.equal(state.calls.filter(call=>call.url.endsWith('/auth/v1/logout?scope=local')).length,0);
+});
+
+test('switching to a different owner token revokes the old token and invalidates old cookie',async t=>{
+ const {base,state,verify}=await fixture(t);
+ const first=await verify('owner-token');assert.equal(first.status,200);
+ const oldCookie=first.headers.get('set-cookie').split(';')[0];
+ const second=await fetch(base+'/__maintenance/verify-session',{method:'POST',headers:{Origin:origin,Authorization:'Bearer alternate-owner-token',Cookie:oldCookie}});
+ assert.equal(second.status,200);
+ const logouts=state.calls.filter(call=>call.url.endsWith('/auth/v1/logout?scope=local'));
+ assert.equal(logouts.length,1);
+ assert.equal(logouts[0].options.headers.Authorization,'Bearer owner-token');
+ assert.equal((await (await fetch(base+'/__maintenance/owner-status',{headers:{Cookie:oldCookie}})).json()).ownerVerified,false);
+ const newCookie=second.headers.get('set-cookie').split(';')[0];
+ assert.equal((await (await fetch(base+'/__maintenance/owner-status',{headers:{Cookie:newCookie}})).json()).ownerVerified,true);
 });

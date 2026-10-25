@@ -7,6 +7,7 @@ on:
       - 'server/**'
       - 'tests/production-gateway.test.mjs'
       - 'tests/maintenance-gateway.test.mjs'
+      - 'tests/gateway-candidate.test.mjs'
       - 'tests/browser/**'
   workflow_dispatch:
 permissions:
@@ -32,3 +33,5 @@ jobs:
         run: node --test tests/production-gateway.test.mjs
       - name: Test owner access, maintenance blocking, session expiry and file denial
         run: node --test tests/maintenance-gateway.test.mjs
+      - name: Test isolated candidate owner login and public access restrictions
+        run: node --test tests/gateway-candidate.test.mjs

@@ -32,7 +32,7 @@ async function refresh(){
   amount.className=Number(item.amount)>=0?'coin-positive':'coin-negative';
   tr.append(date,reason,amount);history.append(tr);
  }
- const already=Boolean(dailyClaim.data);
+ const already=Boolean(dailyClaim.data)||Boolean(transactions.data?.some(item=>item.reason==='daily_reward'&&item.created_at?.slice(0,10)===new Date().toISOString().slice(0,10)));
  // The daily-claim table is authoritative even when recent history is truncated.
  claim.disabled=false;claim.textContent=already?'Already claimed today':'Claim 25 Coins';
  claim.disabled=Boolean(already);
@@ -44,7 +44,9 @@ claim.addEventListener('click',async()=>{
  const {data,error}=await client.rpc('claim_daily_cartoon_coins');
  if(error){status.textContent='Reward unavailable: '+error.message}
  else status.textContent=data.claimed?'You earned 25 Cartoon Coins!':'You already claimed today. Come back after the UTC reset.';
+ const feedback=status.textContent;
  await refresh();
+ if(currentUser)status.textContent=feedback;
 });
 client.auth.onAuthStateChange(()=>setTimeout(refresh,0));
 refresh();

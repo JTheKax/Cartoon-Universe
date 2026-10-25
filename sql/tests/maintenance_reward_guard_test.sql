@@ -6,9 +6,10 @@ select set_config('request.jwt.claims','{"is_anonymous":false}',true);
 update public.site_maintenance set enabled=true where id=true;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',true);
 do $$
-declare before_balance bigint; after_balance bigint; n integer;
+declare before_balance bigint; after_balance bigint; n integer; claims_before integer; claims_after integer;
 begin
  select balance into before_balance from public.coin_wallets where user_id='00000000-0000-0000-0000-000000000001';
+ select count(*) into claims_before from public.coin_daily_claims where user_id='00000000-0000-0000-0000-000000000001';
  begin
   perform public.claim_daily_cartoon_coins();
   raise exception 'Nonowner claim unexpectedly succeeded under maintenance';
@@ -17,7 +18,8 @@ begin
  end;
  select balance into after_balance from public.coin_wallets where user_id='00000000-0000-0000-0000-000000000001';
  select count(*) into n from public.coin_transactions where user_id='00000000-0000-0000-0000-000000000001' and reason='daily_reward';
- if before_balance<>after_balance or n<>0 then raise exception 'Blocked claim modified player funds'; end if;
+ select count(*) into claims_after from public.coin_daily_claims where user_id='00000000-0000-0000-0000-000000000001';
+ if before_balance<>after_balance or n<>0 or claims_before<>claims_after then raise exception 'Blocked claim modified player funds or history'; end if;
 end $$;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',true);
 do $$

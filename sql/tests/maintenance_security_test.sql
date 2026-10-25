@@ -27,12 +27,12 @@ end $$;
 update public.profiles set display_name='Player updated while online'
  where id='00000000-0000-0000-0000-000000000001';
 reset role;
-do $
+do $$
 begin
  if (select display_name from public.profiles where id='00000000-0000-0000-0000-000000000001')<>'Player updated while online' then
   raise exception 'Profile writes unexpectedly blocked while maintenance OFF';
  end if;
-end $;
+end $$;
 -- Owner can edit message but activation is blocked at the database boundary.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',true);
 set local role authenticated;

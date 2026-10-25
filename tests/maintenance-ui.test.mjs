@@ -29,3 +29,9 @@ test('maintenance SQL audit is read-only',()=>{
  assert.match(sql,/pg_policies/);
  assert.match(sql,/role_table_grants/);
 });
+
+test('maintenance editor clears stale owner authorization on reload',()=>{
+ const js=file('maintenance-controls.js');
+ assert.match(js,/async function load\(\)\{\s*verifiedOwnerId=null;/);
+ assert.match(js,/save\.disabled=true;\s*toggle\.disabled=true;/);
+});

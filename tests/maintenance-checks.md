@@ -50,3 +50,9 @@
 - Supabase security advisor also reported leaked-password protection disabled; configure separately with owner approval.
 - The read-only SQL catalog/function-body query was unavailable through the connector safety gate. Do not claim all deployed RPCs or the production `site_maintenance.enabled` value were independently checked.
 - No production mutation, deployment, toggle, or merge was performed during this inspection.
+
+### Reward transaction failure and concurrency checks
+
+- The disposable CI database injects a ledger INSERT failure after wallet update and daily-claim insertion. It verifies rollback of all three records and a successful retry afterward.
+- Two authenticated RPC sessions are held behind the same wallet row lock. CI verifies both are waiting before releasing the lock, then requires one 25-coin award, one duplicate response, a 125-coin balance, and exactly one linked ledger/claim pair.
+- These checks use only the local GitHub Actions PostgreSQL fixture. They do not replace full Supabase staging login tests or the site-wide server/edge gateway requirement.

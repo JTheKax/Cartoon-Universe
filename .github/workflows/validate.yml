@@ -68,3 +68,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_reward_guard_test.sql
       - name: Execute reward and RLS integration assertions
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/cartoon_coin_daily_reward_test.sql
+      - name: Verify reward rollback after ledger failure
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_reward_failure_test.sql
+      - name: Verify overlapping reward claims award once
+        timeout-minutes: 2
+        run: python3 scripts/test-reward-concurrency.py

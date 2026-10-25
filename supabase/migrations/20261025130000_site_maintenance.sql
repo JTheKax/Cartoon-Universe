@@ -33,10 +33,10 @@ create or replace function public.record_site_maintenance_change()
 returns trigger language plpgsql security definer set search_path = ''
 as $$
 begin
-  insert into public.site_maintenance_audit(actor_id,old_enabled,new_enabled,old_message,new_message)
-  values(auth.uid(),old.enabled,new.enabled,old.message,new.message);
   new.updated_at := now();
   new.updated_by := auth.uid();
+  insert into public.site_maintenance_audit(actor_id,old_enabled,new_enabled,old_message,new_message)
+  values(auth.uid(),old.enabled,new.enabled,old.message,new.message);
   return new;
 end;
 $$;
@@ -44,3 +44,20 @@ revoke all on function public.record_site_maintenance_change() from public,anon,
 create trigger audit_site_maintenance_changes
 before update on public.site_maintenance
 for each row execute function public.record_site_maintenance_change();
+
+-- Prevent maintenance activation until all write paths are protected.
+-- Message edits are allowed; enabling maintenance is deliberately rejected.
+create or replace function public.prevent_unprotected_maintenance_activation()
+returns trigger language plpgsql set search_path = ''
+as $$
+begin
+ if new.enabled is true then
+  raise exception 'Maintenance activation is locked until all player write paths are protected';
+ end if;
+ return new;
+end;
+$$;
+revoke all on function public.prevent_unprotected_maintenance_activation() from public,anon,authenticated;
+create trigger prevent_unprotected_maintenance_activation
+before update on public.site_maintenance
+for each row execute function public.prevent_unprotected_maintenance_activation();

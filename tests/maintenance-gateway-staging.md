@@ -56,3 +56,9 @@ The test creates confirmed disposable owner/player accounts through the local Au
 Local access requires `STAGING_LOCAL_CONTAINERS=true` and exactly `http://127.0.0.1:54321`. Only this explicit mode permits a legacy local anon JWT if the CLI does not supply a modern publishable key; service-role/secret keys remain forbidden in browser configuration. Production URLs remain blocked even with local mode enabled.
 
 This test uses real Supabase services but a disposable public schema fixture, and is not proof of production schema, hosted TLS/routing, username-login Edge Function, signup trigger, email recovery, or immediate session revocation parity. Production release still requires those specific reviews. No hosted staging project is created.
+
+## Separate locked production candidate
+
+A separate `server/production-maintenance-gateway.mjs` entry point now prepares production configuration without weakening `stagingConfig`. It refuses to start by default, requires the exact intended production project and a canonical HTTPS origin, rejects privileged keys, and uses a Secure `__Host-` owner cookie. Shared gate code selects staging or owner-facing bridge labels from the validated configuration.
+
+See `deploy/production-gateway-review.md` and `deploy/render-gateway.review.yaml`. The latter is schema-validated review material, not an applied Blueprint or a deployment-ready configuration. Auto-deploy and production startup remain disabled; the existing static service and maintenance toggle are unchanged.

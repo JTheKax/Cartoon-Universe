@@ -1,4 +1,5 @@
-// STAGING ONLY. No production deployment or database writes are performed here.
+// Shared request gate. This file launches staging only; production has a separate locked entry point.
+// No database writes or deployment actions are performed here.
 import {createServer} from 'node:http';
 import {readFile,realpath} from 'node:fs/promises';
 import {resolve,sep,extname} from 'node:path';
@@ -34,12 +35,15 @@ export function stagingConfig(env){
 
 export function createGateway({config,root=resolve(fileURLToPath(new URL('..',import.meta.url))),fetchImpl=fetch,now=Date.now}){
  const sessions=new Map();
+ const cookieName=config.cookieName||COOKIE;
+ const production=config.mode==='production';
+ const label=production?'Owner gateway':'Staging gateway';
  async function api(path,token){
   const response=await fetchImpl(config.supabaseUrl+path,{
    headers:{apikey:config.key,...(token?{Authorization:'Bearer '+token}:{})},
    signal:AbortSignal.timeout(3000),redirect:'error'
   });
-  if(!response.ok)throw new Error('Staging verification unavailable');
+  if(!response.ok)throw new Error('Owner verification unavailable');
   return response.json();
  }
  async function owner(token){
@@ -51,7 +55,7 @@ export function createGateway({config,root=resolve(fileURLToPath(new URL('..',im
    return Array.isArray(rows)&&rows.some(row=>row.user_id===user.id);
   }catch{return false;}
  }
- const cookie=(id,maxAge)=>`${COOKIE}=${id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${config.secure?'; Secure':''}`;
+ const cookie=(id,maxAge)=>`${cookieName}=${id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${config.secure?'; Secure':''}`;
  return createServer(async(req,res)=>{
   const send=(code,body,type='text/plain; charset=utf-8',extra={})=>{
    res.writeHead(code,{'Content-Type':type,'Cache-Control':'no-store','Vary':'Cookie',
@@ -64,30 +68,30 @@ export function createGateway({config,root=resolve(fileURLToPath(new URL('..',im
    const raw=req.url.split('?')[0];
    if(!raw.startsWith('/')||raw.includes('..')||raw.includes('%')||raw.includes('\\')||raw.includes('//'))return send(400,'Invalid path');
    const path=raw==='/'?'/index.html':raw;
-   if(path==='/__maintenance/health')return send(200,'Staging gateway running');
+   if(path==='/__maintenance/health')return send(200,production?'Owner gateway running':'Staging gateway running');
    if(path==='/__maintenance/session'){
     if(!['POST','DELETE'].includes(req.method))return send(405,'Method not allowed',undefined,{Allow:'POST, DELETE'});
     if(req.headers.origin!==config.siteOrigin)return send(403,'Same-origin request required');
-    const id=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);
+    const id=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName+'='))?.slice(cookieName.length+1);
     if(id)sessions.delete(id);
     if(req.method==='DELETE')return send(204,'',undefined,{'Set-Cookie':cookie('',0)});
     const auth=req.headers.authorization||'';
     if(!auth.startsWith('Bearer ')||auth.length>8192||!await owner(auth.slice(7)))
-     return send(403,'Verified staging owner access required',undefined,{'Set-Cookie':cookie('',0)});
+     return send(403,'Verified owner access required',undefined,{'Set-Cookie':cookie('',0)});
     for(const [key,session] of sessions)if(session.expires<=now())sessions.delete(key);
-    if(sessions.size>=1000)return send(503,'Staging session capacity reached');
+    if(sessions.size>=1000)return send(503,'Owner session capacity reached');
     const sessionId=randomBytes(32).toString('hex');
     sessions.set(sessionId,{token:auth.slice(7),expires:now()+TTL});
     return send(204,'',undefined,{'Set-Cookie':cookie(sessionId,TTL/1000)});
    }
    if(!['GET','HEAD'].includes(req.method))return send(405,'Method not allowed',undefined,{Allow:'GET, HEAD'});
-   if(path==='/config.js')return send(200,`export const SUPABASE_URL=${JSON.stringify(config.supabaseUrl)};\nexport const SUPABASE_ANON_KEY=${JSON.stringify(config.key)};\n`,'text/javascript; charset=utf-8');
+   if(path==='/config.js')return send(200,`export const SUPABASE_URL=${JSON.stringify(config.supabaseUrl)};\nexport const SUPABASE_ANON_KEY=${JSON.stringify(config.key)};\nexport const GATEWAY_LABEL=${JSON.stringify(label)};\nexport const GATEWAY_MODE=${JSON.stringify(production?'production':'staging')};\n`,'text/javascript; charset=utf-8');
    if(path==='/__maintenance/bridge.js')return send(200,await readFile(new URL('./staging-owner-bridge.js',import.meta.url)),'text/javascript; charset=utf-8');
    const name=path.slice(1);
    // Never publish repository SQL, credentials, scripts, tests, or server source.
    if(!FILES.has(name))return send(404,'Not found');
    if(!PUBLIC.has(path)){
-    const id=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);
+    const id=(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName+'='))?.slice(cookieName.length+1);
     const session=sessions.get(id);
     const bypass=!!session&&session.expires>now()&&await owner(session.token);
     if(session&&!bypass)sessions.delete(id);
@@ -97,7 +101,7 @@ export function createGateway({config,root=resolve(fileURLToPath(new URL('..',im
       const rows=await api('/rest/v1/site_maintenance?select=enabled,message&id=eq.true');
       if(!Array.isArray(rows)||rows.length!==1||typeof rows[0].enabled!=='boolean')throw new Error('Missing maintenance state');
       state=rows[0];
-     }catch{state={enabled:true,message:'Staging access is temporarily unavailable. Please try again.'};}
+     }catch{state={enabled:true,message:'Access is temporarily unavailable. Please try again.'};}
      if(state.enabled)return send(503,`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cartoon Universe Maintenance</title><body><h1>Cartoon Universe — Under Maintenance</h1><p>${escape(state.message||'We will be back soon.')}</p><a href="/login.html">Owner sign-in</a></body></html>`,'text/html; charset=utf-8',{'Retry-After':'60'});
     }
    }
@@ -112,7 +116,7 @@ export function createGateway({config,root=resolve(fileURLToPath(new URL('..',im
      .replace('</body>','<script type="module" src="/__maintenance/bridge.js"></script></body>');
    }
    return send(200,body,TYPES[extname(name)]||'application/octet-stream');
-  }catch{return send(503,'Staging gateway temporarily unavailable');}
+  }catch{return send(503,'Gateway temporarily unavailable');}
  });
 }
 

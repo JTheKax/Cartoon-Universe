@@ -56,3 +56,39 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f sql/cartoon_coin_daily_reward.sql
       - name: Execute reward and RLS integration assertions
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/cartoon_coin_daily_reward_test.sql
+
+  maintenance-database:
+    name: Test maintenance security (isolated)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: maintenance_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d maintenance_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: maintenance_ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare disposable Supabase fixture
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/ci_bootstrap.sql
+      - name: Apply existing Cartoon Coin schema
+        run: psql -v ON_ERROR_STOP=1 -f sql/cartoon_coin_daily_reward.sql
+      - name: Prepare maintenance fixture
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_bootstrap.sql
+      - name: Apply maintenance migration
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261025130000_site_maintenance.sql
+      - name: Run maintenance security assertions
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_security_test.sql

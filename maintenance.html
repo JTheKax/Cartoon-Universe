@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#060c1e"><title>System Upgrade | Cartoon Universe</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:#e9faff;background:radial-gradient(ellipse at 50% 25%,#17365c 0%,#0a142c 43%,#030713 100%);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(#4ceeff0b 1px,transparent 1px),linear-gradient(90deg,#4ceeff0b 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,transparent,#000)}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0 4px,#00000015 5px 6px)}
+main{min-height:100vh;display:grid;place-items:center;padding:32px 18px}
+.panel{position:relative;isolation:isolate;width:min(760px,100%);padding:clamp(25px,6vw,58px);border:1px solid #3cecff7d;border-radius:18px;background:linear-gradient(145deg,#101f3beb,#080e23f5);box-shadow:0 0 0 8px #31e8ff09,0 0 90px #17a8ff25,inset 0 0 45px #0a71c014;text-align:center}
+.panel:before,.panel:after{content:"";position:absolute;width:45px;height:45px;border:3px solid #63efff;pointer-events:none}.panel:before{top:-2px;left:-2px;border-right:0;border-bottom:0;border-radius:18px 0 0 0}.panel:after{right:-2px;bottom:-2px;border-top:0;border-left:0;border-radius:0 0 18px 0}
+.eyebrow{font-size:.75rem;letter-spacing:.3em;font-weight:800;color:#7ceaff}.orb{width:138px;height:138px;margin:25px auto;display:grid;place-items:center;border:2px solid #59e8ff;border-radius:50%;box-shadow:0 0 45px #2cddff55,inset 0 0 30px #32ddff25;position:relative;animation:float 4s ease-in-out infinite}.orb:before{content:"";position:absolute;inset:-13px;border:2px dashed #8a77ff;border-radius:50%;animation:spin 18s linear infinite}.orb span{font-size:64px}
+h1{font-size:clamp(2rem,6vw,3.5rem);line-height:1.1;margin:22px 0 14px;letter-spacing:.045em;text-shadow:0 0 30px #34dfff5e}h1 strong{color:#7cefff}
+.description{max-width:530px;margin:0 auto 28px;color:#c7ddf1;font-size:1.1rem;line-height:1.7;overflow-wrap:anywhere}
+.status{display:inline-flex;align-items:center;gap:10px;border:1px solid #68f1ff6b;border-radius:30px;background:#0b293d;padding:10px 18px;color:#9cf7ff;font-size:.82rem;letter-spacing:.1em;font-weight:700}.dot{height:9px;width:9px;border-radius:50%;background:#76f3ff;box-shadow:0 0 15px #76f3ff;animation:pulse 2s infinite}
+.progress{height:7px;background:#182d47;border-radius:20px;overflow:hidden;max-width:390px;margin:26px auto 13px}.progress div{height:100%;width:38%;background:linear-gradient(90deg,transparent,#5eeeff,#b391ff);animation:scan 2.8s ease-in-out infinite}.fine{font-size:.78rem;letter-spacing:.16em;color:#91a8c8}
+.owner{display:inline-block;margin-top:26px;color:#93efff;text-decoration:none;border-bottom:1px solid #93efff80;padding:7px}.owner:focus-visible{outline:3px solid #fff;outline-offset:5px}
+@keyframes scan{0%{transform:translateX(-120%)}100%{transform:translateX(370%)}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes float{50%{transform:translateY(-8px)}}@keyframes pulse{50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important}}
+</style>
+</head><body><main><section class="panel" aria-labelledby="maintenance-title">
+<div class="eyebrow">CARTOON UNIVERSE // SYSTEM CONTROL</div>
+<div class="orb" aria-hidden="true"><span>🪐</span></div>
+<div class="status"><span class="dot" aria-hidden="true"></span> SYSTEM UPGRADE IN PROGRESS</div>
+<h1 id="maintenance-title">THE ARCADE IS <strong>EVOLVING</strong></h1>
+<p class="description" id="maintenance-public-message">We're upgrading the universe. Your next adventure is coming soon!</p>
+<div class="progress" aria-hidden="true"><div></div></div>
+<div class="fine">SYSTEM MAINTENANCE // PLEASE STAND BY</div>
+<a class="owner" href="owner.html">Owner access</a>
+</section></main>
+<script type="module">
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
+try{
+ const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+ const {data,error}=await client.from('site_maintenance').select('enabled,message').eq('id',true).single();
+ if(!error&&data){if(!data.enabled){location.replace('index.html');}else{document.getElementById('maintenance-public-message').textContent=data.message;}}
+}catch{}
+</script>
+</body></html>

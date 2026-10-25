@@ -84,6 +84,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Prepare disposable Supabase fixture
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/ci_bootstrap.sql
+      - name: Apply existing Cartoon Coin schema
+        run: psql -v ON_ERROR_STOP=1 -f sql/cartoon_coin_daily_reward.sql
       - name: Prepare maintenance fixture
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_bootstrap.sql
       - name: Apply maintenance migration

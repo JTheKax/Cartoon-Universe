@@ -5,7 +5,7 @@ import {createOwnerVerification} from './owner-verification.mjs';
 import {productionSiteOrigin} from './production-maintenance-gateway.mjs';
 import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
-const html='<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cartoon Universe Gateway Setup</title><body><main><h1>Cartoon Universe gateway setup</h1><p>This address is being prepared.</p><p>Arcade access is unavailable from this setup page. Verified owners should use the approved owner access flow.</p></main></body></html>';
+const html=ownerLoginLink=>'<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cartoon Universe Gateway Setup</title><body><main><h1>Cartoon Universe gateway setup</h1><p>This address is being prepared.</p><p>Arcade access is unavailable from this setup page. Verified owners should use the approved owner access flow.</p>${ownerLoginLink}</main></body></html>';
 export function createCandidateServer({origin,now=Date.now,ownerVerification,fetchImpl=fetch,onOwnerVerified}={}){
  const expectedOrigin=origin?productionSiteOrigin(origin):null;
  const verifyOwner=ownerVerification?createOwnerVerification({origin:expectedOrigin,...ownerVerification,fetchImpl,now,onVerified:onOwnerVerified}):null;
@@ -38,7 +38,7 @@ export function createCandidateServer({origin,now=Date.now,ownerVerification,fet
   }
   const health=path==='/__maintenance/health';
   const code=!readable?405:health?200:503;
-  return send(code,!readable?'Method not allowed':health?'Gateway candidate setup running':html,readable&&!health?'text/html; charset=utf-8':'text/plain; charset=utf-8',{
+  return send(code,!readable?'Method not allowed':health?'Gateway candidate setup running':html(verifyOwner?'<p><a href="/__maintenance/owner-signin">Owner Login</a></p>':''),readable&&!health?'text/html; charset=utf-8':'text/plain; charset=utf-8',{
    ...(code===503?{'Retry-After':'60'}:{}),...(code===405?{Allow:'GET, HEAD'}:{})
   });
  });

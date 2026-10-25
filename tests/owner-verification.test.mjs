@@ -107,6 +107,7 @@ test('verified owner can load only allowlisted arcade assets; revocation closes 
  const page=await fetch(base+'/__maintenance/arcade/',{headers});
  assert.equal(page.status,200);
  assert.match(page.headers.get('content-type'),/text\/html/);
+ assert.match(await page.text(),/<base href="\/__maintenance\/arcade\/">/);
  for(const path of ['/__maintenance/arcade/server/gateway-candidate.mjs','/__maintenance/arcade/package.json','/__maintenance/arcade/%2e%2e/owner.html']){
   const denied=await fetch(base+path,{headers,redirect:'manual'});
   assert.notEqual(denied.status,200,path);

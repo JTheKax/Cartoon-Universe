@@ -94,6 +94,9 @@ test('release checklist requires complete reward rollback verification',()=>{
  const checks=file('tests/maintenance-checks.md');
  const reward=file('sql/tests/maintenance_reward_guard_test.sql');
  assert.match(checks,/daily-claim history/);
- assert.match(reward,/claims_before<>claims_after/);
- assert.match(reward,/before_balance<>after_balance/);
+ assert.match(reward,/before_state is distinct from after_state/);
+ for (const table of ['coin_wallets','coin_transactions','coin_daily_claims'])
+  assert.match(reward,new RegExp('from public\\.'+table));
+ assert.match(reward,/set local role authenticated/);
+ assert.match(reward,/00000000-0000-0000-0000-000000000003/);
 });

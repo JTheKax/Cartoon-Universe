@@ -12,14 +12,11 @@ test('candidate health is reachable but all application paths remain setup-only'
   const body=await response.text();assert.match(body,/This address is being prepared/);assert.match(body,/Arcade access is unavailable from this setup page/);assert.doesNotMatch(body,/Continue to the current arcade|href=["']https:\/\/cartoon-universe-3\.onrender\.com/);assert.doesNotMatch(body,/sb_publishable_|sb_secret_|createClient/);
  }
 });
-test('setup page only offers owner login when owner verification is configured',async t=>{
+test('setup page does not offer owner login without verification',async t=>{
  const base=await fixture(t);
  const body=await (await fetch(base+'/')).text();
- assert.doesNotMatch(body,/Owner Login|__maintenance\\/owner-signin/);
- const source=await import('node:fs/promises');
- const gateway=await source.readFile(fileURLToPath(new URL('../server/gateway-candidate.mjs',import.meta.url)),'utf8');
- assert.match(gateway,/verifyOwner\\?'<p><a href=/);
- assert.match(gateway,/__maintenance\\/owner-signin/);
+ assert.doesNotMatch(body,/Owner Login/);
+ assert.doesNotMatch(body,/owner-signin/);
 });
 test('candidate has no write endpoint and HEAD has no response body',async t=>{
  const base=await fixture(t);assert.equal((await fetch(base+'/__maintenance/session',{method:'POST'})).status,405);

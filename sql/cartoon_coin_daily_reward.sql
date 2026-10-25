@@ -37,6 +37,7 @@ declare
   today_utc date := (now() at time zone 'UTC')::date;
   current_balance bigint;
   new_claim boolean := false;
+  inserted_claims integer := 0;
   claim_tx bigint;
 begin
   if player_id is null
@@ -71,7 +72,8 @@ begin
   values (player_id, today_utc)
   on conflict (user_id, reward_date) do nothing;
 
-  get diagnostics new_claim = row_count;
+  get diagnostics inserted_claims = row_count;
+  new_claim := inserted_claims = 1;
   if new_claim then
     update public.coin_wallets
        set balance = balance + 25, updated_at = now()

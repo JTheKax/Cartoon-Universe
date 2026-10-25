@@ -1,0 +1,34 @@
+name: Isolated gateway integration checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/isolated-gateway.yml'
+      - 'server/**'
+      - 'tests/production-gateway.test.mjs'
+      - 'tests/maintenance-gateway.test.mjs'
+      - 'tests/browser/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-gateway:
+    name: Production-mode gateway (mocked, no production access)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PRODUCTION_GATEWAY_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate gateway entry points
+        run: |
+          node --check server/production-maintenance-gateway.mjs
+          node --check server/maintenance-gateway.mjs
+          node --check server/staging-owner-bridge.js
+      - name: Test production-mode gateway with mocked upstream requests
+        run: node --test tests/production-gateway.test.mjs
+      - name: Test owner access, maintenance blocking, session expiry and file denial
+        run: node --test tests/maintenance-gateway.test.mjs

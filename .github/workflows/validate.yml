@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, feature/cartoon-coin-foundation]
 permissions:
   contents: read
 jobs:

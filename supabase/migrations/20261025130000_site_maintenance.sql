@@ -61,3 +61,22 @@ revoke all on function public.prevent_unprotected_maintenance_activation() from 
 create trigger prevent_unprotected_maintenance_activation
 before update on public.site_maintenance
 for each row execute function public.prevent_unprotected_maintenance_activation();
+
+-- Restrict daily rewards at the database boundary. This is only one write path;
+-- activation remains locked until ALL mutations have been audited.
+create or replace function public.maintenance_guard_daily_claim()
+returns trigger language plpgsql security invoker set search_path = ''
+as $$
+begin
+ if exists (select 1 from public.site_maintenance where id=true and enabled=true)
+    and not exists(select 1 from public.owner_members where user_id=auth.uid()) then
+   raise exception 'Cartoon Universe is under maintenance. Try again later'
+     using errcode='55000';
+ end if;
+ return new;
+end;
+$$;
+revoke all on function public.maintenance_guard_daily_claim() from public,anon,authenticated;
+create trigger maintenance_guard_daily_claim
+before insert on public.coin_daily_claims
+for each row execute function public.maintenance_guard_daily_claim();

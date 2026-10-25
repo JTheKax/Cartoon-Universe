@@ -567,3 +567,46 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
  }
  .header .header-top .menu{order:1}
 }
+
+/* Pumpkin-shaped Halloween navigation tabs, including dropdown triggers. */
+.header .header-nav-row #nav>a,
+.header .header-nav-row #nav>.nav-group>.nav-trigger{
+ position:relative;isolation:isolate;overflow:visible;
+ display:inline-flex;align-items:center;justify-content:center;
+ min-height:54px;padding:15px 20px 12px;
+ border:2px solid #ffb65b;
+ border-radius:46% 46% 40% 40% / 54% 54% 43% 43%;
+ background:
+  radial-gradient(ellipse at 24% 55%,#ffb144 0%,#ef7a1e 30%,transparent 34%),
+  radial-gradient(ellipse at 76% 55%,#ffb144 0%,#ef7a1e 30%,transparent 34%),
+  linear-gradient(90deg,#d65b11 0%,#ff9c27 27%,#f77b17 50%,#ff9c27 73%,#c95611 100%);
+ color:#281023;text-shadow:0 1px 0 #ffd78d;
+ box-shadow:inset 0 3px 3px #ffe1a677,inset 0 -5px 5px #8e370c99,0 5px 0 #783313,0 0 16px #ff8b2c55;
+ font-weight:1000;letter-spacing:.01em;
+}
+.header .header-nav-row #nav>a::before,
+.header .header-nav-row #nav>.nav-group>.nav-trigger::before{
+ content:"";position:absolute;z-index:-1;
+ width:14px;height:12px;top:-11px;left:calc(50% - 7px);
+ border:2px solid #48752c;border-bottom:0;
+ border-radius:4px 5px 0 0;background:#568b32;
+ transform:rotate(-12deg);
+}
+.header .header-nav-row #nav>a:hover,
+.header .header-nav-row #nav>.nav-group>.nav-trigger:hover,
+.header .header-nav-row #nav>.nav-group>.nav-trigger[aria-expanded="true"]{
+ color:#210d1b;filter:brightness(1.12);
+ transform:translateY(-2px);
+ box-shadow:inset 0 3px 3px #ffe1a677,inset 0 -5px 5px #8e370c99,0 7px 0 #783313,0 0 22px #ff9d3caa;
+}
+.header .header-nav-row #nav>a:focus-visible,
+.header .header-nav-row #nav>.nav-group>.nav-trigger:focus-visible{
+ outline:3px solid #bafdf1;outline-offset:4px;
+}
+@media(max-width:1000px){
+ .header .header-nav-row #nav>a,
+ .header .header-nav-row #nav>.nav-group>.nav-trigger{
+  width:100%;min-height:54px;margin-top:9px;
+  border-radius:28px 28px 22px 22px / 32px 32px 24px 24px;
+ }
+}

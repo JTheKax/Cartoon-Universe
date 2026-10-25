@@ -675,3 +675,20 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 @media(prefers-reduced-motion:reduce){
  .header .arcade-marquee .brand{animation:none}
 }
+
+/* Custom uploaded Cartoon Universe header logo. */
+.header .arcade-marquee .brand-with-logo{display:block;width:min(100%,360px);max-width:360px;line-height:0}
+.header .arcade-marquee .custom-header-logo{
+ display:block;width:100%;max-width:360px;height:auto;max-height:170px;object-fit:contain;
+ border-radius:12px;filter:drop-shadow(0 0 10px #aa49ff8c) drop-shadow(0 0 9px #ff8b3380);
+}
+.header .arcade-marquee .brand-logo-fallback{display:block;line-height:1.12}
+.header .arcade-marquee .brand-logo-fallback[hidden]{display:none}
+@media(max-width:1000px){
+ .header .arcade-marquee .brand-with-logo{max-width:290px}
+ .header .arcade-marquee .custom-header-logo{max-height:135px}
+}
+@media(max-width:540px){
+ .header .arcade-marquee .brand-with-logo{max-width:min(100%,235px)}
+ .header .arcade-marquee .custom-header-logo{max-height:110px}
+}

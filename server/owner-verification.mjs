@@ -28,7 +28,7 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
    return Array.isArray(rows)&&rows.some(row=>row.user_id===user.id);
   }catch{return false;}
  }
- return async(req,send)=>{
+ const authorized=async req=>{\n  const id=(req.headers.cookie||'').split(';').map(value=>value.trim()).find(value=>value.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);\n  const session=sessions.get(id);\n  const valid=!!session&&session.expires>now()&&await owner(session.token);\n  if(!valid)sessions.delete(id);\n  return valid;\n };\n const handle=async(req,send)=>{
   const path=req.url.split('?')[0];
   const known=['/__maintenance/owner-signin','/__maintenance/owner-verification.js','/__maintenance/owner-verification.css','/__maintenance/owner-verification-config.js','/__maintenance/verify-session','/__maintenance/owner-status'];
   if(!known.includes(path))return false;
@@ -66,5 +66,4 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
   if(path==='/__maintenance/owner-verification.css')return done(200,CSS,'text/css; charset=utf-8');
   if(path==='/__maintenance/owner-verification.js')return done(200,script,'text/javascript; charset=utf-8');
   return done(200,`export const SUPABASE_URL=${JSON.stringify(PROJECT)};\nexport const SUPABASE_KEY=${JSON.stringify(publishableKey)};\n`,'text/javascript; charset=utf-8');
- };
-}
+ };\n handle.authorized=authorized;\n return handle;\n}

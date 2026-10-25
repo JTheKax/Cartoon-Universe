@@ -21,7 +21,7 @@ async function refresh(){
  ]);
  if(wallet.error){status.textContent='Unable to load your wallet. Please try again.';balance.textContent='—'}
  else{balance.textContent=number(wallet.data?.balance??0);status.textContent='Wallet ready.'}
- if(transactions.error||dailyClaim.error){row(transactions.error?'Unable to load transactions.':'Reward status unavailable.');claim.disabled=true;claim.textContent='Reward unavailable';return}
+ if(wallet.error||transactions.error||dailyClaim.error){row(transactions.error?'Unable to load transactions.':wallet.error?'Wallet unavailable.':'Reward status unavailable.');claim.disabled=true;claim.textContent='Reward unavailable';return}
  history.replaceChildren();
  if(!transactions.data?.length)row('No transactions yet.');
  for(const item of transactions.data||[]){

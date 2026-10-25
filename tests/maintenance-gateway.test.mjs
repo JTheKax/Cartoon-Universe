@@ -51,7 +51,7 @@ test('owner login stays usable and uses only staging configuration',async t=>{
  const {get}=await fixture(t);
  const response=await get('/login.html');assert.equal(response.status,200);
  const html=await response.text();assert.match(html,/__maintenance\/bridge.js/);assert.doesNotMatch(html,/src="maintenance-notice.js"/);
- for(const path of ['/auth.js','/styles.css','/account.css','/theme.js','/__maintenance/bridge.js'])assert.equal((await get(path)).status,200,path);
+ for(const path of ['/auth.js','/supabase-config.js','/styles.css','/account.css','/theme.js','/__maintenance/bridge.js'])assert.equal((await get(path)).status,200,path);
  const config=await (await get('/config.js')).text();assert.match(config,/aaaaaaaaaaaaaaaaaaaa/);assert.doesNotMatch(config,/gjfyemvcrgrthbrlqqnz/);
 });
 test('OFF serves actual site files and rechecks state before subsequent requests',async t=>{

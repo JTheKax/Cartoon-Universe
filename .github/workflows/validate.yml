@@ -23,6 +23,8 @@ jobs:
           if [ -f auth.js ]; then node --check auth.js; fi
       - name: Validate Cartoon Coin migration security contract
         run: node --test tests/cartoon-coins.test.mjs
+      - name: Test Supabase browser configuration validation
+        run: node --test tests/supabase-config.test.mjs
       - name: Validate maintenance UI safety checks
         run: node --test tests/maintenance-ui.test.mjs
       - name: Validate maintenance JavaScript syntax

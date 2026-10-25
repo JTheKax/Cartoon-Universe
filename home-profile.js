@@ -1,8 +1,9 @@
+import {isSupabaseConfigured} from './supabase-config.js';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
 const panel=document.getElementById('home-player-dashboard');
-if(panel&&SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30){
+if(panel&&isSupabaseConfigured(SUPABASE_URL,SUPABASE_ANON_KEY)){
  const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
  const guest=document.getElementById('home-profile-guest');
  const signedIn=document.getElementById('home-profile-signed-in');

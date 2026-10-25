@@ -1,8 +1,9 @@
+import {isSupabaseConfigured} from './supabase-config.js';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 const $=id=>document.getElementById(id);
 const notice=$('notice'),authForms=$('auth-forms'),account=$('account-panel');
-const configured=SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30;
+const configured=isSupabaseConfigured(SUPABASE_URL,SUPABASE_ANON_KEY);
 let client=null;
 function message(text){notice.textContent=text;notice.hidden=!text}
 function show(form){document.querySelectorAll('[data-form]').forEach(el=>el.hidden=el.dataset.form!==form);const actions=$('login-actions');if(actions)actions.hidden=form!=='login';const back=$('reset-actions');if(back)back.hidden=form!=='forgot';message('')}

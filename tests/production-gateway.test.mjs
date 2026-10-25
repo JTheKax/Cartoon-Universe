@@ -17,7 +17,7 @@ test('production configuration requires the intended project and a publishable k
  const config=productionConfig(env);assert.equal(config.secure,true);assert.equal(config.mode,'production');
 });
 test('production origins must be concrete HTTPS website origins',()=>{
- for(const origin of ['http://example.com','https://127.0.0.1','https://[::1]','https://localhost','https://gateway.invalid','https://gateway.test','https://gateway.example','https://example.com:8443','https://user:pass@example.com','https://example.com/path','https://example.com?q=1','https://example.com#hash'])
+ for(const origin of ['http://example.com','https://127.0.0.1','https://[::1]','https://localhost','https://gateway.invalid','https://gateway.test','https://gateway.example','https://*.onrender.com','https://bad_host.onrender.com','https://gateway..onrender.com','https://example.com:8443','https://user:pass@example.com','https://example.com/path','https://example.com?q=1','https://example.com#hash'])
   assert.throws(()=>productionConfig({...env,PRODUCTION_SITE_ORIGIN:origin}),undefined,origin);
 });
 test('the staging entry point still refuses production even when a production switch is present',()=>{

@@ -17,7 +17,9 @@ export function productionConfig(env){
  const site=new URL(env.PRODUCTION_SITE_ORIGIN);
  const host=site.hostname.replace(/^\[|\]$/g,'');
  if(site.protocol!=='https:'||site.port||site.href.replace(/\/$/,'')!==site.origin
-   ||isIP(host)||!host.includes('.')||/(?:^|\.)(?:localhost|test|invalid|example)$/.test(host))
+   ||isIP(host)||!host.includes('.')||host.length>253
+   ||!host.split('.').every(label=>/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))
+   ||/(?:^|\.)(?:localhost|test|invalid|example)$/.test(host))
   throw new Error('A concrete canonical HTTPS production origin without path, credentials, query, fragment, or port is required.');
  return {supabaseUrl:PROJECT_URL,key,siteOrigin:site.origin,secure:true,mode:'production',cookieName:'__Host-cu_owner'};
 }

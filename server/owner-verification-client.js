@@ -3,7 +3,7 @@ const form=document.getElementById('verify-form'),status=document.getElementById
 const password=document.getElementById('password');
 let initializing=true,inFlight=false;
 function busy(value){verify.disabled=value||initializing;clear.disabled=value||initializing;}
-function show(verified){if(verified)password.value='';form.hidden=verified;clear.hidden=!verified;status.textContent=verified?'Owner sign-in verified. No arcade settings have changed.':'Use your existing owner account.';}
+function show(verified){if(verified)password.value='';form.hidden=verified;clear.hidden=!verified;document.getElementById('arcade-entry').hidden=!verified;status.textContent=verified?'Owner sign-in verified. No arcade settings have changed.':'Use your existing owner account.';}
 async function revoke(token){
  try{await fetch(SUPABASE_URL+'/auth/v1/logout?scope=local',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+token},credentials:'omit',redirect:'error',cache:'no-store'});}catch{}
 }
@@ -38,7 +38,7 @@ clear.addEventListener('click',async()=>{
  try{
   const response=await fetch('/__maintenance/verify-session',{method:'DELETE',credentials:'same-origin',redirect:'error',cache:'no-store'});
   if(!response.ok)throw new Error('Unable to clear verification. Try again.');
-  const result=await response.json();form.hidden=false;clear.hidden=true;status.textContent=result.signOutConfirmed?'Verification session cleared.':'Verification cleared. Auth sign-out could not be confirmed.';
+  const result=await response.json();show(false);status.textContent=result.signOutConfirmed?'Verification session cleared.':'Verification cleared. Auth sign-out could not be confirmed.';
  }catch(error){status.textContent=error.message;}
  finally{password.value='';inFlight=false;busy(false);}
 });

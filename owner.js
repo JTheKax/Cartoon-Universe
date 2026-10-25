@@ -24,11 +24,11 @@ async function initMaintenance(client){
  const feedback=document.getElementById('maintenance-feedback');
  const {data,error}=await client.from('site_maintenance').select('enabled,message').eq('id',true).single();
  if(error){feedback.textContent='Maintenance settings unavailable. Database migration may not be applied.';return;}
- toggle.checked=data.enabled;toggle.disabled=false;message.value=data.message;
+ toggle.checked=data.enabled;toggle.disabled=true;toggle.title='Activation requires server-side player action protection';message.value=data.message;
  save.addEventListener('click',async()=>{
   save.disabled=true;toggle.disabled=true;feedback.textContent='Saving…';
   const {error:saveError}=await client.from('site_maintenance').update({enabled:toggle.checked,message:message.value.trim()}).eq('id',true);
   feedback.textContent=saveError?'Save failed: check owner permissions and message length.':'Settings saved.';
-  save.disabled=false;toggle.disabled=false;
+  save.disabled=false;toggle.disabled=true;
  });
 }

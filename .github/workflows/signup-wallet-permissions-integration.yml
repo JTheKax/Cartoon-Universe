@@ -1,0 +1,108 @@
+name: Signup wallet function permission integration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'sql/20261025010000_harden_signup_wallet_function_permissions.sql'
+      - '.github/workflows/signup-wallet-permissions-integration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signup-trigger-permissions:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: disposable-test-password
+          POSTGRES_DB: permissions_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test -d permissions_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: test
+      PGPASSWORD: disposable-test-password
+      PGDATABASE: permissions_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Create disposable signup trigger fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          create role anon nologin;
+          create role authenticated nologin;
+          create schema auth;
+          create table auth.users (id uuid primary key);
+          create table public.coin_wallets (user_id uuid primary key references auth.users(id));
+          create function public.create_coin_wallet_for_new_user()
+          returns trigger
+          language plpgsql
+          security definer
+          set search_path = ''
+          as $$
+          begin
+            insert into public.coin_wallets(user_id) values (new.id);
+            return new;
+          end
+          $$;
+          create trigger on_auth_user_created after insert on auth.users
+            for each row execute function public.create_coin_wallet_for_new_user();
+          grant usage on schema public, auth to authenticated;
+          grant insert on auth.users to authenticated;
+          grant select on public.coin_wallets to authenticated;
+          grant execute on function public.create_coin_wallet_for_new_user() to public;
+          SQL
+      - name: Apply permission hardening to disposable fixture
+        run: psql -v ON_ERROR_STOP=1 -f sql/20261025010000_harden_signup_wallet_function_permissions.sql
+      - name: Assert direct RPC denied to anon and authenticated
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          begin
+            if has_function_privilege('anon','public.create_coin_wallet_for_new_user()','EXECUTE') then
+              raise exception 'anon still has EXECUTE privilege';
+            end if;
+            if has_function_privilege('authenticated','public.create_coin_wallet_for_new_user()','EXECUTE') then
+              raise exception 'authenticated still has EXECUTE privilege';
+            end if;
+          end $$;
+          SQL
+      - name: Assert signup trigger still creates wallet after revocation
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          set role authenticated;
+          insert into auth.users(id) values ('00000000-0000-0000-0000-000000000001');
+          reset role;
+          do $$
+          begin
+            if (select count(*) from public.coin_wallets where user_id='00000000-0000-0000-0000-000000000001') <> 1 then
+              raise exception 'signup trigger did not create exactly one wallet';
+            end if;
+          end $$;
+          SQL
+      - name: Assert direct invocation fails
+        shell: bash
+        run: |
+          set -euo pipefail
+          if psql -v ON_ERROR_STOP=1 -c "set role authenticated; select public.create_coin_wallet_for_new_user();" >/tmp/direct-call.log 2>&1; then
+            echo "::error::Direct invocation unexpectedly succeeded"
+            exit 1
+          fi

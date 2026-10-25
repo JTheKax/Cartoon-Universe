@@ -25,14 +25,14 @@ Production mode shares the tested request gate but uses an opaque `__Host-cu_own
 
 ## Render configuration candidate
 
-`deploy/render-gateway.review.yaml` is a review-only, non-root Blueprint file. It is not connected to Render and has not been applied. It defines a differently named web service, not the current `cartoon-universe` static service.
+`deploy/render-gateway.review.yaml` is a review-only, non-root Blueprint file. It is not connected to Render and has not been applied. It now names the directly created `cartoon-universe-gateway` candidate. The file remains an unapplied future promotion proposal; direct Render configuration is the current source of truth. The current `cartoon-universe` static service is separate.
 
 - Auto-deploy is OFF; the server startup switch is false.
 - The candidate explicitly uses the free compute plan to avoid silently accepting a paid default. Production uptime/capacity and plan selection must be reviewed before resource creation; this is not a recommendation that the free plan meets production availability needs.
 - One instance matches the current in-memory owner-session design.
 - The build checks syntax; the runtime uses only Node built-in modules and requires no production npm installation.
 - No database resource, disk, pre-deploy migration, custom domain, or old-static redirect rule is declared.
-- Public key and canonical origin are manual environment inputs. No key value is committed.
+- The canonical origin is now the allocated Render gateway URL. The publishable key remains a manual environment input; no key value is committed.
 - `/__maintenance/health` reports process availability. It intentionally remains healthy during maintenance; it does not prove Supabase connectivity or hosted compatibility. Post-deploy workload checks are required before routing traffic.
 
 The candidate was checked against Render's retrieved public JSON Schema at `https://render.com/schema/render.yaml.json`. This verifies structure, not account-specific plan availability, platform-aware validation, resource creation, or successful deployment. The Render CLI was not used to apply or sync anything.
@@ -41,7 +41,7 @@ Even with auto-deploy OFF, creating/syncing a new Blueprint would create resourc
 
 ## Cutover inputs still required
 
-The actual canonical gateway URL has not been allocated or chosen. Follow `tests/maintenance-production-routing-review.md` to inventory origins, review Auth/username-login/recovery compatibility, and prepare the old static service's redirect-only publication. Render's existing-file precedence means adding wildcard redirects while retaining the full static publication is insufficient.
+The candidate URL is now `https://cartoon-universe-gateway.onrender.com`. It currently serves only an isolated setup page and is not the active arcade. Follow `tests/maintenance-production-routing-review.md` to inventory origins, review Auth/username-login/recovery compatibility, and prepare the old static service's redirect-only publication. Render's existing-file precedence means adding wildcard redirects while retaining the full static publication is insufficient.
 
 Before enabling this production entry point, verify the real project/key pair and canonical origin, confirm hosted HTTPS cookie behavior and owner access, finish database-policy/grant review, and prove that the old origin cannot serve the protected website directly. Keep production maintenance OFF and the owner activation interlock locked throughout preparation. Do not blindly replace the already-guarded production reward function.
 
@@ -66,3 +66,11 @@ The bundle contains `cutover.review.json`, `render-routes.review.json`, a README
 The generator performs no network call, deployment, SQL, resource creation, or setting update. Its test hostname is only a fixture string, not an allocated service or a suggested live link. Generated rules are review material; existing rules and domain aliases still need inspection before any replacement.
 
 For an eventual cutover, verify the new target first, configure the reviewed redirects while the old website still exists, and only then switch the old static publication to the bundle's `public` subdirectory. Do not publish the whole bundle or retain the original website in the old publication. Test actual hosted redirect status/destination, query strings, browser fragments, Auth links, and every recorded protected path. The generator does not prove Render's live behavior or automatically enable anything.
+
+## Address allocation and current phase
+
+The user selected a new Render address. The candidate was created directly in the existing Cartoon Universe workspace, on the free compute plan, with auto-deploy OFF. It uses the existing draft PR branch and the isolated `server/gateway-candidate.mjs` start command. No new Git branch was created or PR merged. The setup entry point has no Supabase dependency or credential and responds with a setup page (503) plus a process health endpoint (200).
+
+The allocated URL is `https://cartoon-universe-gateway.onrender.com`; the resource is `srv-dbf20i7avr4c73chisug`. `GATEWAY_CANDIDATE_MODE=true` and `PRODUCTION_GATEWAY_ENABLED=false` are set on this candidate. The production gateway has not been enabled. The old arcade remains at `https://cartoon-universe-3.onrender.com`.
+
+`deploy/cutover-candidate/` contains a generated review bundle using the actual target origin. It has not been published or applied. The future promotion Blueprint now uses this service name and origin, with candidate mode false and production startup still disabled. Do not sync it over the live setup phase without reviewing and reconciling the direct configuration. Hosted Auth/cookie compatibility, database-policy/grant work, and old-origin cutover remain separate pending steps.

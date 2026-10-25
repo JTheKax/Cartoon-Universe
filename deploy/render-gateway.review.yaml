@@ -1,9 +1,10 @@
 # REVIEW ONLY: not connected to a Blueprint; do not sync or deploy this file yet.
-# This defines a NEW service, not the existing cartoon-universe static service.
+# Future promotion review for the directly created gateway candidate.
+# This is not connected to Render; the existing cartoon-universe static site is separate.
 # Startup remains disabled. No database, migrations, old-site routing, or domains.
 services:
   - type: web
-    name: cartoon-universe-gateway-candidate
+    name: cartoon-universe-gateway
     runtime: node
     repo: https://github.com/JTheKax/Cartoon-Universe
     branch: main
@@ -16,6 +17,8 @@ services:
     envVars:
       - key: NODE_VERSION
         value: '22'
+      - key: GATEWAY_CANDIDATE_MODE
+        value: 'false'
       - key: PRODUCTION_GATEWAY_ENABLED
         value: 'false'
       - key: PRODUCTION_SUPABASE_URL
@@ -23,4 +26,4 @@ services:
       - key: PRODUCTION_SUPABASE_PUBLISHABLE_KEY
         sync: false
       - key: PRODUCTION_SITE_ORIGIN
-        sync: false
+        value: https://cartoon-universe-gateway.onrender.com

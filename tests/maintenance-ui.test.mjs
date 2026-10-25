@@ -36,13 +36,15 @@ test('maintenance editor clears stale owner authorization on reload',()=>{
  assert.match(js,/save\.disabled=true;\s*toggle\.disabled=true;/);
 });
 
-test('reward guard is generated only for isolated CI and protects nonowners',()=>{
+test('reward guard is tested from the exact review-only migration in isolated CI',()=>{
  const generator=file('scripts/build-maintenance-reward-ci.mjs');
  const workflow=file('.github/workflows/validate.yml');
  assert.match(generator,/site_maintenance/);
  assert.match(generator,/owner_members/);
  assert.match(generator,/claim_daily_cartoon_coins|cartoon_coin_daily_reward/);
  assert.match(workflow,/postgres:17/);
+ assert.match(workflow,/psql -v ON_ERROR_STOP=1 -f supabase\/maintenance-daily-reward-guard\.sql/);
+ assert.doesNotMatch(workflow,/node scripts\/build-maintenance-reward-ci\.mjs/);
  assert.match(workflow,/maintenance_reward_guard_test\.sql/);
  assert.match(workflow,/maintenance_rls_test\.sql/);
 });

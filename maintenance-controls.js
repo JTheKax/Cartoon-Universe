@@ -32,10 +32,12 @@ document.getElementById('maintenance-preview')?.addEventListener('click',()=>{ou
 save?.addEventListener('click',async()=>{
  save.disabled=true;
  const {data:{user},error:authError}=await client.auth.getUser();
- if(authError||!user||user.id!==verifiedOwnerId){status.textContent='Owner session changed. Reload before saving.';return;}
+ if(authError||!user||user.id!==verifiedOwnerId){status.textContent='Owner session changed. Reload before saving.';save.disabled=false;return;}
  const value=message.value.trim();
  if(!value||value.length>280){status.textContent='Enter a message of 1–280 characters.';save.disabled=false;return;}
- const {error}=await client.from('site_maintenance').update({message:value,updated_by:user.id}).eq('id',true);
- status.textContent=error?'Save failed: '+error.message:'Maintenance message saved.';
- save.disabled=false;
+ try {
+  const {data,error}=await client.from('site_maintenance').update({message:value,updated_by:user.id}).eq('id',true).select('id,message').maybeSingle();
+  status.textContent=error?'Save failed: '+error.message:!data?'Save failed: maintenance record was not updated.':'Maintenance message saved.';
+ } catch {status.textContent='Save failed. Check your connection and try again.';}
+ finally {save.disabled=false;}
 });

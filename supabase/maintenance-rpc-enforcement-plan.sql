@@ -1,0 +1,23 @@
+-- PROPOSED ONLY. DO NOT APPLY until reviewed and tested on staging.
+-- This protects the existing daily reward RPC during maintenance without touching balances.
+-- The existing function must retain its transaction/locking behavior; add the following
+-- guard immediately AFTER its existing authentication checks, BEFORE wallet insertion:
+--
+-- IF EXISTS (
+--   SELECT 1 FROM public.site_maintenance
+--   WHERE id = true AND enabled = true
+-- ) AND NOT EXISTS (
+--   SELECT 1 FROM public.owner_members WHERE user_id = player_id
+-- ) THEN
+--   RAISE EXCEPTION 'Cartoon Universe is temporarily under maintenance'
+--     USING errcode = 'P0001';
+-- END IF;
+--
+-- SECURITY: claim_daily_cartoon_coins() currently runs SECURITY DEFINER with
+-- search_path=''. Preserve existing privilege checks and grants.
+-- DO NOT deploy by replacing the function with a partial implementation.
+-- A transaction-safe full function migration and staging tests are required.
+-- Verify anonymous users, authenticated nonowners, owner bypass, and
+-- maintenance OFF/ON behavior, including concurrent claims and rollback.
+-- IMPORTANT: static Render hosting cannot prevent direct access to published
+-- HTML/JS/assets. A server/edge gateway is required for a real site-wide gate.

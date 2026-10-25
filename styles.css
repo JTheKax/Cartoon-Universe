@@ -506,3 +506,172 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 @media(max-width:540px){
  .header .home-player-dashboard{flex:1 1 100%;width:100%;max-width:100%}
 }
+
+/* Two-row haunted arcade header: branding + player portal, then navigation. */
+.header{
+ display:flex;flex-direction:column;align-items:stretch;
+ justify-content:flex-start;gap:0;padding:0;
+}
+.header .header-top{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:20px;width:100%;min-width:0;
+ padding:10px max(2vw,14px);
+}
+.header .header-top .brand{
+ order:0;flex:0 1 auto;max-width:none;width:auto;margin:0;
+}
+.header .header-top .home-player-dashboard{
+ order:0;flex:0 0 440px;width:440px;max-width:440px;
+ margin:0 0 0 auto;min-height:0;
+}
+.header .header-top .menu{order:0;margin:0;flex-shrink:0}
+.header .header-nav-row{
+ display:block;width:100%;min-width:0;
+ padding:10px max(2vw,14px) 12px;
+ border-top:1px solid #9b4d8d66;
+ background:linear-gradient(90deg,#190c2ad9,#2e1139df);
+}
+.header .header-nav-row #nav{
+ display:flex;flex:1 1 auto;width:100%;min-width:0;
+ align-items:center;justify-content:center;
+ flex-wrap:wrap;gap:10px 12px;padding:0;margin:0;
+}
+.header .header-nav-row #nav>a,
+.header .header-nav-row #nav .nav-trigger{
+ font-size:16px;min-height:44px;padding:12px 16px;
+}
+@media(max-width:1000px){
+ .header .header-top{flex-wrap:wrap;gap:10px}
+ .header .header-top .brand{flex:1 1 auto;max-width:none;width:auto}
+ .header .header-top .home-player-dashboard{
+  order:2;flex:0 1 440px;width:440px;max-width:100%;
+  margin:0 0 0 auto;
+ }
+ .header .header-top .menu{
+  display:block;order:1;margin-left:auto;
+  min-width:44px;min-height:44px;
+ }
+ .header .header-nav-row{padding:0 max(2vw,14px)}
+ .header .header-nav-row #nav{display:none;flex-direction:column;align-items:stretch;gap:6px;padding:12px 0}
+ .header .header-nav-row #nav.open{display:flex}
+ .header .header-nav-row #nav>a,
+ .header .header-nav-row #nav .nav-group,
+ .header .header-nav-row #nav .nav-trigger{width:100%;text-align:left}
+ .header .header-nav-row #nav>.nav-group>.nav-dropdown{position:static;width:100%;min-width:0;margin:6px 0}
+}
+@media(max-width:540px){
+ .header .header-top{gap:8px}
+ .header .header-top .brand{width:auto;max-width:calc(100% - 66px)}
+ .header .header-top .home-player-dashboard{
+  order:2;flex:1 1 100%;width:100%;max-width:100%;margin:0;
+ }
+ .header .header-top .menu{order:1}
+}
+
+/* Pumpkin-shaped Halloween navigation tabs, including dropdown triggers. */
+.header .header-nav-row #nav>a,
+.header .header-nav-row #nav>.nav-group>.nav-trigger{
+ position:relative;isolation:isolate;overflow:visible;
+ display:inline-flex;align-items:center;justify-content:center;
+ min-height:54px;padding:15px 20px 12px;
+ border:2px solid #ffb65b;
+ border-radius:46% 46% 40% 40% / 54% 54% 43% 43%;
+ background:
+  radial-gradient(ellipse at 24% 55%,#ffb144 0%,#ef7a1e 30%,transparent 34%),
+  radial-gradient(ellipse at 76% 55%,#ffb144 0%,#ef7a1e 30%,transparent 34%),
+  linear-gradient(90deg,#d65b11 0%,#ff9c27 27%,#f77b17 50%,#ff9c27 73%,#c95611 100%);
+ color:#281023;text-shadow:0 1px 0 #ffd78d;
+ box-shadow:inset 0 3px 3px #ffe1a677,inset 0 -5px 5px #8e370c99,0 5px 0 #783313,0 0 16px #ff8b2c55;
+ font-weight:1000;letter-spacing:.01em;
+}
+.header .header-nav-row #nav>a::before,
+.header .header-nav-row #nav>.nav-group>.nav-trigger::before{
+ content:"";position:absolute;z-index:-1;
+ width:14px;height:12px;top:-11px;left:calc(50% - 7px);
+ border:2px solid #48752c;border-bottom:0;
+ border-radius:4px 5px 0 0;background:#568b32;
+ transform:rotate(-12deg);
+}
+.header .header-nav-row #nav>a:hover,
+.header .header-nav-row #nav>.nav-group>.nav-trigger:hover,
+.header .header-nav-row #nav>.nav-group>.nav-trigger[aria-expanded="true"]{
+ color:#210d1b;filter:brightness(1.12);
+ transform:translateY(-2px);
+ box-shadow:inset 0 3px 3px #ffe1a677,inset 0 -5px 5px #8e370c99,0 7px 0 #783313,0 0 22px #ff9d3caa;
+}
+.header .header-nav-row #nav>a:focus-visible,
+.header .header-nav-row #nav>.nav-group>.nav-trigger:focus-visible{
+ outline:3px solid #bafdf1;outline-offset:4px;
+}
+@media(max-width:1000px){
+ .header .header-nav-row #nav>a,
+ .header .header-nav-row #nav>.nav-group>.nav-trigger{
+  width:100%;min-height:54px;margin-top:9px;
+  border-radius:28px 28px 22px 22px / 32px 32px 24px 24px;
+ }
+}
+
+/* Option 5: pixel-art retro arcade header, scoped to the homepage. */
+.header .arcade-marquee{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0;flex:0 1 auto}
+.header .arcade-marquee .brand{
+ display:block;max-width:100%;font-family:ui-monospace,"Courier New",monospace;
+ font-size:clamp(20px,2.8vw,38px);font-weight:1000;line-height:1.12;
+ letter-spacing:.02em;color:#ffac3d;
+ text-shadow:2px 2px 0 #7b2a25,0 0 12px #ff8026aa,0 0 22px #e87a2799;
+}
+.header .arcade-marquee .brand span{color:#e49aff;text-shadow:2px 2px 0 #642d87,0 0 16px #d85affaa}
+.header .arcade-marquee-subtitle{
+ color:#d8b2ff;font:900 11px ui-monospace,"Courier New",monospace;
+ letter-spacing:.18em;text-shadow:0 0 9px #ba69ffb0;
+}
+.header .arcade-insert-coin{
+ display:inline-block;padding:4px 8px;color:#ffe087;
+ border:2px solid #d267fb;background:#210d3b;
+ box-shadow:3px 3px 0 #702e8b,0 0 12px #d267fb66;
+ font:900 10px ui-monospace,"Courier New",monospace;
+ letter-spacing:.08em;
+}
+.header .header-top{
+ background:
+  linear-gradient(90deg,#250b3ab8,#190925c9),
+  repeating-linear-gradient(90deg,transparent 0 21px,#9d4bc51a 21px 23px);
+ border-bottom:3px solid #a34bdb;
+}
+.header .header-top .home-player-dashboard{
+ border:3px solid #c463ff;border-radius:5px;
+ box-shadow:4px 4px 0 #4d176e,0 0 16px #b452ff70;
+ background:linear-gradient(145deg,#260d3fe8,#170b2deb);
+}
+.header .header-top .home-player-dashboard .home-profile-stats>div{
+ border-radius:3px;border-color:#a65ce0aa;
+}
+.header .header-nav-row{
+ position:relative;border-top:0;
+ border-bottom:4px solid #7b2e9d;
+ background:repeating-linear-gradient(90deg,#180a2b 0 16px,#210d34 16px 32px);
+}
+.header .arcade-nav-decoration{
+ display:block;text-align:center;margin:0 0 8px;
+ font:900 10px ui-monospace,"Courier New",monospace;
+ letter-spacing:.32em;color:#f7ba65;text-shadow:0 0 8px #ff9228a8;
+}
+.header .header-nav-row #nav>a,
+.header .header-nav-row #nav>.nav-group>.nav-trigger{
+ font-family:ui-monospace,"Courier New",monospace;
+ font-weight:1000;font-size:14px;
+}
+@media(max-width:1000px){
+ .header .arcade-marquee{flex:1 1 auto;min-width:0}
+ .header .arcade-marquee .brand{font-size:clamp(18px,4vw,28px)}
+ .header .header-top .menu{display:block}
+}
+@media(max-width:540px){
+ .header .arcade-marquee{flex:1 1 calc(100% - 68px)}
+ .header .arcade-marquee .brand{font-size:clamp(16px,5vw,23px)}
+ .header .arcade-insert-coin{font-size:9px}
+ .header .arcade-marquee-subtitle{font-size:9px;letter-spacing:.07em}
+ .header .arcade-nav-decoration{font-size:9px;letter-spacing:.12em}
+}
+@media(prefers-reduced-motion:reduce){
+ .header .arcade-marquee .brand{animation:none}
+}

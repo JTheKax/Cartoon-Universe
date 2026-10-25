@@ -69,3 +69,22 @@
 - `server/maintenance-gateway.mjs` provides a staging-only request gate with fresh maintenance checks, verified owner bypass, a short-lived opaque session cookie, noncacheable 503 responses, and an explicit published-file list.
 - CI tests real local HTTP requests with mocked Supabase responses; no production or staging Supabase account is used. Owner sign-in remains reachable and staging `/config.js` is generated from separate staging environment values.
 - See `tests/maintenance-gateway-staging.md` for launch settings, access behavior, exclusions, and the required real browser/Supabase verification. This prototype is not deployed and does not unlock the owner ON/OFF control.
+
+### Deployed function, trigger, and table privilege inventory
+
+Read-only catalog inspection on 2026-10-25 confirmed:
+
+| Surface | Observed production state | Release implication |
+| --- | --- | --- |
+| `claim_daily_cartoon_coins()` | SECURITY DEFINER, empty search path; executable by authenticated, not anon | Review-only guarded replacement still requires isolated real-Supabase verification |
+| `create_coin_wallet_for_new_user()` | SECURITY DEFINER, empty search path; not executable by anon/authenticated | Attached to an AFTER INSERT trigger on `auth.users`; registration is a separate privileged write path |
+| `profiles` | RLS enabled; own INSERT/UPDATE, public SELECT; excessive anon/authenticated table grants | Proposed restrictive maintenance policies and minimum-privilege grants remain unapplied |
+| `owner_members` | RLS enabled; own membership SELECT only; excessive anon/authenticated table grants | Keep authenticated SELECT only; browser clients must not manage owner membership |
+| `site_maintenance` | Public-role SELECT grants and owner-restricted authenticated UPDATE | Independently read as OFF during this audit; no setting changed |
+| Coin tables | Authenticated SELECT only, restricted to own rows by RLS | No client table writes were found in the observed grants/policies |
+
+Both `anon` and `authenticated` had effective TRUNCATE privileges on `profiles` and `owner_members`. PostgreSQL row security does not apply to whole-table operations such as TRUNCATE and REFERENCES ([PostgreSQL 17 row security](https://www.postgresql.org/docs/17/ddl-rowsecurity.html)). This catalog result does not by itself demonstrate an available Data API endpoint for truncation; it identifies unnecessary database-role privileges.
+
+The review-only SQL now revokes broad table grants from PUBLIC/anon/authenticated, restoring public profile reads, authenticated profile INSERT/UPDATE, and authenticated owner-membership SELECT. It changes no rows. CI reproduces the broad grants first, verifies the exact resulting privilege matrix, attempts TRUNCATE as both client roles in a disposable rollback transaction, and reruns all profile, owner, and reward tests.
+
+No production function, trigger, grant, policy, record, or maintenance setting was changed. The separate staging project was declined; real Supabase staging verification remains pending and the activation interlock stays locked.

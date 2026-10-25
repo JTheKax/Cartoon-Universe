@@ -70,6 +70,8 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_ci_fixture.sql
       - name: Apply proposed profile maintenance policies in disposable database
         run: psql -v ON_ERROR_STOP=1 -f supabase/maintenance-controls-review.sql
+      - name: Verify minimum profile and owner privileges
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_table_privileges_test.sql
       - name: Verify profile maintenance enforcement
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_profile_guard_test.sql
       - name: Test owner and nonowner maintenance permissions

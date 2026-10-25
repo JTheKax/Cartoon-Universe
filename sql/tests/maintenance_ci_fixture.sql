@@ -21,6 +21,13 @@ grant select on public.owner_members to authenticated;
 grant select on public.site_maintenance to anon,authenticated;
 grant update on public.site_maintenance to authenticated;
 
--- Match browser profile operations without granting deletion or owner writes.
-grant select on public.profiles to anon,authenticated;
-grant insert,update on public.profiles to authenticated;
+-- Reproduce the excessive grants observed in production, so the proposal must
+-- actually remove them rather than passing against already-safe fixtures.
+grant all on public.profiles,public.owner_members to anon,authenticated;
+do $$
+begin
+ if not has_table_privilege('anon','public.profiles','TRUNCATE')
+    or not has_table_privilege('authenticated','public.owner_members','TRUNCATE') then
+  raise exception 'Fixture did not reproduce broad production grants';
+ end if;
+end $$;

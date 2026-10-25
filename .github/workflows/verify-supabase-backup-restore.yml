@@ -74,6 +74,11 @@ jobs:
           # Exclude its extension registration and its managed schema objects only.
           grep -vi "vault" restore-test/toc.txt > restore-test/restore-list.txt
           test -s restore-test/restore-list.txt
+      - name: Prepare Supabase-compatible roles in disposable database
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --network host -e PGHOST=127.0.0.1 -e PGPORT=5432 -e PGUSER=restore_test -e PGPASSWORD=disposable-only-password -e PGDATABASE=cartoon_universe_restore postgres:17 psql -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN;" -c "CREATE ROLE authenticated NOLOGIN;" -c "CREATE ROLE service_role NOLOGIN;"
       - name: Restore into disposable PostgreSQL 17 database
         shell: bash
         run: |

@@ -63,6 +63,8 @@ jobs:
       - name: Test owner and nonowner maintenance permissions
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_rls_test.sql
       - name: Apply proposed migration to disposable database
-        run: psql -v ON_ERROR_STOP=1 -f sql/cartoon_coin_daily_reward.sql
+        run: node scripts/build-maintenance-reward-ci.mjs | psql -v ON_ERROR_STOP=1
+      - name: Verify maintenance reward blocking and owner bypass
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_reward_guard_test.sql
       - name: Execute reward and RLS integration assertions
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/cartoon_coin_daily_reward_test.sql

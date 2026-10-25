@@ -24,8 +24,14 @@ begin
  if found then raise exception 'Non-owner modified maintenance settings'; end if;
 end $$;
 -- Maintenance is OFF: a player must still be able to edit their own profile.
-update public.profiles set display_name='Player updated while online'
- where id='00000000-0000-0000-0000-000000000001';
+do $$
+declare affected integer;
+begin
+ update public.profiles set display_name='Player updated while online'
+  where id='00000000-0000-0000-0000-000000000001';
+ get diagnostics affected = row_count;
+ if affected<>1 then raise exception 'Expected 1 profile update under player RLS, got %',affected; end if;
+end $$;
 reset role;
 do $$
 begin

@@ -56,3 +56,5 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f sql/cartoon_coin_daily_reward.sql
       - name: Execute reward and RLS integration assertions
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/cartoon_coin_daily_reward_test.sql
+      - name: Test simultaneous claims and atomic rollback
+        run: bash sql/tests/concurrency_rollback_ci.sh

@@ -140,7 +140,7 @@ test('owner arcade homepage assets resolve only through the protected route',asy
  const html=await page.text();
  const baseHref=html.match(/<base href="([^"]+)"/)?.[1];
  assert.equal(baseHref,'/__maintenance/arcade/');
- const assets=[...html.matchAll(/<(?:script|link)\\b[^>]*?(?:src|href)="([^"]+)"/g)]
+ const assets=[...html.matchAll(/<(?:script|link)\b[^>]*?(?:src|href)="([^"]+)"/g)]
   .map(match=>match[1]).filter(url=>!url.startsWith('#')&&!/^https?:/.test(url));
  assert.ok(assets.length>=5,'Expected homepage scripts and stylesheet');
  for(const asset of assets){
@@ -153,7 +153,7 @@ test('owner arcade homepage assets resolve only through the protected route',asy
  }
  const signin=await (await fetch(base+'/__maintenance/owner-signin')).text();
  assert.match(signin,/id="arcade-entry" hidden/);
- assert.doesNotMatch(signin,/cartoon-universe-3\\.onrender\\.com/);
+ assert.doesNotMatch(signin,/cartoon-universe-3\.onrender\.com/);
  const client=await (await fetch(base+'/__maintenance/owner-verification.js')).text();
- assert.match(client,/getElementById\\('arcade-entry'\\)\\.hidden=!verified/);
+ assert.match(client,/getElementById\('arcade-entry'\)\.hidden=!verified/);
 });

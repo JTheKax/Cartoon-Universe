@@ -32,7 +32,7 @@ async function refresh(){
  for(const item of transactions.data||[]){
   const tr=document.createElement('tr');
   const date=document.createElement('td');date.textContent=new Date(item.created_at).toLocaleString();
-  const reason=document.createElement('td');reason.textContent=item.reason==='daily_reward'?'🎁 Daily reward':item.reason.replaceAll('_',' ');
+  const reason=document.createElement('td');reason.textContent=item.reason==='daily_reward'?'🎁 Daily reward':String(item.reason??'Transaction').replaceAll('_',' ');
   const amount=document.createElement('td');amount.textContent=(Number(item.amount)>0?'+':'')+number(item.amount);
   amount.className=Number(item.amount)>=0?'coin-positive':'coin-negative';
   tr.append(date,reason,amount);history.append(tr);

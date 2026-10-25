@@ -58,3 +58,16 @@ test('cross-origin requests and password bodies are rejected before verification
  assert.equal((await fetch(base+'/__maintenance/verify-session',{method:'POST',headers:{Origin:'https://unapproved.example',Authorization:'Bearer owner-token'}})).status,403);
  assert.equal((await fetch(base+'/__maintenance/verify-session',{method:'POST',headers:{Origin:origin},body:'password=not-accepted'})).status,400);assert.equal(state.calls.length,0);
 });
+
+test('replacing an owner verification session revokes the previous distinct token',async t=>{
+ const {base,state,verify}=await fixture(t);
+ const first=await verify('owner-token');assert.equal(first.status,200);
+ const cookie=first.headers.get('set-cookie').split(';')[0];
+ const second=await fetch(base+'/__maintenance/verify-session',{method:'POST',headers:{Origin:origin,Authorization:'Bearer owner-token',Cookie:cookie}});
+ assert.equal(second.status,200);
+ assert.equal(state.calls.filter(call=>call.url.endsWith('/auth/v1/logout?scope=local')).length,0);
+ const old=second.headers.get('set-cookie').split(';')[0];
+ const third=await fetch(base+'/__maintenance/verify-session',{method:'POST',headers:{Origin:origin,Authorization:'Bearer owner-token',Cookie:old}});
+ assert.equal(third.status,200);
+ assert.equal(state.calls.filter(call=>call.url.endsWith('/auth/v1/logout?scope=local')).length,0);
+});

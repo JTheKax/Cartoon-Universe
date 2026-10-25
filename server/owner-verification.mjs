@@ -49,7 +49,10 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
    if(auth.length>8192||!await owner(token)){sessions.delete(id);return json(403,{ownerVerified:false},{'Set-Cookie':cookie('',0)});}
    for(const [key,session] of sessions)if(session.expires<=now())sessions.delete(key);
    if(sessions.size>=1000)return done(503,'Verification session capacity reached');
-   sessions.delete(id);const nonce=randomBytes(32).toString('hex');sessions.set(nonce,{token,expires:now()+TTL});
+   const previous=sessions.get(id);
+   sessions.delete(id);
+   if(previous&&previous.token!==token)try{await api('/auth/v1/logout?scope=local',previous.token,'POST');}catch{}
+   const nonce=randomBytes(32).toString('hex');sessions.set(nonce,{token,expires:now()+TTL});
    onVerified();return json(200,{ownerVerified:true,readOnly:true},{'Set-Cookie':cookie(nonce,TTL/1000)});
   }
   if(!['GET','HEAD'].includes(req.method))return done(405,'Method not allowed',undefined,{Allow:'GET, HEAD'});

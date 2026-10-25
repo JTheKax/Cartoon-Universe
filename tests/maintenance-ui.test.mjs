@@ -71,3 +71,19 @@ test('no client-side maintenance switch can write the enabled flag',()=>{
  assert.doesNotMatch(js,/update\(\{[^}]*enabled\s*:/);
  assert.match(js,/toggle\.disabled=true/);
 });
+
+test('review-only migration preserves the complete reward function and inserts guard before wallet writes',()=>{
+ const base=file('sql/cartoon_coin_daily_reward.sql');
+ const migration=file('supabase/maintenance-daily-reward-guard.sql');
+ const marker='  -- The wallet row is the per-user lock;';
+ const guardStart=migration.indexOf('  -- Maintenance is enforced inside');
+ const guardEnd=migration.indexOf(marker,guardStart);
+ assert.ok(guardStart>=0 && guardEnd>guardStart);
+ const preamble=migration.slice(0,migration.indexOf('begin;'));
+ const restored=migration.slice(migration.indexOf('begin;')).slice(0,guardStart-migration.indexOf('begin;'))+migration.slice(guardEnd);
+ assert.equal(restored,base);
+ assert.match(preamble,/REVIEW-ONLY MIGRATION/);
+ assert.match(migration.slice(guardStart,guardEnd),/site_maintenance/);
+ assert.match(migration.slice(guardStart,guardEnd),/owner_members/);
+ assert.match(migration.slice(guardStart,guardEnd),/errcode = 'P0001'/);
+});

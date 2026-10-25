@@ -1,6 +1,6 @@
--- CI ONLY: full daily reward function with maintenance guard is generated
--- from the existing migration, preserving all reward logic and grants.
--- The generator writes the guarded SQL to stdout; never apply to production.
+// CI ONLY: full daily reward function with maintenance guard is generated
+// from the existing migration, preserving all reward logic and grants.
+// The generator writes the guarded SQL to stdout; never apply to production.
 import {readFileSync} from 'node:fs';
 const original=readFileSync('sql/cartoon_coin_daily_reward.sql','utf8');
 const marker='  -- The wallet row is the per-user lock;';

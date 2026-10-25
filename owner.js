@@ -13,5 +13,22 @@ async function init(){
  const {count,error:countError}=await client.from('profiles').select('id',{count:'exact',head:true});
  document.getElementById('player-count').textContent=countError?'Unavailable':String(count??0);
  content.hidden=false;status.hidden=true;
+ await initMaintenance(client);
 }
 init().catch(()=>setStatus('Unable to load the dashboard. Check your connection and try again.'));
+
+async function initMaintenance(client){
+ const toggle=document.getElementById('maintenance-enabled');
+ const message=document.getElementById('maintenance-message');
+ const save=document.getElementById('maintenance-save');
+ const feedback=document.getElementById('maintenance-feedback');
+ const {data,error}=await client.from('site_maintenance').select('enabled,message').eq('id',true).single();
+ if(error){feedback.textContent='Maintenance settings unavailable. Database migration may not be applied.';return;}
+ toggle.checked=data.enabled;toggle.disabled=false;message.value=data.message;
+ save.addEventListener('click',async()=>{
+  save.disabled=true;toggle.disabled=true;feedback.textContent='Saving…';
+  const {error:saveError}=await client.from('site_maintenance').update({enabled:toggle.checked,message:message.value.trim()}).eq('id',true);
+  feedback.textContent=saveError?'Save failed: check owner permissions and message length.':'Settings saved.';
+  save.disabled=false;toggle.disabled=false;
+ });
+}

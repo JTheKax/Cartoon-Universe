@@ -129,3 +129,31 @@ test('owner arcade session expires and cannot be reused after logout',async t=>{
  await fetch(base+'/__maintenance/verify-session',{method:'DELETE',headers:{...fresh,Origin:origin}});
  assert.equal((await fetch(base+'/__maintenance/arcade/',{headers:fresh})).status,503);
 });
+
+test('owner arcade homepage assets resolve only through the protected route',async t=>{
+ const {base,verify}=await fixture(t);
+ const response=await verify('owner-token');
+ assert.equal(response.status,200);
+ const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
+ const page=await fetch(base+'/__maintenance/arcade/',{headers});
+ assert.equal(page.status,200);
+ const html=await page.text();
+ const baseHref=html.match(/<base href="([^"]+)"/)?.[1];
+ assert.equal(baseHref,'/__maintenance/arcade/');
+ const assets=[...html.matchAll(/<(?:script|link)\\b[^>]*?(?:src|href)="([^"]+)"/g)]
+  .map(match=>match[1]).filter(url=>!url.startsWith('#')&&!/^https?:/.test(url));
+ assert.ok(assets.length>=5,'Expected homepage scripts and stylesheet');
+ for(const asset of assets){
+  const url=new URL(asset,new URL(baseHref,base));
+  assert.ok(url.pathname.startsWith('/__maintenance/arcade/'),asset);
+  const allowed=await fetch(url,{headers});
+  assert.equal(allowed.status,200,'Owner asset: '+asset);
+  const blocked=await fetch(url);
+  assert.equal(blocked.status,503,'Anonymous asset: '+asset);
+ }
+ const signin=await (await fetch(base+'/__maintenance/owner-signin')).text();
+ assert.match(signin,/id="arcade-entry" hidden/);
+ assert.doesNotMatch(signin,/cartoon-universe-3\\.onrender\\.com/);
+ const client=await (await fetch(base+'/__maintenance/owner-verification.js')).text();
+ assert.match(client,/getElementById\\('arcade-entry'\\)\\.hidden=!verified/);
+});

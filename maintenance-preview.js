@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     message.value = settings.message;
     const refresh = () => {
       status.textContent = 'Maintenance setting: ' + (enabled ? 'ON (gateway not active)' : 'OFF');
-      toggle.textContent = enabled ? 'Disable Maintenance' : 'Enable Maintenance';
-      toggle.disabled = false;
+      toggle.textContent = enabled ? 'Disable Maintenance' : 'Enable Maintenance (requires gateway)';
+      toggle.disabled = !enabled;
     };
     refresh();
     const update = async (nextEnabled) => {

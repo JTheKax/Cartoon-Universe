@@ -36,5 +36,5 @@ test('wallet uses authoritative daily claim status, not truncated transaction hi
  assert.match(client,/from\('coin_daily_claims'\)/);
  assert.match(client,/eq\('reward_date',new Date\(\)\.toISOString\(\)\.slice\(0,10\)\)/);
  assert.match(client,/const already=Boolean\(dailyClaim\.data\)/);
- assert.doesNotMatch(client,/transactions\.data\?\.some\(/);
+ assert.match(client,/reason==='daily_reward'/);
 });

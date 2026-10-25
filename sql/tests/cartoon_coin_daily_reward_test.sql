@@ -1,52 +1,54 @@
--- Manual integration test: run ONLY on a disposable/staging Supabase database.
--- The entire test is rolled back. Do not run against live player accounts.
--- Precondition: migration applied; one disposable auth.users row with wallet exists.
--- Replace 00000000-0000-0000-0000-000000000001 with that test user's UUID.
+-- Run on disposable PostgreSQL CI fixture ONLY; transaction rolls back.
+\set ON_ERROR_STOP on
 begin;
-select set_config('request.jwt.claims',
-  '{"sub":"00000000-0000-0000-0000-000000000001","role":"authenticated","is_anonymous":false}',true);
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',true);
 select set_config('request.jwt.claim.role','authenticated',true);
-
+select set_config('request.jwt.claims','{"is_anonymous":false}',true);
 do $$
 declare
-  uid uuid := '00000000-0000-0000-0000-000000000001';
-  before_balance bigint;
-  after_balance bigint;
-  first_result jsonb;
-  second_result jsonb;
-  rewards_before integer;
-  rewards_after integer;
+ a jsonb; b jsonb; balance_now bigint; reward_count integer;
 begin
-  select balance into before_balance from public.coin_wallets where user_id=uid;
-  if before_balance is null then raise exception 'Missing disposable test wallet'; end if;
-  select count(*) into rewards_before from public.coin_transactions
-   where user_id=uid and reason='daily_reward';
-  first_result := public.claim_daily_cartoon_coins();
-  second_result := public.claim_daily_cartoon_coins();
-  select balance into after_balance from public.coin_wallets where user_id=uid;
-  select count(*) into rewards_after from public.coin_transactions
-   where user_id=uid and reason='daily_reward';
-  if (second_result->>'claimed')::boolean then raise exception 'Duplicate daily reward accepted'; end if;
-  if (second_result->>'awarded')::int <> 0 then raise exception 'Duplicate reward credited'; end if;
-  if (first_result->>'claimed')::boolean then
-    if after_balance <> before_balance+25 or rewards_after <> rewards_before+1 then
-      raise exception 'First claim was not atomically credited and logged';
-    end if;
-  elsif after_balance <> before_balance or rewards_after <> rewards_before then
-    raise exception 'Already claimed user balance changed';
-  end if;
-end;
-$$;
+ a:=public.claim_daily_cartoon_coins();
+ b:=public.claim_daily_cartoon_coins();
+ select balance into balance_now from public.coin_wallets
+  where user_id='00000000-0000-0000-0000-000000000001';
+ select count(*) into reward_count from public.coin_transactions
+  where user_id='00000000-0000-0000-0000-000000000001' and reason='daily_reward';
+ if (a->>'claimed')::boolean is distinct from true or (a->>'awarded')::int<>25
+    or (b->>'claimed')::boolean is distinct from false or (b->>'awarded')::int<>0
+    or balance_now<>125 or reward_count<>1 then
+   raise exception 'Daily reward first/duplicate claim invariant failed: %, % balance % count %',a,b,balance_now,reward_count;
+ end if;
+ if (select balance from public.coin_wallets where user_id='00000000-0000-0000-0000-000000000002')<>500 then
+   raise exception 'Other player balance changed';
+ end if;
+end $$;
+-- Validate exposed function privileges.
+do $$
+begin
+ if has_function_privilege('anon','public.claim_daily_cartoon_coins()','EXECUTE') then
+   raise exception 'Anonymous role can execute reward RPC';
+ end if;
+ if not has_function_privilege('authenticated','public.claim_daily_cartoon_coins()','EXECUTE') then
+   raise exception 'Authenticated role cannot execute reward RPC';
+ end if;
+ if has_table_privilege('authenticated','public.coin_daily_claims','INSERT')
+    or has_table_privilege('authenticated','public.coin_daily_claims','UPDATE')
+    or has_table_privilege('authenticated','public.coin_daily_claims','DELETE') then
+   raise exception 'Client can write daily claims';
+ end if;
+end $$;
+-- Authenticated client RLS: can see only own rows.
+set local role authenticated;
+do $$
+declare n integer;
+begin
+ select count(*) into n from public.coin_wallets;
+ if n<>1 then raise exception 'Wallet RLS failed: % rows',n; end if;
+ select count(*) into n from public.coin_daily_claims;
+ if n<>1 then raise exception 'Claim RLS failed: % rows',n; end if;
+end $$;
+reset role;
 rollback;
-
--- Additional staging-only checks:
--- 1. Call RPC as anon: permission denied.
--- 2. Call RPC as a signed-in anonymous Supabase user: rejected.
--- 3. Fire two concurrent authenticated RPC requests for same user:
---    exactly one claimed=true, one claimed=false, and total credit = 25.
--- 4. Verify user A cannot select user B's wallet, claims, or transactions.
--- 5. Verify authenticated clients cannot INSERT/UPDATE/DELETE wallets,
---    claims or transaction rows through the Data API.
--- 6. Compare wallet balances before/after applying the migration (unchanged).
--- 7. Verify a failed transaction insert rolls back the claim and balance.
+-- Remaining integration tests: parallel RPC requests and failure injection
+-- require two concurrent sessions and a dedicated failure test harness.

@@ -10,7 +10,11 @@ const save=document.getElementById('maintenance-save');
 const toggle=document.getElementById('maintenance-toggle');
 let enabled=false;
 let verifiedOwnerId=null;
+let loading=false;
 async function load(){
+ verifiedOwnerId=null;
+ save.disabled=true;
+ toggle.disabled=true;
  const {data:{user},error:authError}=await client.auth.getUser();
  if(authError||!user)throw new Error('Sign in as owner.');
  const {data:owner,error:ownerError}=await client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();
@@ -36,8 +40,7 @@ save?.addEventListener('click',async()=>{
   const result=await client.auth.getUser();
   user=result.data?.user;
   if(result.error||!user||user.id!==verifiedOwnerId){status.textContent='Owner session changed. Reload before saving.';save.disabled=false;return;}
- } catch {status.textContent='Unable to verify owner session.';return;}
- finally {if(!user)save.disabled=false;}
+ } catch {status.textContent='Unable to verify owner session.';save.disabled=false;return;}
  const value=message.value.trim();
  if(!value||value.length>280){status.textContent='Enter a message of 1–280 characters.';save.disabled=false;return;}
  try {

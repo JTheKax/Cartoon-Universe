@@ -33,6 +33,8 @@ jobs:
           node --check maintenance-notice.js
       - name: Test staging maintenance HTTP gateway
         run: node --test tests/maintenance-gateway.test.mjs
+      - name: Test redirect-only cutover bundle preparation
+        run: node --test tests/maintenance-cutover.test.mjs
       - name: Test locked production gateway configuration
         run: node --test tests/production-gateway.test.mjs
       - name: Validate staging gateway syntax

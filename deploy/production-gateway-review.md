@@ -50,3 +50,19 @@ Before enabling this production entry point, verify the real project/key pair an
 The production configuration tests cover the default-disabled startup, exact project matching, rejection of privileged keys and insecure/ambiguous origins, preservation of staging isolation, secure production-cookie attributes, and read-only upstream verification. Their upstream transport is a stub; they make no production API request.
 
 The existing HTTP, simulated-browser, and real local Supabase tests continue to exercise the shared gate. These tests do not prove the eventual Render hostname, hosted TLS/routing, or production database policy parity. No deployment, production SQL/grant change, toggle, or merge is included in this package.
+
+## Redirect-only bundle preparation
+
+After the actual canonical gateway origin is chosen, prepare a local review bundle with:
+
+```sh
+node scripts/prepare-maintenance-cutover.mjs --target HTTPS_ORIGIN --output EMPTY_DIRECTORY
+```
+
+The target must pass the production origin validator and must differ from the old static origin. The output must be absent or empty. Existing files are never overwritten.
+
+The bundle contains `cutover.review.json`, `render-routes.review.json`, a README, and a `public` directory containing only a harmless text marker. There is no index HTML or application code to take precedence over Render redirects. The review manifest records the exact old service/origin, chosen target, root/wildcard rules, protected-path verification list, query/fragment probes, and disabled startup/activation state. It contains no API key, user account, or session.
+
+The generator performs no network call, deployment, SQL, resource creation, or setting update. Its test hostname is only a fixture string, not an allocated service or a suggested live link. Generated rules are review material; existing rules and domain aliases still need inspection before any replacement.
+
+For an eventual cutover, verify the new target first, configure the reviewed redirects while the old website still exists, and only then switch the old static publication to the bundle's `public` subdirectory. Do not publish the whole bundle or retain the original website in the old publication. Test actual hosted redirect status/destination, query strings, browser fragments, Auth links, and every recorded protected path. The generator does not prove Render's live behavior or automatically enable anything.

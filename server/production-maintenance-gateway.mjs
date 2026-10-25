@@ -6,6 +6,17 @@ import {isIP} from 'node:net';
 import {createGateway} from './maintenance-gateway.mjs';
 
 const PROJECT_URL='https://gjfyemvcrgrthbrlqqnz.supabase.co';
+export function productionSiteOrigin(value){
+ const site=new URL(value);
+ const host=site.hostname.replace(/^\[|\]$/g,'');
+ if(site.protocol!=='https:'||site.port||site.href.replace(/\/$/,'')!==site.origin
+   ||isIP(host)||!host.includes('.')||host.length>253
+   ||!host.split('.').every(label=>/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))
+   ||/(?:^|\.)(?:localhost|test|invalid|example)$/.test(host))
+  throw new Error('A concrete canonical HTTPS production origin without path, credentials, query, fragment, or port is required.');
+ return site.origin;
+}
+
 export function productionConfig(env){
  if(env.PRODUCTION_GATEWAY_ENABLED!=='true')throw new Error('Production gateway startup is disabled pending routing review.');
  const url=new URL(env.PRODUCTION_SUPABASE_URL);
@@ -14,14 +25,8 @@ export function productionConfig(env){
  const key=env.PRODUCTION_SUPABASE_PUBLISHABLE_KEY;
  if(typeof key!=='string'||!/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)||key.length<=30)
   throw new Error('Use a production publishable key; secret/service-role and legacy keys are forbidden.');
- const site=new URL(env.PRODUCTION_SITE_ORIGIN);
- const host=site.hostname.replace(/^\[|\]$/g,'');
- if(site.protocol!=='https:'||site.port||site.href.replace(/\/$/,'')!==site.origin
-   ||isIP(host)||!host.includes('.')||host.length>253
-   ||!host.split('.').every(label=>/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))
-   ||/(?:^|\.)(?:localhost|test|invalid|example)$/.test(host))
-  throw new Error('A concrete canonical HTTPS production origin without path, credentials, query, fragment, or port is required.');
- return {supabaseUrl:PROJECT_URL,key,siteOrigin:site.origin,secure:true,mode:'production',cookieName:'__Host-cu_owner'};
+ const siteOrigin=productionSiteOrigin(env.PRODUCTION_SITE_ORIGIN);
+ return {supabaseUrl:PROJECT_URL,key,siteOrigin,secure:true,mode:'production',cookieName:'__Host-cu_owner'};
 }
 
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){

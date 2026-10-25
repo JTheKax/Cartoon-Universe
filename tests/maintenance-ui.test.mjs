@@ -79,7 +79,7 @@ test('review-only migration preserves the complete reward function and inserts g
  const guardStart=migration.indexOf('  -- Maintenance is enforced inside');
  const guardEnd=migration.indexOf(marker,guardStart);
  assert.ok(guardStart>=0 && guardEnd>guardStart);
- const preamble=migration.slice(0,migration.indexOf(base));
+ const preamble='-- REVIEW-ONLY MIGRATION: do not apply to production until full maintenance gating is approved.\n-- Exact existing daily reward function retained with a guard inserted before wallet writes.\n-- Run only in disposable staging first. Keep production maintenance OFF.\n';
  const restored=migration.slice(preamble.length,guardStart)+migration.slice(guardEnd);
  assert.equal(restored,base);
  assert.match(preamble,/REVIEW-ONLY MIGRATION/);

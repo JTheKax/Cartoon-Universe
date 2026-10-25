@@ -52,7 +52,7 @@ returns trigger language plpgsql set search_path = ''
 as $$
 begin
  if new.enabled is true then
-  raise exception 'Maintenance activation is locked until all player write paths are protected';
+  raise exception 'Maintenance activation is locked until all player write paths are protected' using errcode='55000';
  end if;
  return new;
 end;

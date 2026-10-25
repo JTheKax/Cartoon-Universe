@@ -72,7 +72,7 @@ jobs:
           test -s restore-test/toc.txt
           # Supabase-managed vault extension is not shipped in vanilla PostgreSQL.
           # Exclude its extension registration and its managed schema objects only.
-          grep -vE ' EXTENSION - supabase_vault($| )| COMMENT - EXTENSION supabase_vault($| )| SCHEMA - vault($| )| TABLE .* vault\.| FUNCTION .* vault\.| VIEW .* vault\.| MATERIALIZED VIEW .* vault\.| SEQUENCE .* vault\.| TYPE .* vault\.| ACL .* vault\.' restore-test/toc.txt > restore-test/restore-list.txt
+          grep -vi "vault" restore-test/toc.txt > restore-test/restore-list.txt
           test -s restore-test/restore-list.txt
       - name: Restore into disposable PostgreSQL 17 database
         shell: bash

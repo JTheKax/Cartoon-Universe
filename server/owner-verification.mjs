@@ -12,7 +12,7 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
  if(supabaseUrl!==PROJECT||typeof publishableKey!=='string'||!/^sb_publishable_[A-Za-z0-9_-]+$/.test(publishableKey)||publishableKey.length<=30)throw new Error('Explicit owner-verification origin, project, and publishable key are required.');
  const script=readFileSync(new URL('./owner-verification-client.js',import.meta.url));
  const sessions=new Map();
- const cookie=(id,age)=>`${COOKIE}=${id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}; Secure`;
+ const cookie=(id,age)=>`${COOKIE}=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}; Secure`;
  const csp=`default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' ${PROJECT}; form-action 'none'; base-uri 'none'; frame-ancestors 'none'`;
  async function api(path,token,method='GET'){
   const response=await fetchImpl(PROJECT+path,{method,headers:{apikey:publishableKey,Authorization:'Bearer '+token},redirect:'error',signal:AbortSignal.timeout(5000)});

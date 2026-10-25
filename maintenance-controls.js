@@ -35,7 +35,7 @@ save?.addEventListener('click',async()=>{
  try {
   const result=await client.auth.getUser();
   user=result.data?.user;
-  if(result.error||!user||user.id!==verifiedOwnerId){status.textContent='Owner session changed. Reload before saving.';return;}
+  if(result.error||!user||user.id!==verifiedOwnerId){status.textContent='Owner session changed. Reload before saving.';save.disabled=false;return;}
  } catch {status.textContent='Unable to verify owner session.';return;}
  finally {if(!user)save.disabled=false;}
  const value=message.value.trim();

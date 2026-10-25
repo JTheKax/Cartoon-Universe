@@ -42,18 +42,12 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$BACKUP_PASSPHRASE" || { echo "::error::Missing SUPABASE_BACKUP_PASSPHRASE secret."; exit 1; }
-      - name: Install PostgreSQL 17 client
+      - name: Prepare PostgreSQL 17 client container
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates curl gnupg
-          sudo install -d /usr/share/postgresql-common/pgdg
-          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor --yes -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
-          . /etc/os-release
-          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client-17
+          docker pull postgres:17
+          docker run --rm postgres:17 pg_restore --version
       - name: Download existing encrypted backup artifact
         shell: bash
         run: |
@@ -74,25 +68,24 @@ jobs:
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
             -in "$encrypted" -out restore-test/cartoon-universe.dump \
             -pass env:BACKUP_PASSPHRASE
-          /usr/lib/postgresql/17/bin/pg_restore --list restore-test/cartoon-universe.dump > restore-test/toc.txt
+          docker run --rm --network host -v "$PWD/restore-test:/backup:ro" postgres:17 pg_restore --list /backup/cartoon-universe.dump > restore-test/toc.txt
           test -s restore-test/toc.txt
       - name: Restore into disposable PostgreSQL 17 database
         shell: bash
         run: |
           set -euo pipefail
-          /usr/lib/postgresql/17/bin/pg_restore \
-            --exit-on-error --no-owner --no-acl \
-            --dbname=cartoon_universe_restore restore-test/cartoon-universe.dump
+          docker run --rm --network host -e PGHOST=127.0.0.1 -e PGPORT=5432 -e PGUSER=restore_test -e PGPASSWORD=disposable-only-password -e PGDATABASE=cartoon_universe_restore -v "$PWD/restore-test:/backup:ro" postgres:17 \
+            pg_restore --exit-on-error --no-owner --no-acl --dbname=cartoon_universe_restore /backup/cartoon-universe.dump
       - name: Verify restored application schema and report table counts
         shell: bash
         run: |
           set -euo pipefail
-          psql -v ON_ERROR_STOP=1 -Atc "select current_database(), current_setting('server_version');"
-          psql -v ON_ERROR_STOP=1 -Atc "select schemaname || '.' || tablename from pg_tables where schemaname='public' order by tablename;" > restore-test/restored-public-tables.txt
+          docker run --rm --network host -e PGHOST=127.0.0.1 -e PGPORT=5432 -e PGUSER=restore_test -e PGPASSWORD=disposable-only-password -e PGDATABASE=cartoon_universe_restore postgres:17 psql -v ON_ERROR_STOP=1 -Atc "select current_database(), current_setting('server_version');"
+          docker run --rm --network host -e PGHOST=127.0.0.1 -e PGPORT=5432 -e PGUSER=restore_test -e PGPASSWORD=disposable-only-password -e PGDATABASE=cartoon_universe_restore -v "$PWD/restore-test:/backup" postgres:17 psql -v ON_ERROR_STOP=1 -Atc "select schemaname || '.' || tablename from pg_tables where schemaname='public' order by tablename;" > restore-test/restored-public-tables.txt
           test -s restore-test/restored-public-tables.txt
           grep -E 'coin_wallets|coin_transactions' restore-test/restored-public-tables.txt
-          psql -v ON_ERROR_STOP=1 -c "select count(*) as wallet_count from public.coin_wallets;"
-          psql -v ON_ERROR_STOP=1 -c "select count(*) as transaction_count from public.coin_transactions;"
+          docker run --rm --network host -e PGHOST=127.0.0.1 -e PGPORT=5432 -e PGUSER=restore_test -e PGPASSWORD=disposable-only-password -e PGDATABASE=cartoon_universe_restore postgres:17 psql -v ON_ERROR_STOP=1 -c "select count(*) as wallet_count from public.coin_wallets;"
+          docker run --rm --network host -e PGHOST=127.0.0.1 -e PGPORT=5432 -e PGUSER=restore_test -e PGPASSWORD=disposable-only-password -e PGDATABASE=cartoon_universe_restore postgres:17 psql -v ON_ERROR_STOP=1 -c "select count(*) as transaction_count from public.coin_transactions;"
       - name: Remove decrypted dump
         if: always()
         shell: bash

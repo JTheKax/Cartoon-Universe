@@ -21,3 +21,38 @@ jobs:
         run: |
           node --check script.js
           if [ -f auth.js ]; then node --check auth.js; fi
+      - name: Validate Cartoon Coin migration security contract
+        run: node --test tests/cartoon-coins.test.mjs
+      - name: Validate wallet JavaScript syntax
+        run: node --check coin-wallet.js
+  coin-database:
+    name: Test Cartoon Coin database (isolated)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cartoon_coins_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d cartoon_coins_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: cartoon_coins_ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare disposable database fixture
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/ci_bootstrap.sql
+      - name: Apply proposed migration to disposable database
+        run: psql -v ON_ERROR_STOP=1 -f sql/cartoon_coin_daily_reward.sql
+      - name: Execute reward and RLS integration assertions
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/cartoon_coin_daily_reward_test.sql

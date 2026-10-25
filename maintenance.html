@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#16102f"><title>Under Maintenance | Cartoon Universe</title><link rel="stylesheet" href="styles.css"><style>
+.maintenance-landing{min-height:75vh;display:grid;place-items:center;padding:30px 18px}.maintenance-landing article{max-width:680px;text-align:center;background:#241944;border:3px solid #f6a84b;border-radius:24px;padding:48px 25px;box-shadow:0 12px 0 #0a0719}.maintenance-landing h1{color:#ffc665;font-size:clamp(30px,6vw,56px)}.maintenance-landing p{font-size:1.15rem;line-height:1.7}.maintenance-landing a{color:#ffc665}
+</style></head><body><main class="maintenance-landing"><article><p aria-hidden="true" style="font-size:4rem">🎃🛠️👻</p><h1>THE HAUNTED ARCADE IS UNDER MAINTENANCE</h1><p id="maintenance-public-message">We're fixing up the arcade. Come back soon!</p><a href="owner.html">Owner Dashboard</a></article></main><script type="module">
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
+try{
+ const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+ const {data,error}=await client.from('site_maintenance').select('enabled,message').eq('id',true).single();
+ if(!error&&data){if(!data.enabled){location.replace('index.html');}else{document.getElementById('maintenance-public-message').textContent=data.message;}}
+}catch{}
+</script><script src="theme.js"></script></body></html>

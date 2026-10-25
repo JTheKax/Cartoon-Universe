@@ -675,3 +675,23 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 @media(prefers-reduced-motion:reduce){
  .header .arcade-marquee .brand{animation:none}
 }
+
+/* Cartoon Coin wallet: responsive Halloween arcade UI */
+.coin-page{min-height:100vh;padding:clamp(18px,4vw,52px);background:radial-gradient(circle at 50% 0,#54206688,transparent 60%),#140a24}
+.coin-back{display:inline-block;margin-bottom:22px;color:#ffcb7e;font-weight:900}
+.coin-wallet{max-width:850px;margin:auto;padding:clamp(18px,4vw,36px);background:linear-gradient(155deg,#2b1242f5,#170b2cf8);border:3px solid #d15af2;border-radius:18px;box-shadow:0 0 32px #a54fff44}
+.coin-wallet h1{font-size:clamp(26px,5vw,42px);color:#ffad40;margin:0 0 14px}
+.coin-wallet h2{color:#ffca86;margin:26px 0 8px}
+.coin-wallet p{color:#e9d7f5;line-height:1.55}
+.coin-wallet-balance{display:grid;gap:6px;margin:24px 0;padding:22px;background:#140820;border:2px solid #ff9d3e;border-radius:14px;text-align:center}
+.coin-wallet-balance span{color:#ffc984;font-weight:900;letter-spacing:.13em;font-size:12px}
+.coin-wallet-balance strong{color:#ffe9a8;font-size:clamp(35px,6vw,64px);text-shadow:0 0 18px #ff9d3eaa}
+.coin-reward{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px;background:#3d1b4c;border:1px solid #a76ac5;border-radius:12px}
+.coin-reward h2{margin:0}.coin-reward p{margin:7px 0}
+.coin-reward .cta{border:0;white-space:nowrap;cursor:pointer}
+.coin-reward .cta:disabled{opacity:.65;cursor:not-allowed;transform:none}
+.coin-history-wrap{overflow-x:auto}.coin-history{width:100%;border-collapse:collapse;text-align:left}
+.coin-history th,.coin-history td{padding:12px;border-bottom:1px solid #73478d}
+.coin-history th{color:#ffc984}.coin-positive{color:#a5ffb7;font-weight:900}.coin-negative{color:#ffb0b0;font-weight:900}
+.coin-wallet-footnote{font-size:13px}
+@media(max-width:600px){.coin-reward{flex-direction:column;align-items:stretch}.coin-reward .cta{width:100%}}

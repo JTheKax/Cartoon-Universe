@@ -1,0 +1,54 @@
+name: Manual Supabase database backup (setup required)
+
+# Intentionally manual-only. No automatic access to production until configured.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.SUPABASE_BACKUP_DATABASE_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.SUPABASE_BACKUP_PASSPHRASE }}
+    steps:
+      - name: Validate backup configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$DATABASE_URL" || -z "$BACKUP_PASSPHRASE" ]]; then
+            echo "::error::Configure SUPABASE_BACKUP_DATABASE_URL and SUPABASE_BACKUP_PASSPHRASE as GitHub Actions secrets."
+            exit 1
+          fi
+      - name: Export full logical database backup
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p backup
+          # The Ubuntu runner's pg_dump client is installed from its PostgreSQL packages.
+          pg_dump --version
+          pg_dump --dbname="$DATABASE_URL" --format=custom --no-owner --no-acl --file=backup/cartoon-universe.dump
+          test -s backup/cartoon-universe.dump
+          pg_restore --list backup/cartoon-universe.dump > backup/contents.txt
+          test -s backup/contents.txt
+      - name: Encrypt backup before upload
+        shell: bash
+        run: |
+          set -euo pipefail
+          openssl enc -aes-256-cbc -pbkdf2 -salt -iter 200000 \
+            -in backup/cartoon-universe.dump -out backup/cartoon-universe.dump.enc \
+            -pass env:BACKUP_PASSPHRASE
+          rm -f backup/cartoon-universe.dump
+          test -s backup/cartoon-universe.dump.enc
+      - name: Upload encrypted backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cartoon-universe-encrypted-db-backup
+          path: |
+            backup/cartoon-universe.dump.enc
+            backup/contents.txt
+          retention-days: 7
+          if-no-files-found: error

@@ -31,3 +31,10 @@ test('wallet client never submits arbitrary coin amount or target user',()=>{
  assert.match(client,/client\.rpc\('claim_daily_cartoon_coins'\)/);
  assert.doesNotMatch(client,/client\.from\('coin_wallets'\)\.(insert|update|upsert|delete)/);
 });
+
+test('wallet checks authoritative claims and honors legacy reward transactions',()=>{
+ assert.match(client,/from\('coin_daily_claims'\)/);
+ assert.match(client,/eq\('reward_date',new Date\(\)\.toISOString\(\)\.slice\(0,10\)\)/);
+ assert.match(client,/const already=Boolean\(dailyClaim\.data\)/);
+ assert.match(client,/reason==='daily_reward'/);
+});

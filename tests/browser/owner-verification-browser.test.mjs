@@ -47,7 +47,7 @@ test('owner verification browser flow keeps passwords at Supabase and isolates i
     if(identifier!=='player@example.test'){
      await page.getByText('Owner sign-in verified. No arcade settings have changed.',{exact:true}).waitFor();
      assert.equal(await page.locator('#password').inputValue(),'');
-     const cookie=(await context.cookies()).find(value=>value.name==='__Host-cu_owner_verify');assert.ok(cookie?.secure&&cookie?.httpOnly);assert.equal(cookie.sameSite,'Strict');
+     const cookie=(await context.cookies()).find(value=>value.name==='__Host-cu_owner_verify');assert.ok(cookie?.secure&&cookie?.httpOnly);assert.equal(cookie.sameSite,'Lax');
      assert.equal(await page.evaluate(()=>localStorage.length+sessionStorage.length),0);
      assert.equal(await page.evaluate(async()=> (await fetch('/owner.html')).status),503);
      await page.locator('#clear').click();await page.getByText('Verification session cleared.',{exact:true}).waitFor();

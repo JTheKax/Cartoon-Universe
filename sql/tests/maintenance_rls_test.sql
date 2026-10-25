@@ -23,4 +23,10 @@ begin
  if not found then raise exception 'Owner cannot disable maintenance'; end if;
 end $$;
 reset role;
+-- Ensure anonymous sessions have no maintenance write privilege.
+do $ begin
+ if has_table_privilege('anon','public.site_maintenance','UPDATE') then
+  raise exception 'Anonymous role can update maintenance';
+ end if;
+end $;
 rollback;

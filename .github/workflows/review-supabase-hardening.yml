@@ -40,6 +40,9 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_ci_fixture.sql
           psql -v ON_ERROR_STOP=1 -f supabase/maintenance-controls-review.sql
           psql -v ON_ERROR_STOP=1 -f supabase/maintenance-daily-reward-guard.sql
+          # The base schema predates the presence_mode column found in the reviewed environment.
+          # Reproduce it only in this disposable CI database, never in production.
+          psql -v ON_ERROR_STOP=1 -c 'ALTER TABLE public.profiles ADD COLUMN presence_mode text DEFAULT '\''online'\'';'
       - name: Apply review proposal only to disposable PostgreSQL
         run: psql -v ON_ERROR_STOP=1 -f review/sql/supabase_hardening_proposal.sql
       - name: Assert hardening grants and policies

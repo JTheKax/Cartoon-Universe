@@ -39,7 +39,7 @@ begin
 end $$;
 reset role;
 set local role authenticated;
-do $
+do $$
 begin
  if has_table_privilege('authenticated','public.profiles','INSERT') then
   raise exception 'Authenticated profile INSERT must be column-scoped';
@@ -48,8 +48,8 @@ begin
     or not has_column_privilege('authenticated','public.profiles','username','INSERT') then
   raise exception 'Authenticated profile INSERT columns unavailable';
  end if;
-end $;
-do $
+end $$;
+do $$
 begin
  if not has_column_privilege('authenticated','public.profiles','username','UPDATE')
     or not has_column_privilege('authenticated','public.profiles','display_name','UPDATE')

@@ -16,7 +16,8 @@ test('review controls use shared feature registry',()=>{
  assert.match(script,/Effective live status: UNKNOWN/);
 });
 test('review panel cannot persist maintenance state',()=>{
- assert.doesNotMatch(script,/\.update\s*\(|\.insert\s*\(|\.upsert\s*\(|fetch\s*\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage/);
+ assert.match(script,/method:'GET',credentials:'same-origin',cache:'no-store'/);
+ assert.doesNotMatch(script,/\.update\s*\(|\.insert\s*\(|\.upsert\s*\(|method:'POST'|method:'PUT'|method:'PATCH'|method:'DELETE'|XMLHttpRequest|sendBeacon|localStorage|sessionStorage/);
 });
 test('real master switch remains disabled',()=>{
  assert.match(html,/id="maintenance-toggle"[^>]*disabled/);

@@ -15,6 +15,13 @@ BEGIN
  OR has_column_privilege('anon','public.profiles','created_at','SELECT') THEN
    RAISE EXCEPTION 'private profile columns remain exposed';
  END IF;
+ IF has_column_privilege('authenticated','public.profiles','created_at','INSERT')
+ OR has_column_privilege('authenticated','public.profiles','updated_at','INSERT')
+ OR NOT has_column_privilege('authenticated','public.profiles','id','INSERT')
+ OR NOT has_column_privilege('authenticated','public.profiles','username','INSERT')
+ OR NOT has_column_privilege('authenticated','public.profiles','display_name','INSERT') THEN
+   RAISE EXCEPTION 'profile INSERT column privileges mismatch';
+ END IF;
  IF has_column_privilege('authenticated','public.profiles','created_at','UPDATE')
  OR has_column_privilege('authenticated','public.profiles','updated_at','UPDATE')
  OR has_column_privilege('authenticated','public.profiles','id','UPDATE') THEN

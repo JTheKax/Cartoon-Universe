@@ -74,6 +74,20 @@ try{
  }
  console.log('Real local Supabase sign-in succeeded for disposable owner and player.');
  psql('update public.site_maintenance set enabled=true where id=true;');
+ // Verify authenticated non-owner cannot read owner membership or another player's wallet.
+ const {data:playerMembership,error:membershipError}=await playerClient.from('owner_members').select('user_id');
+ check(!membershipError&&playerMembership.length===0,'Non-owner could read owner membership');
+ const {data:visibleWallets,error:walletReadError}=await playerClient.from('coin_wallets').select('user_id,balance');
+ check(!walletReadError&&visibleWallets.length===1&&visibleWallets[0].user_id===player.id,'Player wallet SELECT leaked another account');
+ const {data:visibleClaims,error:claimReadError}=await playerClient.from('coin_daily_claims').select('user_id');
+ check(!claimReadError&&visibleClaims.every(row=>row.user_id===player.id),'Player daily-claim SELECT leaked another account');
+ const {data:visibleTransactions,error:transactionReadError}=await playerClient.from('coin_transactions').select('user_id');
+ check(!transactionReadError&&visibleTransactions.every(row=>row.user_id===player.id),'Player transaction SELECT leaked another account');
+ const {error:walletWriteError}=await playerClient.from('coin_wallets').update({balance:999999}).eq('user_id',player.id);
+ check(walletWriteError?.code==='42501','Player wallet balance UPDATE was not denied');
+ const {error:membershipWriteError}=await playerClient.from('owner_members').insert({user_id:player.id});
+ check(membershipWriteError,'Non-owner was able to grant owner membership');
+ console.log('Authenticated player ownership and wallet privilege checks passed.');
  const {data:before,error:readError}=await admin.from('coin_wallets').select('balance').eq('user_id',player.id).single();
  check(!readError&&before.balance===100,'Could not read disposable wallet');
  const blocked=await playerClient.rpc('claim_daily_cartoon_coins');

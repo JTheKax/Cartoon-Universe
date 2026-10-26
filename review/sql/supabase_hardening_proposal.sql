@@ -8,6 +8,12 @@ REVOKE UPDATE ON TABLE public.profiles FROM authenticated;
 GRANT UPDATE (username, display_name, avatar_color, presence_mode)
   ON TABLE public.profiles TO authenticated;
 
+-- Client-created profiles must not accept forged audit timestamps.
+-- Preserve INSERT on id, username and display_name used by signup/upsert.
+REVOKE INSERT ON TABLE public.profiles FROM authenticated;
+GRANT INSERT (id, username, display_name, avatar_color, presence_mode)
+  ON TABLE public.profiles TO authenticated;
+
 -- Restrict anonymous reads to intentionally public profile attributes.
 -- PostgreSQL table-level SELECT must be revoked before column grants help.
 REVOKE SELECT ON TABLE public.profiles FROM anon;

@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {decideMaintenanceTransition as decide} from './maintenance-switch-policy.mjs';
+const base={actor:{role:'owner',isAnonymous:false},ownerVerified:true,current:{enabled:true,revision:7},requested:false,expectedRevision:7,releaseApproved:true,routingReady:true};
+test('verified owner may request reviewed release',()=>assert.equal(decide(base).allowed,true));
+test('anonymous and regular player denied',()=>{for(const actor of [null,{role:'player'},{role:'owner',isAnonymous:true}])assert.equal(decide({...base,actor}).allowed,false)});
+test('unverified owner denied',()=>assert.equal(decide({...base,ownerVerified:false}).allowed,false));
+test('unapproved release cannot disable maintenance',()=>assert.equal(decide({...base,releaseApproved:false}).allowed,false));
+test('routing outage fails closed',()=>assert.equal(decide({...base,routingReady:false}).allowed,false));
+test('stale revision denied',()=>assert.equal(decide({...base,expectedRevision:6}).allowed,false));
+test('missing state denied',()=>assert.equal(decide({...base,current:null}).allowed,false));
+test('ON requires verified routing but no release approval',()=>assert.equal(decide({...base,current:{enabled:false,revision:7},requested:true,releaseApproved:false}).allowed,true));
+test('same-state and malformed requests denied',()=>{assert.equal(decide({...base,requested:true}).allowed,false);assert.equal(decide({...base,requested:'false'}).allowed,false)});

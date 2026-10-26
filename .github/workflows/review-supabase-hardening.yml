@@ -50,7 +50,7 @@ jobs:
       - name: Existing isolated maintenance and reward checks
         run: |
           set -euo pipefail
-          psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_table_privileges_test.sql
+          psql -v ON_ERROR_STOP=1 -f review/sql/maintenance_table_privileges_hardened_test.sql
           psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_profile_guard_test.sql
           psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_rls_test.sql
           psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_reward_guard_test.sql

@@ -8,7 +8,6 @@ begin
   foreach table_name in array array['profiles','owner_members'] loop
    foreach privilege_name in array array['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER'] loop
     expected := (table_name='profiles' and privilege_name='SELECT' and role_name='authenticated')
-     or (role_name='authenticated' and table_name='profiles' and privilege_name = 'INSERT')
      or (role_name='authenticated' and table_name='owner_members' and privilege_name='SELECT');
     if has_table_privilege(role_name,'public.'||table_name,privilege_name) is distinct from expected then
      raise exception 'Unexpected % privilege on % for %',privilege_name,table_name,role_name;
@@ -40,7 +39,17 @@ begin
 end $$;
 reset role;
 set local role authenticated;
-do $$
+do $
+begin
+ if has_table_privilege('authenticated','public.profiles','INSERT') then
+  raise exception 'Authenticated profile INSERT must be column-scoped';
+ end if;
+ if not has_column_privilege('authenticated','public.profiles','id','INSERT')
+    or not has_column_privilege('authenticated','public.profiles','username','INSERT') then
+  raise exception 'Authenticated profile INSERT columns unavailable';
+ end if;
+end $;
+do $
 begin
  if not has_column_privilege('authenticated','public.profiles','username','UPDATE')
     or not has_column_privilege('authenticated','public.profiles','display_name','UPDATE')

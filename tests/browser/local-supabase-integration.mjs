@@ -85,7 +85,7 @@ try{
  check(badLoginError,'Incorrect password unexpectedly authenticated a registered player');
  // Request recovery only against the loopback Auth service; never send live email.
  const {error:recoveryError}=await signupClient.auth.resetPasswordForEmail(signupEmail,{redirectTo:'http://127.0.0.1:54321/reset-password'});
- check(!recoveryError,'Local password-recovery request failed');
+ check(!recoveryError,'Local password-recovery request failed: '+(recoveryError?.code||'unknown')+' / '+(recoveryError?.status||'unknown'));
  const {data:recoveryLookup,error:recoveryLookupError}=await admin.auth.admin.getUserById(signup.user.id);
  check(!recoveryLookupError&&recoveryLookup.user?.email===signupEmail,'Recovery request unexpectedly changed the account');
  console.log('Disposable registration, invalid-password rejection and recovery request passed.');

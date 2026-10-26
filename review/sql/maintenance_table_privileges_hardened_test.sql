@@ -40,7 +40,7 @@ begin
 end $$;
 reset role;
 set local role authenticated;
-do $
+do $$
 begin
  if not has_column_privilege('authenticated','public.profiles','username','UPDATE')
     or not has_column_privilege('authenticated','public.profiles','display_name','UPDATE')
@@ -53,8 +53,8 @@ begin
     or has_column_privilege('authenticated','public.profiles','updated_at','UPDATE') then
   raise exception 'Authenticated role can update protected profile columns';
  end if;
-end $;
-do $
+end $$;
+do $$
 begin
  begin
   truncate public.profiles;

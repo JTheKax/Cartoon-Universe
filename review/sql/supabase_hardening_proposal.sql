@@ -14,9 +14,8 @@ REVOKE SELECT ON TABLE public.profiles FROM anon;
 GRANT SELECT (username, display_name, avatar_color)
   ON TABLE public.profiles TO anon;
 
--- Remove duplicate equivalent policies, preserving one INSERT and one UPDATE.
-DROP POLICY IF EXISTS "insert own profile" ON public.profiles;
-DROP POLICY IF EXISTS "update own profile" ON public.profiles;
+-- Preserve the sole permissive own-profile INSERT/UPDATE policies.
+-- Removing them would leave only restrictive maintenance policies and deny all writes.
 
 -- Explicitly preserve the Coin RPC's current restricted caller roles.
 REVOKE ALL ON FUNCTION public.claim_daily_cartoon_coins() FROM PUBLIC, anon;

@@ -1,0 +1,41 @@
+name: Public release package (isolated)
+on:
+  pull_request:
+    paths:
+      - 'scripts/build-public-release.mjs'
+      - '.github/workflows/public-release-package.yml'
+      - '*.html'
+      - '*.css'
+      - '*.js'
+      - 'static/**'
+  workflow_dispatch:
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build allowlisted public package
+        run: node scripts/build-public-release.mjs
+      - name: Check output and excluded files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s .release-review/public/index.html
+          test -s .release-review/public/login.html
+          test -s .release-review/public/register.html
+          test -s .release-review/public/coin-wallet.html
+          test ! -e .release-review/public/owner.html
+          test ! -e .release-review/public/owner.js
+          test ! -e .release-review/public/server
+          test ! -e .release-review/public/sql
+          test ! -e .release-review/public/supabase
+          grep -q '__maintenance/owner-signin' .release-review/public/index.html
+          if grep -R -nE 'href=["\x27]owner\.html|src=["\x27]owner\.js' .release-review/public; then
+            echo 'Legacy owner reference detected'; exit 1
+          fi
+          echo 'Public package allowlist validated'

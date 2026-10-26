@@ -24,8 +24,9 @@ BEGIN
  OR NOT has_function_privilege('authenticated','public.claim_daily_cartoon_coins()','EXECUTE') THEN
    RAISE EXCEPTION 'Coin RPC caller permissions mismatch';
  END IF;
- IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public'
- AND tablename='profiles' AND policyname IN ('insert own profile','update own profile')) THEN
-   RAISE EXCEPTION 'duplicate profile policies remain';
+ IF (SELECT count(*) FROM pg_policies WHERE schemaname='public'
+ AND tablename='profiles' AND policyname IN ('insert own profile','update own profile')
+ AND permissive='PERMISSIVE') <> 2 THEN
+   RAISE EXCEPTION 'own-profile permissive RLS policies missing';
  END IF;
 END $$;

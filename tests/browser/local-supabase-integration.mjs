@@ -39,7 +39,7 @@ try{
  await writeFile(join(directory,'supabase/migrations',migration),sql);
  execFileSync('docker',['network','create','-o','com.docker.network.bridge.host_binding_ipv4=127.0.0.1',network],{stdio:'pipe'});networkCreated=true;
  console.log('Starting local Auth, PostgREST, API gateway and PostgreSQL containers.');
- cli(['start','--network-id',network,'--exclude','realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,mailpit']);
+ cli(['start','--network-id',network,'--exclude','realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor']);
  const local=JSON.parse(cli(['status','-o','json']));
  const apiUrl=local.API_URL;
  check(apiUrl==='http://127.0.0.1:54321','Refusing a nonlocal API URL');

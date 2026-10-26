@@ -50,5 +50,4 @@ begin
 end $$;
 reset role;
 rollback;
--- Remaining integration tests: parallel RPC requests and failure injection
--- require two concurrent sessions and a dedicated failure test harness.
+-- Failure injection and overlapping RPC sessions run in separate CI harnesses.

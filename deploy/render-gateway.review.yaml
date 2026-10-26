@@ -1,0 +1,29 @@
+# REVIEW ONLY: not connected to a Blueprint; do not sync or deploy this file yet.
+# Future promotion review for the directly created gateway candidate.
+# This is not connected to Render; the existing cartoon-universe static site is separate.
+# Startup remains disabled. No database, migrations, old-site routing, or domains.
+services:
+  - type: web
+    name: cartoon-universe-gateway
+    runtime: node
+    repo: https://github.com/JTheKax/Cartoon-Universe
+    branch: main
+    plan: free
+    numInstances: 1
+    autoDeployTrigger: 'off'
+    buildCommand: node --check server/production-maintenance-gateway.mjs
+    startCommand: node server/production-maintenance-gateway.mjs
+    healthCheckPath: /__maintenance/health
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      - key: GATEWAY_CANDIDATE_MODE
+        value: 'false'
+      - key: PRODUCTION_GATEWAY_ENABLED
+        value: 'false'
+      - key: PRODUCTION_SUPABASE_URL
+        value: https://gjfyemvcrgrthbrlqqnz.supabase.co
+      - key: PRODUCTION_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: PRODUCTION_SITE_ORIGIN
+        value: https://cartoon-universe-gateway.onrender.com

@@ -23,6 +23,29 @@ jobs:
           if [ -f auth.js ]; then node --check auth.js; fi
       - name: Validate Cartoon Coin migration security contract
         run: node --test tests/cartoon-coins.test.mjs
+      - name: Test Supabase browser configuration validation
+        run: node --test tests/supabase-config.test.mjs
+      - name: Validate maintenance UI safety checks
+        run: node --test tests/maintenance-ui.test.mjs
+      - name: Validate maintenance JavaScript syntax
+        run: |
+          node --check maintenance-controls.js
+          node --check maintenance-notice.js
+      - name: Test staging maintenance HTTP gateway
+        run: node --test tests/maintenance-gateway.test.mjs
+      - name: Test read-only owner verification
+        run: node --test tests/owner-verification.test.mjs
+      - name: Test isolated gateway address candidate
+        run: node --test tests/gateway-candidate.test.mjs
+      - name: Test redirect-only cutover bundle preparation
+        run: node --test tests/maintenance-cutover.test.mjs
+      - name: Test locked production gateway configuration
+        run: node --test tests/production-gateway.test.mjs
+      - name: Validate staging gateway syntax
+        run: |
+          node --check server/maintenance-gateway.mjs
+          node --check server/production-maintenance-gateway.mjs
+          node --check server/staging-owner-bridge.js
       - name: Validate wallet JavaScript syntax
         run: node --check coin-wallet.js
   coin-database:
@@ -52,7 +75,65 @@ jobs:
       - uses: actions/checkout@v4
       - name: Prepare disposable database fixture
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/ci_bootstrap.sql
+      - name: Prepare real profile and owner schema in disposable database
+        run: psql -v ON_ERROR_STOP=1 -f supabase/schema.sql
+      - name: Prepare isolated maintenance RLS fixture
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_ci_fixture.sql
+      - name: Apply proposed profile maintenance policies in disposable database
+        run: psql -v ON_ERROR_STOP=1 -f supabase/maintenance-controls-review.sql
+      - name: Verify minimum profile and owner privileges
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_table_privileges_test.sql
+      - name: Verify profile maintenance enforcement
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_profile_guard_test.sql
+      - name: Test owner and nonowner maintenance permissions
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_rls_test.sql
       - name: Apply proposed migration to disposable database
-        run: psql -v ON_ERROR_STOP=1 -f sql/cartoon_coin_daily_reward.sql
+        run: psql -v ON_ERROR_STOP=1 -f supabase/maintenance-daily-reward-guard.sql
+      - name: Verify maintenance reward blocking and owner bypass
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_reward_guard_test.sql
       - name: Execute reward and RLS integration assertions
         run: psql -v ON_ERROR_STOP=1 -f sql/tests/cartoon_coin_daily_reward_test.sql
+      - name: Verify reward rollback after ledger failure
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_reward_failure_test.sql
+      - name: Verify overlapping reward claims award once
+        timeout-minutes: 2
+        run: python3 scripts/test-reward-concurrency.py
+  maintenance-browser:
+    name: Test maintenance browser (simulated identities)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser test dependencies
+        working-directory: tests/browser
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium and system dependencies
+        working-directory: tests/browser
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Test browser sign-in, navigation, expiry and logout with simulated identities
+        working-directory: tests/browser
+        run: npm test
+  local-supabase-integration:
+    name: Test real local Supabase integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: supabase/setup-cli@v1
+        with:
+          version: '2.122.0'
+      - name: Install pinned integration dependencies
+        working-directory: tests/browser
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium and system dependencies
+        working-directory: tests/browser
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Test real disposable Supabase Auth, database enforcement and browser navigation
+        working-directory: tests/browser
+        run: node local-supabase-integration.mjs

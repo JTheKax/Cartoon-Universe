@@ -1,8 +1,9 @@
+import {isSupabaseConfigured} from './supabase-config.js';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 const $=id=>document.getElementById(id);
 const notice=$('notice'),authForms=$('auth-forms'),account=$('account-panel');
-const configured=SUPABASE_URL.startsWith('https://')&&SUPABASE_ANON_KEY.length>30;
+const configured=isSupabaseConfigured(SUPABASE_URL,SUPABASE_ANON_KEY);
 let client=null;
 function message(text){notice.textContent=text;notice.hidden=!text}
 function show(form){document.querySelectorAll('[data-form]').forEach(el=>el.hidden=el.dataset.form!==form);const actions=$('login-actions');if(actions)actions.hidden=form!=='login';const back=$('reset-actions');if(back)back.hidden=form!=='forgot';message('')}
@@ -39,7 +40,7 @@ else{
   const username=$('signup-username').value.trim(),email=$('signup-email').value.trim(),password=$('signup-password').value;
   if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){message('Username must be 3–20 letters, numbers or underscores.');return}
   if(password.length<8){message('Use a password of at least 8 characters.');return}
-  const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:location.origin+'/login.html'}});
+  const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
   if(error){message(errorText(error));return}
   if(data.user&&data.session){
    const {error:profileError}=await client.from('profiles').insert({id:data.user.id,username,display_name:username});
@@ -72,8 +73,8 @@ else{
   if(!error)await render();
  }catch{message('Login is temporarily unavailable. Try again shortly.')}
 });
- $('forgot').addEventListener('submit',async e=>{e.preventDefault();const {error}=await client.auth.resetPasswordForEmail($('forgot-email').value.trim(),{redirectTo:location.origin+'/login.html'});message(error?errorText(error):'If the address is registered, a reset email will arrive.')});
- $('password-update').addEventListener('submit',async e=>{e.preventDefault();const password=$('new-password').value;if(password.length<8){message('Use at least 8 characters.');return}const {error}=await client.auth.updateUser({password});message(error?errorText(error):'Password updated.');if(!error){params.delete('type');history.replaceState(null,'','/login.html');authForms.hidden=false;account.hidden=true;show('login');message('Password updated. You can now sign in.')}});
+ $('forgot').addEventListener('submit',async e=>{e.preventDefault();const {error}=await client.auth.resetPasswordForEmail($('forgot-email').value.trim(),{redirectTo:location.origin+location.pathname});message(error?errorText(error):'If the address is registered, a reset email will arrive.')});
+ $('password-update').addEventListener('submit',async e=>{e.preventDefault();const password=$('new-password').value;if(password.length<8){message('Use at least 8 characters.');return}const {error}=await client.auth.updateUser({password});message(error?errorText(error):'Password updated.');if(!error){params.delete('type');history.replaceState(null,'',location.pathname);authForms.hidden=false;account.hidden=true;show('login');message('Password updated. You can now sign in.')}});
  $('profile').addEventListener('submit',async e=>{e.preventDefault();const {data:{user}}=await client.auth.getUser();if(!user)return;const username=$('profile-username').value.trim();if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){message('Username must be 3–20 letters, numbers or underscores.');return}const {error}=await client.from('profiles').upsert({id:user.id,username,display_name:$('profile-name').value.trim().slice(0,40),avatar_color:$('profile-color').value},{onConflict:'id'});message(error?errorText(error):'Profile saved!');if(!error)await render()});
  $('logout').addEventListener('click',async()=>{const {error}=await client.auth.signOut();message(error?errorText(error):'Signed out.');if(!error)await render()});
 }

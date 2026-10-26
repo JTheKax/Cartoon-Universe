@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "status": "review-only",
+  "sourceServiceId": "srv-dbeg2nu7bikc738b8ulg",
+  "sourceOrigin": "https://cartoon-universe-3.onrender.com",
+  "targetOrigin": "https://cartoon-universe-gateway.onrender.com",
+  "productionGatewayEnabled": false,
+  "maintenanceActivation": "locked",
+  "autoDeployTrigger": "off",
+  "publicationDirectory": "public",
+  "publicationFiles": [
+    "cutover.txt"
+  ],
+  "routes": [
+    {
+      "type": "redirect",
+      "source": "/",
+      "destination": "https://cartoon-universe-gateway.onrender.com/"
+    },
+    {
+      "type": "redirect",
+      "source": "/*",
+      "destination": "https://cartoon-universe-gateway.onrender.com/*"
+    }
+  ],
+  "verifyPaths": [
+    "/",
+    "/index.html",
+    "/login.html",
+    "/register.html",
+    "/account.html",
+    "/owner.html",
+    "/coin-wallet.html",
+    "/styles.css",
+    "/account.css",
+    "/owner.css",
+    "/script.js",
+    "/auth.js",
+    "/supabase-config.js",
+    "/config.js",
+    "/theme.js",
+    "/admin-nav.js",
+    "/home-profile.js",
+    "/coin-wallet.js",
+    "/owner.js",
+    "/maintenance-preview.js",
+    "/maintenance-controls.js",
+    "/maintenance-notice.js",
+    "/static/cartoon-carnival.png",
+    "/static/haunted-arcade.gif",
+    "/supabase/schema.sql",
+    "/login.html?type=recovery"
+  ],
+  "browserFragmentProbe": "/login.html#cutover-test-marker",
+  "requiredChecks": [
+    "Verify the target hostname is allocated and hosted HTTPS owner access works.",
+    "Inventory existing redirect rules and every website alias before replacing any routing configuration.",
+    "Publish only the generated public directory; original website resources must not remain at the old origin.",
+    "Verify redirects for every listed old path, including query strings and a browser fragment probe.",
+    "Verify Auth recovery/confirmation and username-login against the actual canonical origin.",
+    "Keep production maintenance OFF and the activation interlock locked until routing and database enforcement are verified."
+  ]
+}

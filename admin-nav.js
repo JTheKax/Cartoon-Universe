@@ -1,7 +1,8 @@
+import {isSupabaseConfigured} from './supabase-config.js';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 const link=document.getElementById('admin-nav');
-if(link && SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.length>30){
+if(link && isSupabaseConfigured(SUPABASE_URL,SUPABASE_ANON_KEY)){
  const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
  async function refresh(){link.hidden=true;try{
  const {data:{user},error}=await client.auth.getUser();if(error||!user)return;

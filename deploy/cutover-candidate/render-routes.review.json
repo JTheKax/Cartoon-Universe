@@ -1,0 +1,12 @@
+[
+  {
+    "type": "redirect",
+    "source": "/",
+    "destination": "https://cartoon-universe-gateway.onrender.com/"
+  },
+  {
+    "type": "redirect",
+    "source": "/*",
+    "destination": "https://cartoon-universe-gateway.onrender.com/*"
+  }
+]

@@ -73,6 +73,23 @@ try{
   check(!error,'Local Auth password sign-in failed');
  }
  console.log('Real local Supabase sign-in succeeded for disposable owner and player.');
+ // Exercise real self-service registration against disposable local Supabase Auth.
+ const signupEmail='signup-'+randomBytes(6).toString('hex')+'@example.test';
+ const signupClient=client();
+ const {data:signup,error:signupError}=await signupClient.auth.signUp({email:signupEmail,password});
+ check(!signupError&&signup.user,'Disposable player self-registration failed');
+ check(signup.user.email===signupEmail,'Registration returned an unexpected identity');
+ const {data:signupLookup,error:signupLookupError}=await admin.auth.admin.getUserById(signup.user.id);
+ check(!signupLookupError&&signupLookup.user?.email===signupEmail,'Registered player missing from local Auth');
+ const {error:badLoginError}=await client().auth.signInWithPassword({email:signupEmail,password:'DefinitelyWrong!123'});
+ check(badLoginError,'Incorrect password unexpectedly authenticated a registered player');
+ // Request recovery only against the loopback Auth service; never send live email.
+ const {error:recoveryError}=await signupClient.auth.resetPasswordForEmail(signupEmail,{redirectTo:'http://127.0.0.1:54321/reset-password'});
+ check(!recoveryError,'Local password-recovery request failed');
+ const {data:recoveryLookup,error:recoveryLookupError}=await admin.auth.admin.getUserById(signup.user.id);
+ check(!recoveryLookupError&&recoveryLookup.user?.email===signupEmail,'Recovery request unexpectedly changed the account');
+ console.log('Disposable registration, invalid-password rejection and recovery request passed.');
+
  psql('update public.site_maintenance set enabled=true where id=true;');
  // Verify authenticated non-owner cannot read owner membership or another player's wallet.
  const {data:playerMembership,error:membershipError}=await playerClient.from('owner_members').select('user_id');

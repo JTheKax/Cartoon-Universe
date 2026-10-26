@@ -6,6 +6,7 @@ on:
       - 'server/maintenance-control-handler*.mjs'
       - 'server/owner-maintenance-preview-route*.mjs'
       - 'server/public-maintenance-router*.mjs'
+      - 'server/public-maintenance-http*.mjs'
       - 'deploy/feature-status-preview/**'
       - '.github/workflows/maintenance-switch-isolated.yml'
   workflow_dispatch:
@@ -20,4 +21,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run fail-closed switch policy and preview tests
-        run: node --test server/maintenance-switch-policy.test.mjs server/maintenance-switch-preview.test.mjs server/maintenance-control-handler.test.mjs server/owner-maintenance-preview-route.test.mjs deploy/feature-status-preview/public-feature-status.test.mjs deploy/feature-status-preview/feature-navigation.test.mjs server/public-maintenance-router.test.mjs
+        run: node --test server/maintenance-switch-policy.test.mjs server/maintenance-switch-preview.test.mjs server/maintenance-control-handler.test.mjs server/owner-maintenance-preview-route.test.mjs deploy/feature-status-preview/public-feature-status.test.mjs deploy/feature-status-preview/feature-navigation.test.mjs server/public-maintenance-router.test.mjs server/public-maintenance-http.test.mjs

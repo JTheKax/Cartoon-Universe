@@ -4,15 +4,17 @@ import {randomBytes} from 'node:crypto';
 import {readFile,realpath} from 'node:fs/promises';
 import {sep,extname} from 'node:path';
 import {createOwnerVerification} from './owner-verification.mjs';
+import {createOwnerMaintenanceSettingsReader} from './owner-maintenance-settings-reader.mjs';
 import {productionSiteOrigin} from './production-maintenance-gateway.mjs';
 import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
-const ARCADE_FILES=new Set(['index.html','login.html','register.html','account.html','coin-wallet.html','owner.html','styles.css','account.css','owner.css','script.js','auth.js','config.js','supabase-config.js','theme.js','admin-nav.js','home-profile.js','coin-wallet.js','owner.js','maintenance-preview.js','maintenance-controls.js','maintenance-notice.js','static/cartoon-carnival.png','static/haunted-arcade.gif']);
+const ARCADE_FILES=new Set(['index.html','login.html','register.html','account.html','coin-wallet.html','owner.html','styles.css','account.css','owner.css','script.js','auth.js','config.js','supabase-config.js','theme.js','admin-nav.js','home-profile.js','coin-wallet.js','owner.js','maintenance-preview.js','maintenance-controls.js','maintenance-notice.js','maintenance-feature-review.js','deploy/feature-status-preview/public-feature-status.mjs','static/cartoon-carnival.png','static/haunted-arcade.gif']);
 const ARCADE_TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.gif':'image/gif'};
 const html=ownerLoginLink=>`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cartoon Universe Gateway Setup</title><body><main><h1>Cartoon Universe gateway setup</h1><p>This address is being prepared.</p><p>Arcade access is unavailable from this setup page. Verified owners should use the approved owner access flow.</p>${ownerLoginLink}</main></body></html>`;
-export function createCandidateServer({origin,now=Date.now,ownerVerification,fetchImpl=fetch,onOwnerVerified,arcadeRoot=resolve(fileURLToPath(new URL('..',import.meta.url)))}={}){
+export function createCandidateServer({origin,now=Date.now,ownerVerification,fetchImpl=fetch,onOwnerVerified,maintenanceSettingsPreview,arcadeRoot=resolve(fileURLToPath(new URL('..',import.meta.url)))}={}){
  const expectedOrigin=origin?productionSiteOrigin(origin):null;
  const verifyOwner=ownerVerification?createOwnerVerification({origin:expectedOrigin,...ownerVerification,fetchImpl,now,onVerified:onOwnerVerified}):null;
+ const ownerSettingsReader=maintenanceSettingsPreview&&verifyOwner?createOwnerMaintenanceSettingsReader({verifyOwner:async req=>verifyOwner.authorized(req),readRoutingState:maintenanceSettingsPreview.readRoutingState}):null;
  const probes=new Map();
  const cookieName='__Host-cu_probe';
  const setCookie=(nonce,age)=>`${cookieName}=${nonce}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}; Secure`;
@@ -24,6 +26,10 @@ export function createCandidateServer({origin,now=Date.now,ownerVerification,fet
    res.end(req.method==='HEAD'?undefined:body);
   };
   if(verifyOwner&&await verifyOwner(req,send))return;
+  if(path==='/__maintenance/owner/settings-preview'){
+   if(!ownerSettingsReader)return send(503,'Owner settings preview unavailable');
+   return ownerSettingsReader(req,res);
+  }
   if(path==='/__maintenance/arcade'||path.startsWith('/__maintenance/arcade/')){
    if(!readable)return send(405,'Method not allowed',undefined,{Allow:'GET, HEAD'});
    if(!verifyOwner||!await verifyOwner.authorized(req))return send(503,'Owner verification required',undefined,{'Retry-After':'60'});

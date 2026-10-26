@@ -1,0 +1,55 @@
+name: Review-only Supabase hardening (disposable DB)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'review/sql/**'
+      - '.github/workflows/review-supabase-hardening.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-security:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cartoon_coins_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d cartoon_coins_ci"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: cartoon_coins_ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Prepare disposable production-equivalent schema and maintenance guards
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -f sql/tests/ci_bootstrap.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/schema.sql
+          psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_ci_fixture.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/maintenance-controls-review.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/maintenance-daily-reward-guard.sql
+      - name: Apply review proposal only to disposable PostgreSQL
+        run: psql -v ON_ERROR_STOP=1 -f review/sql/supabase_hardening_proposal.sql
+      - name: Assert hardening grants and policies
+        run: psql -v ON_ERROR_STOP=1 -f review/sql/supabase_hardening_assertions.sql
+      - name: Existing isolated maintenance and reward checks
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_table_privileges_test.sql
+          psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_profile_guard_test.sql
+          psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_rls_test.sql
+          psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_reward_guard_test.sql
+          psql -v ON_ERROR_STOP=1 -f sql/tests/cartoon_coin_daily_reward_test.sql
+          psql -v ON_ERROR_STOP=1 -f sql/tests/maintenance_reward_failure_test.sql

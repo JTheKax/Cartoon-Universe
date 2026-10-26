@@ -4,10 +4,53 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Cartoon Universe — Maintenance</title>
+<meta name="theme-color" content="#080f2a">
+<title>Cartoon Universe — We'll Be Back Soon!</title>
 <style>
-:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#10162a;color:#fff;font:1rem/1.6 system-ui,sans-serif;padding:2rem}main{max-width:36rem;text-align:center;padding:3rem 2rem;border:1px solid #34415f;border-radius:1rem;background:#19223b}h1{font-size:clamp(2rem,5vw,3rem);line-height:1.15;margin:0 0 1rem}p{color:#d7dfed;margin:0}
+:root{color-scheme:dark;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:#f8faff;background:radial-gradient(ellipse at 85% 20%,#50208088,transparent 32%),radial-gradient(ellipse at 8% 75%,#005dc566,transparent 35%),linear-gradient(145deg,#070d26,#101a4b 54%,#080c24);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.7;background-image:radial-gradient(2px 2px at 12% 14%,#fff 98%,transparent),radial-gradient(2px 2px at 73% 21%,#fff 98%,transparent),radial-gradient(1px 1px at 44% 39%,#fff 98%,transparent),radial-gradient(2px 2px at 92% 76%,#fff 98%,transparent),radial-gradient(1px 1px at 21% 88%,#fff 98%,transparent);background-size:310px 280px}
+header,footer{position:relative;z-index:1;background:#060e27b5;border-bottom:1px solid #4975ba44}
+header{padding:18px max(24px,calc((100vw - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{font-weight:1000;font-size:clamp(1.2rem,3vw,1.9rem);line-height:1;color:#ffc83f;text-shadow:0 3px #8c367f,0 0 22px #9a4cff}
+.brand span{display:block;color:#5bcaff;margin-left:24px}
+.status{border:1px solid #8d7af8;border-radius:100px;padding:8px 13px;color:#ddd7ff;background:#40226d88;font-size:.8rem;font-weight:700}
+main{position:relative;z-index:1;max-width:1040px;margin:clamp(40px,7vw,100px) auto;padding:0 20px}
+.panel{border:1px solid #498ee8;border-radius:28px;padding:clamp(24px,5vw,62px);background:linear-gradient(150deg,#0b1b43e8,#121139ed);box-shadow:0 30px 100px #0007,0 0 60px #2678ff25;text-align:center}
+.eyebrow{text-transform:uppercase;letter-spacing:.2em;color:#80d5ff;font-size:.75rem;font-weight:800}
+h1{font-size:clamp(2.4rem,7vw,5rem);line-height:1.07;margin:20px 0;background:linear-gradient(100deg,#fff,#a8d6ff 60%,#f4b4ff);background-clip:text;color:transparent}
+.lead{max-width:640px;margin:0 auto 30px;color:#d3def8;font-size:clamp(1rem,2vw,1.2rem);line-height:1.7}
+.orbit{font-size:3.8rem;filter:drop-shadow(0 0 24px #68c7ff);margin:8px}
+.features{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:30px 0}
+.feature{padding:20px 10px;border:1px solid #2b70c2;border-radius:16px;background:#071936bb}
+.feature .symbol{font-size:2rem;display:block;margin-bottom:8px}
+.feature strong{display:block;font-size:.95rem}
+.feature small{display:block;color:#bdccec;margin-top:8px;line-height:1.5}
+.notice{padding:19px;border:1px solid #8069e9;border-radius:14px;background:#38216b66}
+.notice strong{display:block;color:#cbd9ff}
+.notice p{margin:6px 0 0;color:#c9d4ed}
+footer{border-top:1px solid #4975ba44;border-bottom:0;padding:24px;text-align:center;color:#aebbd7;font-size:.85rem}
+.owner{display:inline-block;margin-top:14px;color:#9ecfff;text-underline-offset:4px}
+.owner:focus-visible{outline:3px solid #ffcc3b;outline-offset:5px}
+@media(max-width:650px){.features{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{border-radius:20px}.feature{padding:16px 8px}}
+@media(prefers-reduced-motion:no-preference){.orbit{animation:float 5s ease-in-out infinite}@keyframes float{50%{transform:translateY(-8px)}}}
 </style>
 </head>
-<body><main><h1>Cartoon Universe is under maintenance</h1><p>The arcade is temporarily unavailable to players. Please check back later.</p></main></body>
-</html>
+<body>
+<header><div class="brand" aria-label="Cartoon Universe">CARTOON<span>UNIVERSE</span></div><div class="status">● Maintenance in progress</div></header>
+<main><section class="panel" aria-labelledby="heading">
+<div class="orbit" aria-hidden="true">🪐</div>
+<p class="eyebrow">Something awesome is coming</p>
+<h1 id="heading">We'll Be Back Soon!</h1>
+<p class="lead">Cartoon Universe is temporarily closed while we make updates, add new experiences, and get the arcade ready for everyone. Thanks for your patience!</p>
+<div class="features" aria-label="What's coming">
+<div class="feature"><span class="symbol" aria-hidden="true">🎮</span><strong>Arcade Games</strong><small>More fun adventures</small></div>
+<div class="feature"><span class="symbol" aria-hidden="true">🪙</span><strong>Cartoon Coin</strong><small>Play, earn, collect</small></div>
+<div class="feature"><span class="symbol" aria-hidden="true">👥</span><strong>Community</strong><small>Connect with players</small></div>
+<div class="feature"><span class="symbol" aria-hidden="true">✨</span><strong>Improvements</strong><small>A better experience</small></div>
+</div>
+<div class="notice" role="status"><strong>🛠️ Maintenance in Progress</strong><p>The arcade is unavailable to regular players right now. Please check back soon.</p></div>
+</section></main>
+<footer>© 2026 Cartoon Universe. Play. Collect. Explore.<div><a class="owner" href="https://cartoon-universe-gateway.onrender.com/__maintenance/owner-signin">Owner sign in</a></div></footer>
+</body></html>

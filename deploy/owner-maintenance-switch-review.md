@@ -18,3 +18,13 @@
 
 ## Status
 Design only. No endpoint, control-plane credential, deployment change, or working ON/OFF switch has been implemented. Do not enable the disabled dashboard button until the requirements above are met.
+
+## Per-page maintenance and player-facing status (approved design scope)
+- Owner Maintenance Center will support a master maintenance override and individually controlled page/feature entries (e.g., home, arcade, shop, profiles, leaderboards). Define a stable route/feature registry rather than trusting arbitrary browser-provided paths.
+- Each public navigation tab displays a plain-language LIVE or MAINTENANCE indicator; add a separate public feature-status page listing the same entries, explanatory notices, and last-confirmed state.
+- Status must reflect **effective server-enforced access**, including the master override, not just an owner preference in Supabase. An unverified or stale status must display an unavailable/unknown state, never falsely LIVE.
+- Keep status reads public and strictly read-only; redact owner identities, session data, unreleased routes, and internal infrastructure details. Do not expose private features in the public status registry.
+- Individual maintenance must block direct URL access server-side, while verified owners may preview safely. Default to maintenance when routing/control-plane health is uncertain.
+- Publish status changes atomically with routing changes or only after routing confirms the effective state. Include cache invalidation/versioning so tabs and the status page agree.
+- Add isolated tests for per-route direct access, owner bypass, master override, tab/status consistency, invalid routes, outage fail-closed, and stale cache handling.
+- This is design scope only. No status badges, status page, route toggles, or production changes are live yet.

@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'review/sql/**'
+      - 'sql/tests/cartoon_coin_daily_reward_test.sql'
       - '.github/workflows/review-supabase-hardening.yml'
 permissions:
   contents: read

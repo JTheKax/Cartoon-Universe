@@ -19,4 +19,4 @@ jobs:
         with:
           node-version: '22'
       - name: Run fail-closed switch policy and preview tests
-        run: node --test server/maintenance-switch-policy.test.mjs server/maintenance-switch-preview.test.mjs server/maintenance-control-handler.test.mjs server/owner-maintenance-preview-route.test.mjs deploy/feature-status-preview/public-feature-status.test.mjs
+        run: node --test server/maintenance-switch-policy.test.mjs server/maintenance-switch-preview.test.mjs server/maintenance-control-handler.test.mjs server/owner-maintenance-preview-route.test.mjs deploy/feature-status-preview/public-feature-status.test.mjs deploy/feature-status-preview/feature-navigation.test.mjs

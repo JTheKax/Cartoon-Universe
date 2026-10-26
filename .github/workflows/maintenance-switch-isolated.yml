@@ -7,7 +7,7 @@ on:
       - 'server/owner-maintenance-preview-route*.mjs'
       - 'server/public-maintenance-router*.mjs'
       - 'server/public-maintenance-http*.mjs'
-      - 'server/maintenance-feature-review.test.mjs server/owner-maintenance-settings-reader.test.mjs'
+      - 'server/maintenance-feature-review.test.mjs server/owner-maintenance-settings-reader.test.mjs server/owner-maintenance-settings-e2e.test.mjs'
       - 'server/owner-maintenance-settings-reader*.mjs'
       - 'maintenance-feature-review.js'
       - 'owner.html'

@@ -51,3 +51,9 @@
 html[data-logo-mode="dragon"] .cu-logo-dragon,html[data-logo-mode="ninja"] .cu-logo-ninja{animation:none!important;opacity:1!important;transform:none!important;display:flex!important}
 html[data-logo-mode="dragon"] .cu-logo-ninja,html[data-logo-mode="ninja"] .cu-logo-dragon{animation:none!important;opacity:0!important;display:none!important}
 @media(prefers-reduced-motion:reduce){html[data-logo-mode="ninja"] .cu-logo-ninja{display:flex!important}}
+
+/* Uploaded logo image overrides built-in slides in custom mode. */
+.cu-animated-brand{position:relative}
+.cu-custom-logo{display:block;max-width:230px;max-height:75px;object-fit:contain}
+.cu-custom-logo[hidden]{display:none!important}
+html[data-logo-mode="custom"] .cu-animated-brand .cu-logo-frame{display:none!important}

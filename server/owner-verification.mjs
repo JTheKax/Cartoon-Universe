@@ -37,7 +37,7 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
  };
  const handle=async(req,send)=>{
   const path=req.url.split('?')[0];
-  const known=['/__maintenance/owner-signin','/__maintenance/owner-verification.js','/__maintenance/owner-verification.css','/__maintenance/owner-verification-config.js','/__maintenance/verify-session','/__maintenance/owner-status'];
+  const known=['/__maintenance/owner-signin','/__maintenance/owner-verification.js','/__maintenance/owner-verification.css','/__maintenance/owner-verification-config.js','/__maintenance/verify-session','/__maintenance/owner-status','/__maintenance/arcade-error-background.png'];
   if(!known.includes(path))return false;
   const done=(code,body,type='text/plain; charset=utf-8',extra={})=>{send(code,body,type,{'Content-Security-Policy':csp,...extra});return true;};
   const json=(code,data,extra={})=>done(code,JSON.stringify(data),'application/json; charset=utf-8',extra);
@@ -68,6 +68,10 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
    const valid=!!session&&session.expires>now()&&await owner(session.token);
    if(!valid)sessions.delete(id);
    return json(200,{ownerVerified:valid,readOnly:true});
+  }
+  if(path==='/__maintenance/arcade-error-background.png'){
+   try{return done(200,readFileSync(new URL('../deploy/public-maintenance/arcade-error-background.png',import.meta.url)),'image/png');}
+   catch{return done(404,'Artwork not installed');}
   }
   if(path==='/__maintenance/owner-signin')return done(200,HTML,'text/html; charset=utf-8');
   if(path==='/__maintenance/owner-verification.css')return done(200,CSS,'text/css; charset=utf-8');

@@ -12,6 +12,10 @@ main{padding-left:clamp(12px,2vw,30px)!important;padding-right:clamp(12px,2vw,30
 .cinema-screen-shell{width:100%!important;max-width:none!important;margin:12px auto 22px!important;padding:clamp(5px,1vw,14px)!important}
 .cinema-screen-shell #theater-player,.cinema-screen-shell #theater-embed{width:100%!important;aspect-ratio:16/9!important}
 @media(min-width:900px){.cinema-screen-shell{width:min(100%,1600px)!important}}
+
+/* Oversized cinema projection: 2x the previous maximum width (1600px -> 3200px), constrained to the viewport without horizontal overflow. */
+@media(min-width:900px){.cinema-screen-shell{width:min(100%,3200px)!important;max-width:3200px!important}}
+.cinema-screen-shell{min-height:0!important}
 </style></head><body><header><a href="../index.html">← Cartoon Universe Arcade</a><h1>🍿 Cartoon Universe Movie Theater</h1></header><main><div class="cinema-curtain cinema-curtain-left" aria-hidden="true"></div><div class="cinema-curtain cinema-curtain-right" aria-hidden="true"></div><section id="watch" class="section arcade-destination">
 <p class="eyebrow">LIGHTS, CAMERA, CARTOONS</p><h2>🎬 CARTOON UNIVERSE TV</h2>
 <p class="explore-intro">24/7 scheduled theater with owner-controlled live broadcast overrides. Streams play only when configured by the owner.</p>

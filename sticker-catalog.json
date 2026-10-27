@@ -1,16 +1,20 @@
 {
   "series": [
     {
-      "id": "xiaolin-showdown",
-      "name": "Xiaolin Showdown"
+      "id": "family-guy",
+      "name": "Family Guy"
     },
     {
       "id": "futurama",
       "name": "Futurama"
     },
     {
-      "id": "family-guy",
-      "name": "Family Guy"
+      "id": "spongebob-squarepants",
+      "name": "SpongeBob SquarePants"
+    },
+    {
+      "id": "xiaolin-showdown",
+      "name": "Xiaolin Showdown"
     }
   ],
   "stickers": []

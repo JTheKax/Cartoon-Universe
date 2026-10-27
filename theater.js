@@ -54,17 +54,17 @@ if(player){
   for(const p of programs){const li=document.createElement('li');li.textContent=p.title+' · '+p.duration_minutes+' min';list.append(li)}
   if(!programs.length){const li=document.createElement('li');li.textContent='No programs scheduled yet.';list.append(li)}
   if(live?.enabled&&parseMedia(live.media_url)){
-   status.textContent='🔴 LIVE NOW';el('theater-now').textContent=live.title;
+   status.textContent='🔴 LIVE NOW';el('theater-now').textContent=live.title;el('theater-marquee-label').textContent='🔴 LIVE PREMIERE';el('theater-marquee-program').textContent=live.title;
    play(live.media_url,'live:'+live.id+':'+live.updated_at);
    message.textContent='Owner live broadcast is on air.';return;
   }
   const valid=programs.filter(p=>parseMedia(p.media_url)&&p.duration_minutes>0);
   const total=valid.reduce((sum,p)=>sum+p.duration_minutes*60,0);
-  if(!total){status.textContent='⚫ OFF AIR';el('theater-now').textContent='';play(null);message.textContent='The owner has not scheduled a playable channel yet.';return}
+  if(!total){status.textContent='⚫ OFF AIR';el('theater-now').textContent='';el('theater-marquee-label').textContent='COMING SOON';el('theater-marquee-program').textContent='STAY TUNED';play(null);message.textContent='The owner has not scheduled a playable channel yet.';return}
   // Shared UTC epoch anchors the same schedule across viewers and page reloads.
   let t=Math.floor(Date.now()/1000)%total,chosen=valid[0],offset=0;
   for(const p of valid){const duration=p.duration_minutes*60;if(t<duration){chosen=p;offset=t;break}t-=duration}
-  status.textContent='🟢 24/7 PROGRAMMING';el('theater-now').textContent='Now playing: '+chosen.title;
+  status.textContent='🟢 24/7 PROGRAMMING';el('theater-now').textContent='Now playing: '+chosen.title;el('theater-marquee-label').textContent='NOW PLAYING';el('theater-marquee-program').textContent=chosen.title;
   play(safeURL(chosen.media_url),'program:'+chosen.id,offset);
   message.textContent='Scheduled playback; availability depends on the video host.';
  }

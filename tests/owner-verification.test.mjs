@@ -163,19 +163,18 @@ test('owner arcade homepage assets resolve only through the protected route',asy
 
 test('verified owner can open standalone theater without exposing assets to anonymous visitors',async t=>{
  const {base,verify}=await fixture(t);
- const denied=await fetch(base+'/__maintenance/arcade/static/theater.html');
- assert.equal(denied.status,503);
+ assert.equal((await fetch(base+'/__maintenance/arcade/static/theater.html')).status,503);
  const response=await verify('owner-token');assert.equal(response.status,200);
  const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
  const page=await fetch(base+'/__maintenance/arcade/static/theater.html',{headers});
  assert.equal(page.status,200);
  const html=await page.text();
- assert.match(html,/<base href="\\/__maintenance\\/arcade\\/">/);
+ assert.ok(html.includes('<base href="/__maintenance/arcade/">'));
  for(const asset of ['styles.css','theater.js','index.html']){
-  assert.match(html,new RegExp('(?:href|src)="'+asset.replace('.','\\\\.')+'"'));
+  assert.ok(html.includes('href="'+asset+'"')||html.includes('src="'+asset+'"'),asset);
   const path='/__maintenance/arcade/'+asset;
   assert.equal((await fetch(base+path,{headers})).status,200,path);
   assert.equal((await fetch(base+path)).status,503,path);
+  assert.ok(!html.includes('="../'+asset+'"'),'Escaping protected prefix: '+asset);
  }
- assert.doesNotMatch(html,/(?:href|src)="\\.\\.\\/(?:styles\\.css|theater\\.js|index\\.html)"/);
 });

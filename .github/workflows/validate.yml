@@ -27,6 +27,8 @@ jobs:
         run: node --test tests/supabase-config.test.mjs
       - name: Validate maintenance UI safety checks
         run: node --test tests/maintenance-ui.test.mjs
+      - name: Verify section status transactional contracts
+        run: node --test tests/section-maintenance-transaction.test.mjs
       - name: Verify read-only section status behavior
         run: node --test tests/section-maintenance-read-api.test.mjs
       - name: Test isolated HTTP section status adapter

@@ -1,0 +1,29 @@
+name: Validate appearance controls (isolated)
+on:
+  pull_request:
+    paths:
+      - 'assets/**'
+      - 'scripts/build_appearance_catalog.py'
+      - 'tests/test_appearance_catalog.py'
+      - 'owner.html'
+      - 'index.html'
+      - 'theme.js'
+      - 'logo-preferences.js'
+      - 'admin-nav.js'
+      - 'clean-arcade.css'
+      - 'owner.css'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  appearance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate catalog and owner controls
+        run: python -m unittest discover -s tests -p test_appearance_catalog.py
+      - name: Ensure catalog generation does not leave changes
+        run: git diff --exit-code -- assets/appearance-catalog.json

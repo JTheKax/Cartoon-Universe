@@ -125,3 +125,16 @@ body:has(.arcade-destination)::before,body:has(.arcade-destination)::after{backg
 .arcade-destination:has(nav[aria-label="Main areas"]) > nav[aria-label$="pages"]{order:-1;position:sticky;top:54px;z-index:29;margin:0 !important;border:1px solid #5ebee9;border-radius:9px}
 .arcade-destination .cmart-tabs a[aria-current="page"]{background:#5bbcf0;color:#071b32;border-color:#d4f6ff}
 @media(max-width:720px){.arcade-destination:has(nav[aria-label="Main areas"]) > nav[aria-label="Main areas"],.arcade-destination:has(nav[aria-label="Main areas"]) > nav[aria-label$="pages"]{position:relative;top:auto}.arcade-destination .cmart-tabs{gap:5px}.arcade-destination .cmart-tabs a{padding:7px 9px}}
+
+/* Same top navigation as homepage, on all standalone pages. */
+.cu-shared-header{position:sticky;top:0;z-index:100;background:#09152ded;border-bottom:1px solid #3aa8e5;backdrop-filter:blur(12px);padding:8px max(12px,calc((100vw - 1200px)/2))}
+.cu-shared-brand{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:5px 8px 10px}
+.cu-shared-brand a{color:#fff;text-decoration:none;font-weight:900;letter-spacing:.12em}
+.cu-shared-brand span{color:#a8d8f7;font-size:.75rem;letter-spacing:.09em}
+.cu-shared-header .header-nav-row{display:block}
+.cu-shared-header #nav{display:flex !important;align-items:center;flex-wrap:wrap;gap:8px}
+.cu-shared-header .cu-nav-dropdown{position:relative}
+.cu-shared-header .cu-nav-options{position:absolute;top:100%;left:0;z-index:110;min-width:190px;max-height:65vh;overflow:auto;background:#102f55;border:1px solid #57b9ec;border-radius:8px;padding:8px;box-shadow:0 12px 26px #000b}
+.cu-shared-header .cu-nav-options a{display:block;padding:8px;color:white;text-decoration:none}
+.cu-shared-header .cu-nav-options a:hover{background:#245d91}
+@media(max-width:700px){.cu-shared-header{position:sticky}.cu-shared-header #nav{gap:4px}.cu-shared-header .cu-nav-options{position:absolute}}

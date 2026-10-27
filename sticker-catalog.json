@@ -21,12 +21,12 @@
       "name": "The Simpsons"
     },
     {
-      "id": "video-game-covers",
-      "name": "Video Game Covers"
-    },
-    {
       "id": "xiaolin-showdown",
       "name": "Xiaolin Showdown"
+    },
+    {
+      "id": "misc",
+      "name": "Misc."
     }
   ],
   "stickers": []

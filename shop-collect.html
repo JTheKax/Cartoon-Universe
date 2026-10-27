@@ -34,7 +34,7 @@
  function updateCounts(){const n=records.filter(x=>x.series==='Xiaolin Showdown').length;document.getElementById('xiaolin-sticker-count').textContent=n;document.getElementById('cartoons-sticker-count').textContent=records.filter(x=>x.set==='Cartoons').length;document.getElementById('library-published-count').textContent=records.length}
  seriesLink.addEventListener('click',()=>{filters.set.value='Cartoons';filters.series.value='Xiaolin Showdown';render()});
  Object.values(filters).forEach(el=>el.addEventListener('input',render));
- fetch('sticker-catalog.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Catalog unavailable');return r.json()}).then(data=>{if(!Array.isArray(data.stickers))throw Error('Invalid catalog');records.push(...data.stickers.filter(x=>x&&x.published===true&&typeof x.name==='string'&&typeof x.series==='string'&&typeof x.set==='string'));updateCounts();render()}).catch(()=>{grid.replaceChildren(make('strong','','Sticker catalog could not be loaded.'));document.getElementById('registry-count').textContent='Catalog unavailable';});
+ fetch('sticker-catalog.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Catalog unavailable');return r.json()}).then(data=>{if(!Array.isArray(data.stickers))throw Error('Invalid catalog');records.push(...data.stickers.filter(x=>x&&x.published===true&&typeof x.name==='string'&&typeof x.series==='string'&&typeof x.set==='string'));updateCounts();render()}).catch(()=>{grid.replaceChildren(make('strong','','Sticker registry not available on this preview deployment.'));document.getElementById('registry-count').textContent='Registry data not loaded';});
  render();
 })();
 </script>

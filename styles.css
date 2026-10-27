@@ -695,3 +695,12 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 .coin-history th{color:#ffc984}.coin-positive{color:#a5ffb7;font-weight:900}.coin-negative{color:#ffb0b0;font-weight:900}
 .coin-wallet-footnote{font-size:13px}
 @media(max-width:600px){.coin-reward{flex-direction:column;align-items:stretch}.coin-reward .cta{width:100%}}
+
+
+/* Cartoon Universe TV: full container width, responsive 16:9 player and embeds. */
+#watch .theater-panel{width:100%;max-width:none;min-width:0;margin-inline:0;box-sizing:border-box}
+#watch #theater-player,#watch #theater-embed{display:block;width:100%;max-width:100%;aspect-ratio:16 / 9;height:auto;box-sizing:border-box;background:#05030c;border:0;border-radius:12px;overflow:hidden}
+#watch #theater-player{object-fit:contain}
+#watch #theater-embed iframe{display:block;width:100%;height:100%;border:0}
+#watch #theater-player[hidden],#watch #theater-embed[hidden]{display:none!important}
+@media(max-width:600px){#watch .theater-panel{padding-inline:0}#watch #theater-player,#watch #theater-embed{border-radius:6px}}

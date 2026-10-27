@@ -57,3 +57,17 @@ html[data-logo-mode="dragon"] .cu-logo-ninja,html[data-logo-mode="ninja"] .cu-lo
 .cu-custom-logo{display:block;max-width:230px;max-height:75px;object-fit:contain}
 .cu-custom-logo[hidden]{display:none!important}
 html[data-logo-mode="custom"] .cu-animated-brand .cu-logo-frame{display:none!important}
+
+/* Accessible review-only arcade navigation dropdowns. */
+#nav .cu-nav-dropdown{position:relative;display:inline-flex;align-items:center;min-width:0}
+#nav .cu-nav-dropdown summary{list-style:none;cursor:pointer;color:#e9faff;font-weight:800;padding:12px 13px;border-radius:9px;white-space:nowrap}
+#nav .cu-nav-dropdown summary::-webkit-details-marker{display:none}
+#nav .cu-nav-dropdown summary:hover,#nav .cu-nav-dropdown[open] summary{color:#4cfce5;background:rgba(25,255,226,.12)}
+#nav .cu-nav-options{position:absolute;top:100%;left:0;z-index:1000;min-width:180px;padding:8px;background:#090b22;border:1px solid #34e9fc;border-radius:10px;box-shadow:0 10px 25px #000b,0 0 16px #13e6ff55}
+#nav .cu-nav-options a{display:block;padding:11px 13px;white-space:nowrap;color:#e8faff;text-decoration:none;border-radius:6px;font-size:14px}
+#nav .cu-nav-options a:hover,#nav .cu-nav-options a:focus-visible{background:#182a4c;color:#60fff1}
+#nav .cu-nav-dropdown summary:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:800px){#nav .cu-nav-dropdown{display:block;width:100%}#nav .cu-nav-options{position:static;box-shadow:none;min-width:0;margin:0 8px 8px}}
+/* Correct owner menu visibility: its parent, not the trigger, owns verification. */
+#nav #admin-nav-group[hidden]{display:none!important}
+#nav #admin-nav-group:not(.verified-owner):not([data-owner-verified="true"]){display:none!important}

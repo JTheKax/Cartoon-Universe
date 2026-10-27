@@ -21,3 +21,8 @@
 @keyframes cu-logo-pulse{to{opacity:.25;transform:rotate(10deg) scale(1.2)}}
 @media(max-width:750px){.cu-logo-frame{width:175px;height:62px}.cu-logo-art{font-size:24px}.cu-logo-words{font-size:19px}}
 @media(prefers-reduced-motion:reduce){.cu-logo-slide,.cu-logo-art,.cu-logo-energy{animation:none!important}.cu-logo-ninja{display:none}}
+
+/* Admin dropdown grouping, with scrollable access on smaller screens. */
+#nav-admin{max-height:min(75vh,580px);overflow-y:auto;overscroll-behavior:contain}
+#nav-admin .admin-menu-heading{display:block;padding:12px 14px 5px;color:#ffb629;font-size:10px;font-weight:900;letter-spacing:1.2px;pointer-events:none;border-top:1px solid #30445e}
+#nav-admin a:focus-visible{outline:2px solid #34adff;outline-offset:-2px}

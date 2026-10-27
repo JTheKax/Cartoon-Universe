@@ -1,5 +1,5 @@
 -- Disposable PostgreSQL fixture only. All changes are rolled back.
-\\set ON_ERROR_STOP on
+\set ON_ERROR_STOP on
 begin;
 do $$
 begin

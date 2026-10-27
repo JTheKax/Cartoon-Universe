@@ -26,3 +26,9 @@
 #nav-admin{max-height:min(75vh,580px);overflow-y:auto;overscroll-behavior:contain}
 #nav-admin .admin-menu-heading{display:block;padding:12px 14px 5px;color:#ffb629;font-size:10px;font-weight:900;letter-spacing:1.2px;pointer-events:none;border-top:1px solid #30445e}
 #nav-admin a:focus-visible{outline:2px solid #34adff;outline-offset:-2px}
+
+/* Flat top-level tabs: no dropdowns. Keep hidden owner link hidden even with flex nav rules. */
+.clean-header #nav>a{display:inline-flex;align-items:center;font-size:13px;white-space:nowrap;padding:15px 10px;color:#e8f2ff;text-decoration:none}
+.clean-header #nav>a[hidden]{display:none!important}
+.clean-header #nav>a.active,.clean-header #nav>a[aria-current=page]{background:#102e54;border-bottom:3px solid #1b9dff}
+@media(max-width:750px){.clean-header #nav>a{font-size:12px}}

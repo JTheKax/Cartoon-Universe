@@ -23,7 +23,7 @@ Keep the current owner switch disabled until the implementation and tests pass.
 
 ## Release blockers
 
-1. Confirm the SQL proposal matches the actual production schema and existing grants using read-only inspection. Test migrations against a disposable local Supabase environment first; do not create paid branches.
+1. Read-only production catalog inspection on 2026-10-27 confirmed `site_maintenance.enabled` is boolean, `owner_members.user_id` is UUID, and neither new section table exists yet; the existing maintenance and membership SELECT/UPDATE policies are present. **No production rows or settings were changed.** Recheck grants and test migrations against disposable local Supabase before any release; do not create paid branches.
 2. Verify the new server-only owner identity resolver and RPC writer together under real disposable Supabase Auth sessions; no owner ID, role, or token may be accepted from the JSON request body.
 3. Validate the proposed audited RPC and writer against a real disposable Supabase environment. The new PostgreSQL CI test proves atomic rollback in its fixture, but the integration is not yet connected to a gateway.
 4. Mount read and write routes only in an isolated gateway and verify every protected page, asset, and mutation. A status banner alone is not access control.

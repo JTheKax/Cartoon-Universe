@@ -12,3 +12,19 @@ This is a design checklist only. It does not change production behavior.
 - Verify rollback before enabling owner controls.
 
 Keep the current owner switch disabled until the implementation and tests pass.
+
+## Isolated implementation inventory (2026-10-27)
+
+- `supabase/section-maintenance-review.sql` proposes ten fail-closed section records, a read-only public status table, an owner-only authenticated RPC, and a private audit table. **Not applied to production.**
+- `sql/tests/section_maintenance_rpc_test.sql` runs in a disposable PostgreSQL CI database and checks owner/nonowner privileges, invalid input, audit creation, and rollback if audit insertion fails.
+- `server/section-maintenance-supabase-reader.mjs` reads global and section states using a publishable key only. The read API defaults to maintenance when the source fails.
+- The section API, route guard, transaction contract, and read API remain isolated modules. They are **not mounted on the production gateway** and the owner's section toggles must remain disabled.
+
+## Release blockers
+
+1. Confirm the SQL proposal matches the actual production schema and existing grants using read-only inspection. Test migrations against a disposable local Supabase environment first; do not create paid branches.
+2. Connect authenticated owner identity to the server-only write endpoint without accepting a user ID or role from the browser. The current owner-verification helper exposes only a boolean authorization check.
+3. Implement a trusted persistence adapter that invokes the audited RPC with the verified owner's Supabase access token. The in-memory transaction contract alone is not proof of database rollback.
+4. Mount read and write routes only in an isolated gateway and verify every protected page, asset, and mutation. A status banner alone is not access control.
+5. Test owner, player, anonymous, expired-token, global-maintenance, partial-outage, concurrent-update, and rollback paths end-to-end; check all GitHub Actions jobs before release.
+6. Obtain separate release authorization before any production migration, merge, deployment, or maintenance-mode change.

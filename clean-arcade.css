@@ -34,7 +34,7 @@
 @media(max-width:750px){.clean-header #nav>a{font-size:12px}}
 
 /* Fail closed: ADMIN must remain hidden until verified owner membership is returned. */
-#nav #admin-nav[hidden],#nav #admin-nav:not(.verified-owner){display:none!important}
+#nav #admin-nav[hidden]{display:none!important}
 
 /* Owner-only ADMIN dropdown; other tabs remain flat. */
 #nav .owner-menu[hidden],#nav .owner-menu:not(.verified-owner){display:none!important}

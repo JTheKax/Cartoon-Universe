@@ -1,0 +1,15 @@
+{
+  "sets": [
+    {
+      "id": "cartoons",
+      "name": "Cartoons",
+      "series": [
+        {
+          "id": "xiaolin-showdown",
+          "name": "Xiaolin Showdown"
+        }
+      ]
+    }
+  ],
+  "stickers": []
+}

@@ -1,14 +1,8 @@
 {
-  "sets": [
+  "series": [
     {
-      "id": "cartoons",
-      "name": "Cartoons",
-      "series": [
-        {
-          "id": "xiaolin-showdown",
-          "name": "Xiaolin Showdown"
-        }
-      ]
+      "id": "xiaolin-showdown",
+      "name": "Xiaolin Showdown"
     }
   ],
   "stickers": []

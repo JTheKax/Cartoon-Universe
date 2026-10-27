@@ -32,3 +32,6 @@
 .clean-header #nav>a[hidden]{display:none!important}
 .clean-header #nav>a.active,.clean-header #nav>a[aria-current=page]{background:#102e54;border-bottom:3px solid #1b9dff}
 @media(max-width:750px){.clean-header #nav>a{font-size:12px}}
+
+/* Fail closed: ADMIN must remain hidden until verified owner membership is returned. */
+#nav #admin-nav[hidden],#nav #admin-nav:not(.verified-owner){display:none!important}

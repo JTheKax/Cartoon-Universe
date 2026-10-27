@@ -19,22 +19,30 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
   if(!response.ok)throw new Error('Owner verification unavailable');
   return response;
  }
- async function owner(token){
-  if(!token)return false;
+ async function ownerIdentity(token){
+  if(!token)return null;
   try{
    const user=await (await api('/auth/v1/user',token)).json();
    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id||'')||user.is_anonymous===true)return false;
    const rows=await (await api('/rest/v1/owner_members?select=user_id&user_id=eq.'+encodeURIComponent(user.id),token)).json();
-   return Array.isArray(rows)&&rows.some(row=>row.user_id===user.id);
-  }catch{return false;}
+   return Array.isArray(rows)&&rows.some(row=>row.user_id===user.id)?user.id:null;
+  }catch{return null;}
  }
- const authorized=async req=>{
+ const owner=async token=>!!await ownerIdentity(token);
+ // Server-only identity resolver for isolated audited RPC integration.
+ // The token is never returned by an HTTP endpoint or placed in a response body.
+ const identity=async req=>{
   const id=(req.headers.cookie||'').split(';').map(value=>value.trim()).find(value=>value.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);
   const session=sessions.get(id);
-  const valid=!!session&&session.expires>now()&&await owner(session.token);
-  if(!valid)sessions.delete(id);
-  return valid;
+  if(!session||session.expires<=now()){
+   sessions.delete(id);
+   return {verified:false};
+  }
+  const userId=await ownerIdentity(session.token);
+  if(!userId){sessions.delete(id);return {verified:false};}
+  return {verified:true,userId,accessToken:session.token};
  };
+ const authorized=async req=>(await identity(req)).verified===true;
  const handle=async(req,send)=>{
   const path=req.url.split('?')[0];
   const known=['/__maintenance/owner-signin','/__maintenance/owner-verification.js','/__maintenance/owner-verification.css','/__maintenance/owner-verification-config.js','/__maintenance/verify-session','/__maintenance/owner-status','/__maintenance/arcade-error-background.png'];
@@ -81,5 +89,6 @@ export const SUPABASE_KEY=${JSON.stringify(publishableKey)};
 `,'text/javascript; charset=utf-8');
  };
  handle.authorized=authorized;
+ handle.identity=identity;
  return handle;
 }

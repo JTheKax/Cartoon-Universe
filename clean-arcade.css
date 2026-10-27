@@ -46,3 +46,8 @@
 #nav .owner-menu-dropdown a{display:block;padding:12px 14px;border-radius:7px;color:#e8f2ff;text-decoration:none;white-space:nowrap}
 #nav .owner-menu-dropdown a:hover,#nav .owner-menu-dropdown a:focus-visible{background:#173453;color:#ffbf43}
 @media(max-width:1000px){#nav .owner-menu{width:100%;display:block}#nav .owner-menu-trigger{width:100%;text-align:left}#nav .owner-menu-dropdown{position:static;box-shadow:none;width:100%;box-sizing:border-box}}
+
+/* Browser-local logo mode selection, preserving the default alternating cycle. */
+html[data-logo-mode="dragon"] .cu-logo-dragon,html[data-logo-mode="ninja"] .cu-logo-ninja{animation:none!important;opacity:1!important;transform:none!important;display:flex!important}
+html[data-logo-mode="dragon"] .cu-logo-ninja,html[data-logo-mode="ninja"] .cu-logo-dragon{animation:none!important;opacity:0!important;display:none!important}
+@media(prefers-reduced-motion:reduce){html[data-logo-mode="ninja"] .cu-logo-ninja{display:flex!important}}

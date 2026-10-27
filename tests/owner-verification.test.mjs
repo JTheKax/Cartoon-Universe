@@ -159,3 +159,23 @@ test('owner arcade homepage assets resolve only through the protected route',asy
  const client=await (await fetch(base+'/__maintenance/owner-verification.js')).text();
  assert.match(client,/getElementById\('arcade-entry'\)\.hidden=!verified/);
 });
+
+
+test('verified owner can open standalone theater without exposing assets to anonymous visitors',async t=>{
+ const {base,verify}=await fixture(t);
+ const denied=await fetch(base+'/__maintenance/arcade/static/theater.html');
+ assert.equal(denied.status,503);
+ const response=await verify('owner-token');assert.equal(response.status,200);
+ const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
+ const page=await fetch(base+'/__maintenance/arcade/static/theater.html',{headers});
+ assert.equal(page.status,200);
+ const html=await page.text();
+ assert.match(html,/<base href="\\/__maintenance\\/arcade\\/">/);
+ for(const asset of ['styles.css','theater.js','index.html']){
+  assert.match(html,new RegExp('(?:href|src)="'+asset.replace('.','\\\\.')+'"'));
+  const path='/__maintenance/arcade/'+asset;
+  assert.equal((await fetch(base+path,{headers})).status,200,path);
+  assert.equal((await fetch(base+path)).status,503,path);
+ }
+ assert.doesNotMatch(html,/(?:href|src)="\\.\\.\\/(?:styles\\.css|theater\\.js|index\\.html)"/);
+});

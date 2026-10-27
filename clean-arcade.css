@@ -71,3 +71,14 @@ html[data-logo-mode="custom"] .cu-animated-brand .cu-logo-frame{display:none!imp
 /* Correct owner menu visibility: its parent, not the trigger, owns verification. */
 #nav #admin-nav-group[hidden]{display:none!important}
 #nav #admin-nav-group:not(.verified-owner):not([data-owner-verified="true"]){display:none!important}
+
+/* Appearance preview: uncluttered full-screen arcade stage. */
+body:has(.clean-header) .dashboard-home{min-height:calc(100vh - 155px);display:block;padding:0;background:transparent!important}
+body:has(.clean-header) .dashboard-home .dashboard-main,
+body:has(.clean-header) .dashboard-home .dashboard-tiles{display:none!important}
+body:has(.clean-header) .clean-profile-container{display:none!important}
+body:has(.clean-header) .header.clean-header{z-index:10;background:rgba(5,12,32,.91);backdrop-filter:blur(8px)}
+body:has(.clean-header){background:linear-gradient(180deg,#050b2b 0%,#152e65 48%,#ee6e69 72%,#111d58 76%,#03192c 100%) fixed!important}
+body:has(.clean-header) .dashboard-home::before{content:"★";display:block;text-align:center;font-size:clamp(100px,22vw,230px);line-height:1.25;color:#ffdf66;text-shadow:0 0 28px #ffb736,0 0 80px #ff722a;pointer-events:none}
+body:has(.clean-header) .dashboard-home::after{content:"";display:block;height:34vh;background:repeating-linear-gradient(90deg,transparent 0 9%,#37e5ff99 9.2% 9.5%,transparent 9.8% 18%),repeating-linear-gradient(0deg,transparent 0 23%,#37e5ff99 24% 25%,transparent 26% 48%);transform:perspective(230px) rotateX(56deg);transform-origin:bottom;opacity:.7;pointer-events:none}
+@media(max-width:800px){body:has(.clean-header) .dashboard-home{min-height:75vh}body:has(.clean-header) .dashboard-home::after{height:25vh}}

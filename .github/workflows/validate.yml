@@ -57,6 +57,8 @@ jobs:
           node --check maintenance-notice.js
       - name: Test staging maintenance HTTP gateway
         run: node --test tests/maintenance-gateway.test.mjs
+      - name: Verify server-only owner identity resolver
+        run: node --test tests/section-owner-identity.test.mjs
       - name: Test read-only owner verification
         run: node --test tests/owner-verification.test.mjs
       - name: Test isolated gateway address candidate

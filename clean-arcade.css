@@ -82,3 +82,14 @@ body:has(.clean-header){background:linear-gradient(180deg,#050b2b 0%,#152e65 48%
 body:has(.clean-header) .dashboard-home::before{content:"★";display:block;text-align:center;font-size:clamp(100px,22vw,230px);line-height:1.25;color:#ffdf66;text-shadow:0 0 28px #ffb736,0 0 80px #ff722a;pointer-events:none}
 body:has(.clean-header) .dashboard-home::after{content:"";display:block;height:34vh;background:repeating-linear-gradient(90deg,transparent 0 9%,#37e5ff99 9.2% 9.5%,transparent 9.8% 18%),repeating-linear-gradient(0deg,transparent 0 23%,#37e5ff99 24% 25%,transparent 26% 48%);transform:perspective(230px) rotateX(56deg);transform-origin:bottom;opacity:.7;pointer-events:none}
 @media(max-width:800px){body:has(.clean-header) .dashboard-home{min-height:75vh}body:has(.clean-header) .dashboard-home::after{height:25vh}}
+
+/* Sticker gallery window — catalog connection follows in isolated sticker development. */
+.sticker-gallery-window{margin:24px auto;max-width:1100px;min-height:310px;padding:22px;border:2px solid #42d8ff;border-radius:22px;background:linear-gradient(145deg,rgba(10,19,53,.96),rgba(37,17,70,.95));box-shadow:0 0 25px #1bceff55,inset 0 0 20px #ffffff0a;color:#f4f7ff}
+.sticker-gallery-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:24px}
+.sticker-gallery-toolbar label{font-weight:700;font-size:.88rem}
+.sticker-gallery-toolbar input,.sticker-gallery-toolbar select{background:#111d43;color:#fff;border:1px solid #72d9ff;border-radius:9px;padding:10px;min-width:140px;max-width:100%}
+.sticker-gallery-toolbar input{flex:1;min-width:180px}
+.sticker-gallery-empty{min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;border:1px dashed #6c8db7;border-radius:16px;padding:24px}
+.sticker-gallery-empty span{font-size:44px}
+.sticker-gallery-empty p{max-width:530px;margin:0;color:#d2d9ef}
+@media(max-width:600px){.sticker-gallery-window{padding:14px}.sticker-gallery-toolbar{align-items:stretch;flex-direction:column}.sticker-gallery-toolbar input,.sticker-gallery-toolbar select{width:100%}}

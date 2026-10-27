@@ -7,6 +7,10 @@
     {
       "id": "futurama",
       "name": "Futurama"
+    },
+    {
+      "id": "family-guy",
+      "name": "Family Guy"
     }
   ],
   "stickers": []

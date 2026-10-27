@@ -704,3 +704,15 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 #watch #theater-embed iframe{display:block;width:100%;height:100%;border:0}
 #watch #theater-player[hidden],#watch #theater-embed[hidden]{display:none!important}
 @media(max-width:600px){#watch .theater-panel{padding-inline:0}#watch #theater-player,#watch #theater-embed{border-radius:6px}}
+
+
+/* Classic cinema marquee above the responsive theater screen. */
+#watch .theater-marquee{width:100%;margin:0 0 14px;box-sizing:border-box;overflow:hidden;text-align:center;color:#ffe8a0;background:linear-gradient(180deg,#6b1428,#320d21 72%,#190b19);border:4px solid #e9aa39;border-radius:15px;box-shadow:0 0 0 3px #4d1b21 inset,0 8px 24px #0008}
+#watch .theater-marquee-lights{height:15px;background-image:radial-gradient(circle,#fff3b5 0 3px,#f5a52b 4px,#6b2c16 6px,transparent 7px);background-size:25px 15px;background-repeat:repeat-x;filter:drop-shadow(0 0 4px #ffb53d);animation:theater-marquee-glow 1.4s ease-in-out infinite alternate}
+#watch .theater-marquee-title{font-size:clamp(1.05rem,3.3vw,2.4rem);font-weight:950;letter-spacing:.09em;line-height:1.3;padding:12px 8px 4px;text-shadow:0 2px 0 #7b3916,0 0 15px #f6a92e}
+#watch .theater-marquee-subtitle{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 18px;padding:6px 10px 14px;font-size:clamp(.75rem,1.8vw,1.05rem);font-weight:800;letter-spacing:.05em}
+#watch #theater-marquee-label{color:#ffb85a}
+#watch #theater-marquee-program{color:#fff4d4;overflow-wrap:anywhere}
+@keyframes theater-marquee-glow{from{opacity:.65}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#watch .theater-marquee-lights{animation:none}}
+@media(max-width:600px){#watch .theater-marquee{border-width:3px;border-radius:9px}#watch .theater-marquee-title{letter-spacing:.03em}}

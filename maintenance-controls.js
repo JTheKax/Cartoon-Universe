@@ -2,6 +2,7 @@ import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
 const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const panel=document.getElementById('maintenance-panel');
+const modeCurrent=document.getElementById('owner-mode-current');
 const status=document.getElementById('maintenance-live-status');
 const message=document.getElementById('maintenance-message');
 const preview=document.getElementById('maintenance-preview-screen');
@@ -23,6 +24,7 @@ async function load(){
  if(error)throw error;
  enabled=!!data.enabled;message.value=data.message||'We will be back soon!';
  status.textContent='Maintenance mode: '+(enabled?'ON':'OFF');
+ if(modeCurrent)modeCurrent.textContent='Current mode: '+(enabled?'🛠️ Maintenance':'🟢 Live')+' (read-only)';
  toggle.textContent=enabled?'Turn maintenance OFF':'Turn maintenance ON';
  // Safety interlock: never enable until server-side enforcement is verified.
  toggle.disabled=true;
@@ -48,3 +50,7 @@ save?.addEventListener('click',async()=>{
  } catch {status.textContent='Save failed. Check your connection and try again.';}
  finally {save.disabled=false;}
 });
+
+// Mode buttons are intentionally read-only until server-side gating is verified.
+async function showCurrentMode(){if(!modeCurrent)return;try{const {data:{user}}=await client.auth.getUser();if(!user){modeCurrent.textContent='Current mode: sign in required';return;}const {data:owner}=await client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();if(!owner){modeCurrent.textContent='Current mode: owner access required';return;}const {data,error}=await client.from('site_maintenance').select('enabled').eq('id',true).single();modeCurrent.textContent=error?'Current mode: unavailable':'Current mode: '+(data.enabled?'🛠️ Maintenance':'🟢 Live')+' (read-only)';}catch{modeCurrent.textContent='Current mode: unavailable';}}
+showCurrentMode();

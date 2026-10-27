@@ -1,15 +1,16 @@
 // Browser-local appearance selection; custom theme CSS is indexed from assets/themes.
 (() => {
  const key='cartoon-universe-background-theme';
- const builtin={haunted:'Haunted Arcade',galaxy:'Cosmic Galaxy',neon:'Neon Arcade',midnight:'Midnight'};
+ const builtin={galaxy:'Cosmic Galaxy',neon:'Neon Arcade',midnight:'Midnight'};
  let selected='neon';try{selected=localStorage.getItem(key)||'neon'}catch{}
+ if(selected==='haunted')selected='neon';
  const preferredOnLoad=selected;
  const stylesheet=document.createElement('link');stylesheet.rel='stylesheet';stylesheet.id='cu-custom-theme-css';
  function apply(theme){
   const entries=window.cartoonUniverseThemes||[];
   const item=entries.find(x=>x.id===theme);
   const isBuiltIn=Object.hasOwn(builtin,theme);
-  if(!isBuiltIn&&!item)theme='neon';
+  if(theme==='haunted'||(!isBuiltIn&&!item))theme='neon';
   const custom=!isBuiltIn&&item&&item.kind==='file';
   document.documentElement.dataset.backgroundTheme=custom?'custom':theme;
   if(custom){stylesheet.href=item.path;if(!stylesheet.isConnected)document.head.append(stylesheet)}

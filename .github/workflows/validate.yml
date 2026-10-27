@@ -27,6 +27,8 @@ jobs:
         run: node --test tests/supabase-config.test.mjs
       - name: Validate maintenance UI safety checks
         run: node --test tests/maintenance-ui.test.mjs
+      - name: Test fail-closed section status snapshots
+        run: node --test tests/section-maintenance-store.test.mjs
       - name: Test fail-closed section maintenance decisions
         run: node --test tests/section-maintenance-policy.test.mjs
       - name: Test arcade section preview safety contracts

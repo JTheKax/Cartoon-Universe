@@ -16,8 +16,8 @@ if(player){
    const id=host==='youtu.be'?u.pathname.slice(1):u.pathname.startsWith('/shorts/')||u.pathname.startsWith('/live/')?u.pathname.split('/')[2]:u.searchParams.get('v');
    return id&&/^[a-zA-Z0-9_-]{11}$/.test(id)?{type:'youtube',url:'https://www.youtube-nocookie.com/embed/'+id}:null;
   }
-  if(/\\.m3u8$/i.test(u.pathname))return {type:'hls',url};
-  if(/\\.(mp4|webm)$/i.test(u.pathname))return {type:'video',url};
+  if(/\.m3u8$/i.test(u.pathname))return {type:'hls',url};
+  if(/\.(mp4|webm)$/i.test(u.pathname))return {type:'video',url};
   return null;
  };
  async function play(raw,key,offset=0){

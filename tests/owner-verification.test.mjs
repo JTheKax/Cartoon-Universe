@@ -166,6 +166,9 @@ test('verified owner can open standalone theater without exposing assets to anon
  assert.equal((await fetch(base+'/__maintenance/arcade/static/theater.html')).status,503);
  const response=await verify('owner-token');assert.equal(response.status,200);
  const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
+ const ownerDashboard=await fetch(base+'/__maintenance/arcade/owner.html',{headers});
+ assert.equal(ownerDashboard.status,200);
+ assert.ok((await ownerDashboard.text()).includes('href="static/theater.html"'));
  const page=await fetch(base+'/__maintenance/arcade/static/theater.html',{headers});
  assert.equal(page.status,200);
  const html=await page.text();

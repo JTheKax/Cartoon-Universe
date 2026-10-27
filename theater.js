@@ -1,0 +1,70 @@
+import {isSupabaseConfigured} from './supabase-config.js';
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
+const el=id=>document.getElementById(id), player=el('theater-player'),status=el('theater-status'),message=el('theater-message');
+if(player){
+ const client=isSupabaseConfigured(SUPABASE_URL,SUPABASE_ANON_KEY)?createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+ let programs=[],live=null,owner=false,activeKey='',started=0;
+ const safeURL=value=>{try{const u=new URL(value);return u.protocol==='https:'&&!!u.hostname?u.href:null}catch{return null}};
+ const say=(id,text)=>{el(id).textContent=text};
+ function play(url,key,offset=0){
+  if(!url){if(activeKey){player.pause();player.removeAttribute('src');player.load();activeKey=''}return}
+  if(key===activeKey)return;
+  activeKey=key;player.src=url;player.load();
+  const seek=()=>{if(Number.isFinite(player.duration)&&offset<player.duration)try{player.currentTime=offset}catch{};player.removeEventListener('loadedmetadata',seek)};
+  player.addEventListener('loadedmetadata',seek);
+  player.play().catch(()=>say('theater-message','Press play to start watching. Browser autoplay may be blocked.'));
+ }
+ function render(){
+  const list=el('theater-schedule');list.replaceChildren();
+  for(const p of programs){const li=document.createElement('li');li.textContent=p.title+' · '+p.duration_minutes+' min';list.append(li)}
+  if(!programs.length){const li=document.createElement('li');li.textContent='No programs scheduled yet.';list.append(li)}
+  if(live?.enabled&&safeURL(live.media_url)){
+   status.textContent='🔴 LIVE NOW';el('theater-now').textContent=live.title;
+   play(safeURL(live.media_url),'live:'+live.id+':'+live.updated_at);
+   message.textContent='Owner live broadcast is on air.';return;
+  }
+  const valid=programs.filter(p=>safeURL(p.media_url)&&p.duration_minutes>0);
+  const total=valid.reduce((sum,p)=>sum+p.duration_minutes*60,0);
+  if(!total){status.textContent='⚫ OFF AIR';el('theater-now').textContent='';play(null);message.textContent='The owner has not scheduled a playable channel yet.';return}
+  // Shared UTC epoch anchors the same schedule across viewers and page reloads.
+  let t=Math.floor(Date.now()/1000)%total,chosen=valid[0],offset=0;
+  for(const p of valid){const duration=p.duration_minutes*60;if(t<duration){chosen=p;offset=t;break}t-=duration}
+  status.textContent='🟢 24/7 PROGRAMMING';el('theater-now').textContent='Now playing: '+chosen.title;
+  play(safeURL(chosen.media_url),'program:'+chosen.id,offset);
+  message.textContent='Scheduled playback; availability depends on the video host.';
+ }
+ async function refresh(){
+  if(!client){status.textContent='⚫ NOT CONFIGURED';message.textContent='Streaming requires Supabase configuration.';return}
+  const [p,l]=await Promise.all([client.from('theater_programs').select('id,title,media_url,duration_minutes,sort_order').eq('enabled',true).order('sort_order'),client.from('theater_live').select('id,title,media_url,enabled,updated_at').eq('id',1).maybeSingle()]);
+  if(p.error||l.error){status.textContent='⚫ UNAVAILABLE';message.textContent='The theater database is not ready. Apply the reviewed migration before enabling.';return}
+  programs=p.data||[];live=l.data;render();
+ }
+ async function checkOwner(){
+  if(!client)return;
+  const {data:{user}}=await client.auth.getUser();owner=false;
+  if(user){const r=await client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();owner=!r.error&&!!r.data}
+  el('theater-owner').hidden=!owner;
+ }
+ const submit=async(table,record)=>{if(!owner)return {error:{message:'Owner verification required'}};return client.from(table).upsert(record)};
+ el('theater-program-form').addEventListener('submit',async e=>{
+  e.preventDefault();if(!owner)return;
+  const data=new FormData(e.currentTarget),url=safeURL(data.get('media_url')),duration=Number(data.get('duration'));
+  if(!url||!Number.isInteger(duration)||duration<1||duration>1440){say('theater-owner-message','Use a valid HTTPS URL and duration.');return}
+  const {error}=await client.from('theater_programs').insert({title:String(data.get('title')).trim(),media_url:url,duration_minutes:duration,sort_order:programs.length,enabled:true});
+  say('theater-owner-message',error?error.message:'Program saved.');if(!error){e.currentTarget.reset();await refresh()}
+ });
+ el('theater-live-form').addEventListener('submit',async e=>{
+  e.preventDefault();if(!owner)return;
+  const data=new FormData(e.currentTarget),url=safeURL(data.get('media_url'));
+  if(!url){say('theater-owner-message','Use a valid HTTPS stream URL.');return}
+  const {error}=await submit('theater_live',{id:1,title:String(data.get('title')).trim(),media_url:url,enabled:true,updated_at:new Date().toISOString()});
+  say('theater-owner-message',error?error.message:'Live override enabled.');if(!error)await refresh();
+ });
+ el('theater-stop-live').addEventListener('click',async()=>{
+  if(!owner)return;
+  const {error}=await client.from('theater_live').update({enabled:false,updated_at:new Date().toISOString()}).eq('id',1);
+  say('theater-owner-message',error?error.message:'Playlist resumed.');if(!error)await refresh();
+ });
+ if(client){client.auth.onAuthStateChange(()=>setTimeout(checkOwner,0));checkOwner();refresh();setInterval(refresh,30000);setInterval(render,10000)}else refresh();
+}

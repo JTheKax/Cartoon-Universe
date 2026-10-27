@@ -1,8 +1,6 @@
 /* Original demo items only; this preview does not query or mutate wallets or inventory. */
 (() => {
- const items=[
- ['Pixel Pal','Arcade Originals','Common',75,'👾','item'],['Star Hopper','Space Adventures','Uncommon',125,'🚀','item'],['Moon Muncher','Space Adventures','Rare',250,'🌙','item'],['Pumpkin Prankster','Spooky Specials','Common',100,'🎃','item'],['Ghostly Gamer','Spooky Specials','Very Rare',500,'👻','item'],['Joystick Hero','Arcade Originals','Rare',225,'🕹️','item'],['Cosmic Cat','Space Adventures','Very Rare',450,'🐈','item'],['Witchy Whirl','Spooky Specials','Uncommon',175,'🧙','item'],['Arcade Starter Pack','Arcade Originals','Common',300,'🎁','pack'],['Spooky Mystery Pack','Spooky Specials','Rare',650,'📦','pack'],['Galaxy Surprise Pack','Space Adventures','Rare',600,'🪐','pack'],['Golden Trophy','Arcade Originals','Prize Only',0,'🏆','item']
- ];
+ const items=[];
  const $=id=>document.getElementById(id), grid=$('cmart-grid');if(!grid)return;
  let rarity='all',category='all';
  function render(){

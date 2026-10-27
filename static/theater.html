@@ -7,6 +7,11 @@ main>.cinema-curtain-right{right:0;left:auto;transform-origin:right center;anima
 main>section,main>.cinema-seating{position:relative;z-index:1}
 @media(max-width:700px){main>.cinema-curtain{width:clamp(35px,12vw,85px)}main>.cinema-curtain-left{animation:cinema-curtain-retract-left 1.8s ease-out both}main>.cinema-curtain-right{animation:cinema-curtain-retract-right 1.8s ease-out both}}
 @media(prefers-reduced-motion:reduce){main>.cinema-curtain-left{animation:none;transform:translateX(-42%)}main>.cinema-curtain-right{animation:none;transform:translateX(42%)}}
+/* Larger cinema screen: use the available viewport width without breaking 16:9. */
+main{padding-left:clamp(12px,2vw,30px)!important;padding-right:clamp(12px,2vw,30px)!important;max-width:none!important;width:100%!important;box-sizing:border-box}
+.cinema-screen-shell{width:100%!important;max-width:none!important;margin:12px auto 22px!important;padding:clamp(5px,1vw,14px)!important}
+.cinema-screen-shell #theater-player,.cinema-screen-shell #theater-embed{width:100%!important;aspect-ratio:16/9!important}
+@media(min-width:900px){.cinema-screen-shell{width:min(100%,1600px)!important}}
 </style></head><body><header><a href="../index.html">← Cartoon Universe Arcade</a><h1>🍿 Cartoon Universe Movie Theater</h1></header><main><div class="cinema-curtain cinema-curtain-left" aria-hidden="true"></div><div class="cinema-curtain cinema-curtain-right" aria-hidden="true"></div><section id="watch" class="section arcade-destination">
 <p class="eyebrow">LIGHTS, CAMERA, CARTOONS</p><h2>🎬 CARTOON UNIVERSE TV</h2>
 <p class="explore-intro">24/7 scheduled theater with owner-controlled live broadcast overrides. Streams play only when configured by the owner.</p>

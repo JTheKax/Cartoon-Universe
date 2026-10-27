@@ -3,3 +3,10 @@
 
 /* Clean arcade owner review styling and deep-link targets. */
 .owner-wrap{scroll-margin-top:20px}.owner-wrap h1{color:#ffb629;text-shadow:3px 4px #6f341c}.owner-sub,.owner-tile p{color:#b8cee7}.owner-stats article,.owner-tile{background:#0d1c30;border:1px solid #35506d;box-shadow:0 8px 22px #0004}.owner-stats strong{color:#34adff}.owner-tag{background:#173453;color:#ffcc6d}.owner-tile[id]{scroll-margin-top:24px}.owner-tile[id]:target{outline:2px solid #ffb629;outline-offset:4px}.maintenance-panel{background:#0d1c30;border-color:#35506d}.owner-note{color:#a9bed9}
+
+/* Owner-only dashboard selectors; preference changes are browser-local. */
+.owner-choice-list{display:grid;gap:8px;margin:12px 0}
+.owner-choice-list button{width:100%;text-align:left;background:#122f4b;color:#e8f2ff;border:1px solid #416180;border-radius:10px;padding:12px 14px;cursor:pointer;font:700 14px system-ui,sans-serif}
+.owner-choice-list button[aria-pressed="true"]{background:#1d4569;border-color:#ffb629;box-shadow:inset 4px 0 #ffb629;color:#fff}
+.owner-choice-list button:hover,.owner-choice-list button:focus-visible{border-color:#55c9ff}
+.owner-choice-status{font-size:12px!important;color:#a8c9e5!important;min-height:0!important;margin-top:8px}

@@ -716,3 +716,15 @@ html[data-background-theme]:not([data-background-theme="haunted"]) .hero{backgro
 @keyframes theater-marquee-glow{from{opacity:.65}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){#watch .theater-marquee-lights{animation:none}}
 @media(max-width:600px){#watch .theater-marquee{border-width:3px;border-radius:9px}#watch .theater-marquee-title{letter-spacing:.03em}}
+
+/* Cinematic animated theater marquee */
+#watch .theater-marquee-premiere{position:relative;border:5px ridge #ffd36b;border-radius:20px;background:radial-gradient(ellipse at 50% 0%,#a32a35 0%,#581020 55%,#220915 100%);box-shadow:0 0 0 5px #38101a,0 0 0 8px #b9772c,0 14px 35px #000b,0 0 40px #e7812440}
+#watch .theater-marquee-premiere .theater-marquee-title{font-family:Georgia,serif;color:#fff0b2;text-transform:uppercase;letter-spacing:.08em;text-shadow:0 2px 0 #7b280a,0 0 12px #ffad37,0 0 24px #f26c28;padding:17px 10px 9px}
+#watch .theater-marquee-premiere .theater-marquee-subtitle{display:flex;flex-wrap:wrap;gap:8px 14px;min-height:50px;align-items:center;justify-content:center;background:#18081188;border-top:1px solid #e8a74480;padding:12px}
+#watch .theater-marquee-premiere #theater-marquee-program{display:block;flex-basis:100%;font-size:clamp(1.1rem,3vw,2rem);color:#fff4ce;text-shadow:0 0 12px #fca42e;letter-spacing:.04em}
+#watch .theater-marquee-premiere .marquee-star{color:#ffcb4b;text-shadow:0 0 10px #ffbc2c;animation:theater-star-twinkle 1.2s ease-in-out infinite alternate}
+#watch .theater-marquee-premiere .marquee-star:nth-of-type(3){animation-delay:.6s}
+#watch .theater-marquee-premiere .theater-marquee-lights{height:18px;background-image:radial-gradient(circle,#fff8cc 0 3px,#ffbf39 4px,#a74a18 6px,transparent 7px);background-size:24px 18px;animation:theater-bulb-chase 1s steps(2,end) infinite;filter:drop-shadow(0 0 6px #ffc04a)}
+@keyframes theater-bulb-chase{0%{opacity:1;filter:drop-shadow(0 0 8px #ffbf43)}50%{opacity:.6;filter:drop-shadow(0 0 2px #f49b24)}100%{opacity:1;filter:drop-shadow(0 0 8px #ffbf43)}}
+@keyframes theater-star-twinkle{from{opacity:.5;transform:scale(.9)}to{opacity:1;transform:scale(1.15)}}
+@media(prefers-reduced-motion:reduce){#watch .theater-marquee-premiere .theater-marquee-lights,#watch .theater-marquee-premiere .marquee-star{animation:none}}

@@ -170,6 +170,8 @@ test('verified owner can open standalone theater without exposing assets to anon
  assert.equal(page.status,200);
  const html=await page.text();
  assert.ok(html.includes('<base href="/__maintenance/arcade/">'));
+ assert.ok(!html.includes('<script>'),'Theater chat must not use inline scripts blocked by gateway CSP');
+ assert.match(page.headers.get('content-security-policy'),/script-src 'self' https:\/\/esm\.sh/);
  for(const asset of ['styles.css','theater.js','index.html']){
   assert.ok(html.includes('href="'+asset+'"')||html.includes('src="'+asset+'"'),asset);
   const path='/__maintenance/arcade/'+asset;

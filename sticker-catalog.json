@@ -1,6 +1,10 @@
 {
   "series": [
     {
+      "id": "disney",
+      "name": "Disney"
+    },
+    {
       "id": "family-guy",
       "name": "Family Guy"
     },

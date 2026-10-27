@@ -17,7 +17,11 @@ export function createSectionMaintenanceApi({origin,verifyOwner,saveChange}){
   if(owner?.verified!==true||typeof owner.userId!=='string'||!owner.userId)
    return {status:403,body:{error:'owner-required'}};
   try{
-   const result=await saveChange({section:change.section,maintenanceEnabled:change.maintenanceEnabled,ownerId:owner.userId});
+   // The access token, when supplied, comes only from the trusted server-side
+   // owner session resolver. It is never accepted from the JSON request body.
+   const write={section:change.section,maintenanceEnabled:change.maintenanceEnabled,ownerId:owner.userId};
+   if(typeof owner.accessToken==='string'&&owner.accessToken)write.accessToken=owner.accessToken;
+   const result=await saveChange(write);
    if(result?.saved!==true||result?.audited!==true)return {status:503,body:{error:'save-unconfirmed'}};
    return {status:200,body:{saved:true,section:change.section,maintenanceEnabled:change.maintenanceEnabled}};
   }catch{return {status:503,body:{error:'save-unavailable'}};}

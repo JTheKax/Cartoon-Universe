@@ -10,7 +10,7 @@ const PRODUCTION_REF='gjfyemvcrgrthbrlqqnz';
 const COOKIE='cu_staging_owner';
 const TTL=5*60*1000;
 const PUBLIC=new Set(['/login.html','/auth.js','/supabase-config.js','/styles.css','/account.css','/theme.js','/config.js','/__maintenance/bridge.js']);
-const FILES=new Set(['index.html','login.html','register.html','account.html','coin-wallet.html','owner.html','styles.css','account.css','owner.css','script.js','auth.js','supabase-config.js','theme.js','admin-nav.js','home-profile.js','coin-wallet.js','owner.js','maintenance-preview.js','maintenance-controls.js','maintenance-notice.js','static/cartoon-carnival.png','static/haunted-arcade.gif']);
+const FILES=new Set(['index.html','login.html','register.html','account.html','coin-wallet.html','owner.html','styles.css','arcade-redesign.css','arcade-redesign.js','account.css','owner.css','script.js','auth.js','supabase-config.js','theme.js','admin-nav.js','home-profile.js','coin-wallet.js','owner.js','maintenance-preview.js','maintenance-controls.js','maintenance-notice.js','static/cartoon-carnival.png','static/haunted-arcade.gif']);
 const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.gif':'image/gif'};
 const escape=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 

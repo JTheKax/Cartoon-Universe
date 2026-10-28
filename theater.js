@@ -96,10 +96,7 @@ if(player){
   el('theater-owner').hidden=!owner;
  }
  // Review-only suggested title: owner must verify rights and publish through owner form.
- const suggestedMovie={title:'Resident Evil: Damnation',media_url:'https://www.youtube.com/watch?v=dT1MNOhU0X8&t=3s'};
  const ownerForm=el('theater-program-form');
- ownerForm.elements.namedItem('title').value=suggestedMovie.title;
- ownerForm.elements.namedItem('media_url').value=suggestedMovie.media_url;
  let pendingUpload=null,previewURL=null;
  const uploadForm=el('theater-upload-form'),publishButton=el('theater-upload-publish'),uploadMessage=el('theater-upload-message');
  uploadForm.addEventListener('submit',event=>{

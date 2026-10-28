@@ -84,7 +84,7 @@ test('reset email requests use only the fixed gateway redirect and do not enumer
  const history={replaceState:()=>{}};
  await runInNewContext('(async()=>{'+source+'})()',{createClient,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_KEY:'sb_publishable_fixture',document:{querySelector:selector=>fields[selector]},location,history});
  await handlers.submit({preventDefault(){}});
- assert.deepEqual(calls,[{address:'owner@example.com',options:{redirectTo:'https://cartoon-universe-gateway.onrender.com/__maintenance/password-recovery'}}]);
+ assert.deepEqual(JSON.parse(JSON.stringify(calls)),[{address:'owner@example.com',options:{redirectTo:'https://cartoon-universe-gateway.onrender.com/__maintenance/password-recovery'}}]);
  assert.match(status.textContent,/If this email belongs to an account/);
  assert.equal(email.value,'');assert.equal(button.disabled,false);
 });

@@ -128,3 +128,18 @@ test('normal public navigation logout does not call owner gateway',async()=>{
  await f.logout();
  assert.deepEqual(f.events,['browser-signout']);
 });
+
+test('navigation logout revokes owner cookie on slashless arcade root',async()=>{
+ const f=await navLogoutFixture({path:'/__maintenance/arcade'});
+ await f.logout();
+ assert.deepEqual(f.events,['gateway-delete','browser-signout']);
+ assert.equal(f.alerts.length,0);
+});
+
+test('account logout guard includes both canonical and slashless protected arcade roots',()=>{
+ const authSource=readFileSync(new URL('../auth.js',import.meta.url),'utf8');
+ for(const source of [authSource,navSource]){
+  assert.match(source,/location\.pathname!=='\/__maintenance\/arcade'/,'Slashless arcade root must be protected');
+  assert.match(source,/location\.pathname\.startsWith\('\/__maintenance\/arcade\/'\)/,'Nested protected arcade paths must be protected');
+ }
+});

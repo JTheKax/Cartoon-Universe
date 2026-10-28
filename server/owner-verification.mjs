@@ -70,7 +70,7 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
    if(!valid)sessions.delete(id);
    return json(200,{ownerVerified:valid,readOnly:true});
   }
-  if(path==='/__maintenance/password-recovery')return done(200,RECOVERY_HTML,'text/html; charset=utf-8');
+  if(path==='/__maintenance/password-recovery')return done(200,RECOVERY_HTML,'text/html; charset=utf-8',{'Content-Security-Policy':csp.replace("script-src 'self'","script-src 'self' https://esm.sh")});
   if(path==='/__maintenance/password-recovery.js')return done(200,readFileSync(new URL('./password-recovery-client.js',import.meta.url)),'text/javascript; charset=utf-8');
   if(path==='/__maintenance/owner-signin')return done(200,HTML,'text/html; charset=utf-8');
   if(path==='/__maintenance/owner-verification.css')return done(200,CSS,'text/css; charset=utf-8');

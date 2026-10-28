@@ -26,6 +26,7 @@ test('unknown, malformed, and wrong-method routes are denied even for owners',()
  assert.equal(guardSectionRoute({pathname:'/api/coins/transfer',method:'GET',globalMaintenance:false,sectionStatuses:statuses,verifiedOwner:true}).allowed,false);
  assert.equal(guardSectionRoute({pathname:'/coin-wallet.html',method:'POST',globalMaintenance:false,sectionStatuses:statuses,verifiedOwner:true}).allowed,false);
  assert.equal(guardSectionRoute({pathname:'/index.html',method:'TRACE',globalMaintenance:false,sectionStatuses:statuses,verifiedOwner:true}).allowed,false);
+ for(const method of ['PUT','PATCH','DELETE'])assert.equal(guardSectionRoute({pathname:'/api/coins/transfer',method,globalMaintenance:false,sectionStatuses:statuses,verifiedOwner:true}).allowed,false);
 });
 test('only server-verified owners bypass global and section maintenance for registered routes',()=>{
  for(const [pathname,method] of [['/shop-watch-movies.html','GET'],['/api/theater/schedule','POST']]){

@@ -55,7 +55,7 @@ jobs:
       - name: Test read-only owner verification
         run: node --test tests/owner-verification.test.mjs
       - name: Test maintenance-safe owner password recovery
-        run: node --test tests/owner-password-recovery.test.mjs
+        run: node --test tests/owner-password-recovery.test.mjs tests/gateway-account-recovery.test.mjs
       - name: Test isolated owner browser session continuity
         run: node --test tests/owner-session-flow.test.mjs
       - name: Validate owner sign-in and recovery client JavaScript syntax

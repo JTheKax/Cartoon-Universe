@@ -11,7 +11,7 @@ empty.textContent='No Ctoons available yet. New Ctoons will appear here when add
 function createCtoonCard(ctoon){
  const card=document.createElement('article');card.className='pack';
  const art=document.createElement('div');art.className='pack-art';
- const badge=document.createElement('span');badge.className='ownership';badge.textContent='Unowned';
+ const badge=document.createElement('span');badge.className='ownership';badge.textContent='Preview';
  const symbol=document.createElement('span');symbol.className='emoji';symbol.textContent=ctoon.fallback||'✦';
  art.append(badge,symbol);
  if(ctoon.image){const img=document.createElement('img');img.src=ctoon.image;img.alt=ctoon.name;img.addEventListener('load',()=>symbol.remove());img.addEventListener('error',()=>img.remove());art.append(img);}

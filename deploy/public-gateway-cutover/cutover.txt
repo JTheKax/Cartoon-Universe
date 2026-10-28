@@ -1,0 +1,2 @@
+Cartoon Universe public cutover: asset-free redirect-only publish directory.
+No website pages, credentials, scripts or review bundles are stored here.

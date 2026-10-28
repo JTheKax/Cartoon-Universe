@@ -48,8 +48,8 @@ async function fixture({username=false,owner=true,deleteFails=false}={}){
 
 test('email owner login establishes both a persistent browser session and protected cookie',async()=>{
  const f=await fixture();
- assert.equal(f.options.auth.persistSession,true);
  await f.submit();
+ assert.equal(f.options.auth.persistSession,true);
  assert.ok(f.authCalls.some(x=>x[0]==='email'));
  assert.ok(f.calls.some(x=>x.url==='/__maintenance/verify-session'&&x.init.headers.Authorization==='Bearer owner-token'));
  assert.equal(f.elements['arcade-entry'].hidden,false);

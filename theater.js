@@ -13,7 +13,7 @@ if(player){
   const url=safeURL(value);if(!url)return null;
   const u=new URL(url),host=u.hostname.toLowerCase();
   if(host==='youtu.be'||host==='youtube.com'||host==='www.youtube.com'||host==='m.youtube.com'||host==='www.youtube-nocookie.com'){
-   const id=host==='youtu.be'?u.pathname.slice(1):u.pathname.startsWith('/shorts/')||u.pathname.startsWith('/live/')?u.pathname.split('/')[2]:u.searchParams.get('v');
+   const id=host==='youtu.be'?u.pathname.slice(1):u.pathname.startsWith('/shorts/')||u.pathname.startsWith('/live/')||u.pathname.startsWith('/embed/')?u.pathname.split('/')[2]:u.searchParams.get('v');
    return id&&/^[a-zA-Z0-9_-]{11}$/.test(id)?{type:'youtube',url:'https://www.youtube-nocookie.com/embed/'+id}:null;
   }
   if(/\.m3u8$/i.test(u.pathname))return {type:'hls',url};
@@ -33,9 +33,9 @@ if(player){
    const frame=document.createElement('iframe');
    frame.title='Cartoon Universe video';frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';frame.allowFullscreen=true;
    frame.referrerPolicy='strict-origin-when-cross-origin';
-   const u=new URL(media.url);u.searchParams.set('start',String(Math.floor(offset)));u.searchParams.set('autoplay','0');
+   const u=new URL(media.url);u.searchParams.set('start',String(Math.floor(offset)));u.searchParams.set('autoplay','1');
    frame.src=u.href;embed.append(frame);
-   message.textContent='YouTube playback depends on embedding permissions. Scheduled seeking is approximate.';return;
+   message.textContent='YouTube playback depends on the video's embedding permissions.';return;
   }
   const seek=()=>{if(Number.isFinite(player.duration)&&offset<player.duration)try{player.currentTime=offset}catch{};player.removeEventListener('loadedmetadata',seek)};
   player.addEventListener('loadedmetadata',seek);
@@ -51,13 +51,13 @@ if(player){
  }
  function render(){
   const library=el('theater-library');library.replaceChildren();
-  if(!programs.length){const p=document.createElement('p');p.textContent='No movies in the library yet.';library.append(p);return}
+  if(!programs.length){const p=document.createElement('p');p.className='dvd-empty';p.textContent='No DVDs available yet. Sign in as owner to add your first movie.';library.append(p);return}
   for(const movie of programs){
    if(!parseMedia(movie.media_url))continue;
    const dvd=document.createElement('button');dvd.type='button';dvd.className='dvd-case';dvd.setAttribute('aria-pressed',String(activeKey==='movie:'+movie.id));
    const icon=document.createElement('span');icon.className='dvd-icon';icon.textContent='📀';
    const title=document.createElement('strong');title.textContent=movie.title;
-   const duration=document.createElement('small');duration.textContent=movie.duration_minutes+' min · PLAY MOVIE';
+   const duration=document.createElement('small');duration.textContent=(movie.duration_minutes?movie.duration_minutes+' min · ':'')+'▶ PLAY MOVIE';
    dvd.append(icon,title,duration);
    dvd.addEventListener('click',()=>{status.textContent='▶ NOW PLAYING';el('theater-now').textContent=movie.title;el('theater-marquee-label').textContent='NOW SHOWING';el('theater-marquee-program').textContent=movie.title;play(movie.media_url,'movie:'+movie.id);message.textContent='Selected: '+movie.title+'. Press play if autoplay is blocked.';render()});
    library.append(dvd);
@@ -76,7 +76,6 @@ if(player){
   if(user){const r=await client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();owner=!r.error&&!!r.data}
   el('theater-owner').hidden=!owner;
  }
- const submit=async(table,record)=>{if(!owner)return {error:{message:'Owner verification required'}};return client.from(table).upsert(record)};
  // Review-only suggested title: owner must verify rights and publish through owner form.
  const suggestedMovie={title:'Resident Evil: Damnation',media_url:'https://www.youtube.com/watch?v=dT1MNOhU0X8&t=3s'};
  const ownerForm=el('theater-program-form');

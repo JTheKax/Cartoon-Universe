@@ -1,3 +1,22 @@
+// Fallback DVD playback, served from the existing theater script route.
+document.addEventListener('click',event=>{
+ const dvd=event.target.closest('[data-theater-video-id]');if(!dvd)return;
+ event.preventDefault();const id=dvd.dataset.theaterVideoId;
+ if(!/^[a-zA-Z0-9_-]{11}$/.test(id))return;
+ const player=document.getElementById('theater-player'),embed=document.getElementById('theater-embed');
+ if(!player||!embed)return;
+ player.pause();player.removeAttribute('src');player.load();player.hidden=true;embed.replaceChildren();
+ const frame=document.createElement('iframe');frame.title=dvd.dataset.theaterTitle||'Movie';
+ frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';frame.allowFullscreen=true;
+ frame.referrerPolicy='strict-origin-when-cross-origin';
+ frame.src='https://www.youtube.com/embed/'+id+'?autoplay=1';embed.append(frame);embed.hidden=false;
+ document.getElementById('theater-status').textContent='▶ NOW PLAYING';
+ document.getElementById('theater-now').textContent=dvd.dataset.theaterTitle||'Movie';
+ document.getElementById('theater-marquee-label').textContent='NOW SHOWING';
+ document.getElementById('theater-marquee-program').textContent=dvd.dataset.theaterTitle||'Movie';
+ document.getElementById('theater-message').textContent='YouTube playback depends on embedding permission. If an error appears, this video cannot play here.';
+ document.querySelector('.cinema-screen-shell')?.scrollIntoView({behavior:'smooth',block:'center'});
+});
 import {isSupabaseConfigured} from './supabase-config.js';
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
@@ -14,7 +33,7 @@ if(player){
   const u=new URL(url),host=u.hostname.toLowerCase();
   if(host==='youtu.be'||host==='youtube.com'||host==='www.youtube.com'||host==='m.youtube.com'||host==='www.youtube-nocookie.com'){
    const id=host==='youtu.be'?u.pathname.slice(1):u.pathname.startsWith('/shorts/')||u.pathname.startsWith('/live/')||u.pathname.startsWith('/embed/')?u.pathname.split('/')[2]:u.searchParams.get('v');
-   return id&&/^[a-zA-Z0-9_-]{11}$/.test(id)?{type:'youtube',url:'https://www.youtube-nocookie.com/embed/'+id}:null;
+   return id&&/^[a-zA-Z0-9_-]{11}$/.test(id)?{type:'youtube',url:'https://www.youtube.com/embed/'+id}:null;
   }
   if(/\.m3u8$/i.test(u.pathname))return {type:'hls',url};
   if(/\.(mp4|webm)$/i.test(u.pathname))return {type:'video',url};

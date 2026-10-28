@@ -33,6 +33,7 @@ jobs:
           test -f /tmp/cartoon-universe-review/sticker-catalog.json
           test -f /tmp/cartoon-universe-review/assets/appearance-catalog.json
           test -f /tmp/cartoon-universe-review/static/theater.js
+          test -f /tmp/cartoon-universe-review/static/dark-side-ring-blue-cover.svg
           # Exercise Render's actual no-argument build command and publish directory.
           CARTOON_UNIVERSE_REVIEW_BUILD=true node scripts/build-review-static.mjs
           test -f preview-public/index.html
@@ -40,6 +41,7 @@ jobs:
           test -f preview-public/sticker-catalog.json
           test -f preview-public/static/theater.html
           test -f preview-public/static/theater.js
+          test -f preview-public/static/dark-side-ring-blue-cover.svg
       - name: Validate new client script syntax
         run: |
           node --check nav-account-controls.js

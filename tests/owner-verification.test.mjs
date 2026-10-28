@@ -172,6 +172,7 @@ test('on-demand Cartoon Theater and DVD shelf are owner-protected during mainten
  assert.match(html,/<base href="\/__maintenance\/arcade\/static\/">/);
  assert.match(html,/class="dvd-shelf(?: [^"]+)?"/);
  assert.match(html,/src="theater\.js"/);
+ assert.match(html,/src="dark-side-ring-blue-cover\.svg"/);
  assert.match(html,/href="\.\.\/styles\.css"/);
  const script=await fetch(base+'/__maintenance/arcade/static/theater.js',{headers});
  assert.equal(script.status,200);
@@ -179,6 +180,12 @@ test('on-demand Cartoon Theater and DVD shelf are owner-protected during mainten
  assert.match(js,/DVD shelf preview selection/);
  assert.doesNotMatch(js,/setInterval\(render/);
  assert.equal((await fetch(base+'/__maintenance/arcade/static/theater.js')).status,503);
+ const coverUrl=base+'/__maintenance/arcade/static/dark-side-ring-blue-cover.svg';
+ const cover=await fetch(coverUrl,{headers});
+ assert.equal(cover.status,200,'Verified owner must be able to load the DVD cover');
+ assert.match(cover.headers.get('content-type'),/image\/svg\+xml/);
+ assert.match(await cover.text(),/data:image\/jpeg;base64,/);
+ assert.equal((await fetch(coverUrl)).status,503,'Anonymous requests for the cover must fail closed');
  const owner=await (await fetch(base+'/__maintenance/arcade/owner.html',{headers})).text();
  assert.match(owner,/Open Theater Preview/);
  const homepage=await (await fetch(base+'/__maintenance/arcade/',{headers})).text();

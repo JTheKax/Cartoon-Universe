@@ -68,6 +68,10 @@ test('combined arcade navigation, owner dashboard shell, theater DVD cases and a
  // The owner removed the demonstration DVD cases: the built-in shelf now has
  // exactly one Dark Side collection. User-created browser-local drafts are separate.
  assert.equal(await page.locator('#dvd-shelf .dvd-case').count(),1,'Only the requested Dark Side DVD case should be preloaded');
+ const cover=page.locator('#dvd-shelf .dark-side-logo-art img');
+ assert.equal(await cover.getAttribute('src'),'dark-side-ring-blue-cover.svg');
+ await cover.evaluate(img=>img.decode());
+ assert.ok(await cover.evaluate(img=>img.naturalWidth>0),'Featured DVD artwork must render in the protected browser');
  const darkCase=page.locator('#dvd-shelf .dark-side-dvd');
  assert.equal(await darkCase.getAttribute('data-title'),'Dark Side of the Ring');
  await darkCase.click();

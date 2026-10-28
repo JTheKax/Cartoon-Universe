@@ -33,6 +33,16 @@ for(const [page,script] of [
  });
 }
 
+test('the featured DVD cover is bundled and owner-protected, without executable SVG content',()=>{
+ assert.ok(allowed.has('static/dark-side-ring-blue-cover.svg'));
+ assert.match(source('static/theater.html'),/src="dark-side-ring-blue-cover\.svg"/);
+ assert.match(gateway,/\.svg':'image\/svg\+xml/);
+ const svg=source('static/dark-side-ring-blue-cover.svg');
+ assert.match(svg,/<svg\b/);
+ assert.match(svg,/href="data:image\/jpeg;base64,/);
+ assert.doesNotMatch(svg,/<(?:script|foreignObject)\b/i);
+});
+
 test('public sticker catalog is available for the protected Collect page',()=>{
  assert.ok(allowed.has('sticker-catalog.json'));
  assert.match(gateway,/\.json':'application\/json/);

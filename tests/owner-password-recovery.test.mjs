@@ -14,6 +14,9 @@ test('recovery accepts supported token formats and clears URL',()=>{
  assert.match(client,/setSession/);
  assert.match(client,/history\.replaceState/);
  assert.match(client,/updateUser/);
+ assert.match(client,/resetPasswordForEmail/);
+ assert.match(client,/location\.origin\+'\/__maintenance\/password-recovery'/);
+ assert.match(client,/requestForm\.hidden=true/);
  assert.match(client,/password\.value=''/);
  assert.doesNotMatch(client,/service_role|maintenance_controls|coin_wallets/);
 });
@@ -45,4 +48,22 @@ test('owner verification persists the Supabase session for the existing Owner Da
  assert.match(browser,/auth\.signOut/);
  assert.match(browser,/verify-session/);
  assert.doesNotMatch(browser,/service_role|sb_secret_/);
+});
+
+
+test('owner recovery page can request a reset email while public maintenance remains active',async t=>{
+ const {once}=await import('node:events');
+ const {createCandidateServer}=await import('../server/gateway-candidate.mjs');
+ const server=createCandidateServer({origin:'https://cartoon-universe-gateway.onrender.com',ownerVerification:{supabaseUrl:'https://gjfyemvcrgrthbrlqqnz.supabase.co',publishableKey:'sb_publishable_disposable_fixture_key'}});
+ server.listen(0,'127.0.0.1');await once(server,'listening');
+ t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve)}));
+ const base='http://127.0.0.1:'+server.address().port;
+ const response=await fetch(base+'/__maintenance/password-recovery');
+ assert.equal(response.status,200);
+ const html=await response.text();
+ assert.match(html,/id="recovery-request-form"/);
+ assert.match(html,/id="recovery-email" type="email"/);
+ assert.match(html,/id="recovery-form" hidden/);
+ assert.equal((await fetch(base+'/__maintenance/password-recovery.js')).status,200);
+ assert.equal((await fetch(base+'/__maintenance/arcade/owner.html')).status,503);
 });

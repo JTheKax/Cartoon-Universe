@@ -6,8 +6,8 @@ import {runInNewContext} from 'node:vm';
 const clientSource=readFileSync(new URL('../server/owner-verification-client.js',import.meta.url),'utf8')
  .replace(/^import .*;\s*$/gm,'');
 
-async function fixture({username=false,owner=true}={}){
- const handlers=new Map(),calls=[],authCalls=[];
+async function fixture({username=false,owner=true,deleteFails=false}={}){
+ const handlers=new Map(),calls=[],authCalls=[],events=[];
  const names=['verify-form','status','clear','verify','password','identifier','arcade-entry'];
  const elements=Object.fromEntries(names.map(name=>[name,{
   hidden:false,disabled:false,value:'',textContent:'',
@@ -20,7 +20,7 @@ async function fixture({username=false,owner=true}={}){
  const auth={
   async signInWithPassword(credentials){authCalls.push(['email',credentials.email]);return {data:{session},error:null};},
   async setSession(tokens){authCalls.push(['username',tokens]);return {data:{session},error:null};},
-  async signOut(){authCalls.push(['signout']);return {error:null};}
+  async signOut(){authCalls.push(['signout']);events.push('browser-signout');return {error:null};}
  };
  let options;
  const createClient=(_url,_key,config)=>{options=config;return {auth};};
@@ -32,14 +32,14 @@ async function fixture({username=false,owner=true}={}){
    if(!owner)return {ok:false};
    verified=true;return {ok:true};
   }
-  if(url==='/__maintenance/verify-session'&&init.method==='DELETE'){verified=false;return {ok:true};}
+  if(url==='/__maintenance/verify-session'&&init.method==='DELETE'){events.push('gateway-delete');if(deleteFails)return {ok:false};verified=false;return {ok:true};}
   throw new Error('Unexpected test request: '+url);
  };
  runInNewContext(clientSource,{createClient,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_KEY:'sb_publishable_fixture',document:{getElementById:name=>elements[name]},fetch});
  await new Promise(resolve=>setImmediate(resolve));
  const submit=()=>handlers.get('verify-form:submit')({preventDefault(){}});
  const clear=()=>handlers.get('clear:click')();
- return {submit,clear,options,elements,calls,authCalls};
+ return {submit,clear,options,elements,calls,authCalls,events};
 }
 
 test('email owner login establishes both a persistent browser session and protected cookie',async()=>{
@@ -51,6 +51,7 @@ test('email owner login establishes both a persistent browser session and protec
  assert.equal(f.elements['arcade-entry'].hidden,false);
  await f.clear();
  assert.ok(f.authCalls.some(x=>x[0]==='signout'));
+ assert.deepEqual(f.events.slice(-2),['gateway-delete','browser-signout']);
  assert.equal(f.elements['arcade-entry'].hidden,true);
 });
 
@@ -67,4 +68,13 @@ test('nonowner verification failure clears the browser session and denies arcade
  assert.ok(f.authCalls.some(x=>x[0]==='signout'));
  assert.equal(f.elements['arcade-entry'].hidden,true);
  assert.match(f.elements.status.textContent,/Owner access could not be verified/);
+});
+
+test('failed gateway cookie revocation prevents misleading owner logout',async()=>{
+ const f=await fixture({deleteFails:true});
+ await f.submit();
+ await f.clear();
+ assert.deepEqual(f.events,['gateway-delete']);
+ assert.equal(f.authCalls.some(x=>x[0]==='signout'),false);
+ assert.match(f.elements.status.textContent,/Unable to clear verification/);
 });

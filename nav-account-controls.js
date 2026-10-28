@@ -7,7 +7,14 @@ const ownerTab=document.getElementById('nav-owner-tab');
 const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const loginLink=document.getElementById('nav-login-link'),logoutButton=document.getElementById('nav-logout-button'),registerLink=document.getElementById('nav-register-link');
 function showAccountActions(signedIn){if(loginLink)loginLink.hidden=signedIn;if(logoutButton)logoutButton.hidden=!signedIn;if(registerLink)registerLink.hidden=signedIn;}
-logoutButton?.addEventListener('click',async()=>{logoutButton.disabled=true;const {error}=await client.auth.signOut();logoutButton.disabled=false;if(!error){showAccountActions(false);await refresh();}else alert('Could not log out. Please try again.');});
+// Revoking the Supabase session alone leaves the gateway's owner cookie valid
+// until its short TTL. Explicitly clear that server-side session first.
+async function clearOwnerGatewaySession(){
+ if(!location.pathname.startsWith('/__maintenance/arcade/'))return;
+ const response=await fetch('/__maintenance/verify-session',{method:'DELETE',credentials:'same-origin',redirect:'error',cache:'no-store'});
+ if(!response.ok)throw new Error('Owner gateway logout could not be confirmed.');
+}
+logoutButton?.addEventListener('click',async()=>{logoutButton.disabled=true;try{await clearOwnerGatewaySession();const {error}=await client.auth.signOut();if(error)throw error;showAccountActions(false);await refresh();}catch{alert('Could not fully log out. Please try again.');}finally{logoutButton.disabled=false;}});
 let sequence=0;
 let displayedUserId=null;
 async function refresh(){

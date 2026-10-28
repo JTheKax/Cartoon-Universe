@@ -75,7 +75,7 @@ test('maintenance off opens allowlisted public pages but never owner dashboard',
   assert.equal(response.status,200,path);
   assert.equal(response.headers.get('cache-control'),'no-store');
  }
- for(const path of ['/owner.html','/owner.js','/maintenance-controls.js'])
+ for(const path of ['/owner.html','/owner.js','/owner-theater.js','/maintenance-controls.js'])
   assert.equal((await fetch(base+path)).status,403,path);
  for(const path of ['/server/public-launch-gateway.mjs','/sql/tests/ci_bootstrap.sql','/.env','/package.json'])
   assert.equal((await fetch(base+path)).status,404,path);
@@ -93,7 +93,7 @@ test('owner cookie unlocks protected arcade only after server-side membership ch
  const cookie=response.headers.get('set-cookie');
  assert.match(cookie,/^__Host-cu_owner_verify=[0-9a-f]{64}; Path=\/; HttpOnly; SameSite=Lax; Max-Age=300; Secure$/);
  const headers={Cookie:cookie.split(';')[0]};
- for(const path of ['/__maintenance/arcade/','/__maintenance/arcade/owner.html','/__maintenance/arcade/static/theater.html','/__maintenance/arcade/static/dark-side-ring-blue-cover.svg']){
+ for(const path of ['/__maintenance/arcade/','/__maintenance/arcade/owner.html','/__maintenance/arcade/owner-theater.js','/__maintenance/arcade/static/theater.html','/__maintenance/arcade/static/dark-side-ring-blue-cover.svg']){
   const r=await fetch(base+path,{headers});
   assert.equal(r.status,200,path);
  }

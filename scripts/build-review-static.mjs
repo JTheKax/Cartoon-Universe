@@ -7,7 +7,7 @@ if(process.env.CARTOON_UNIVERSE_REVIEW_BUILD!=='true'){
  throw new Error('Review-only build: set CARTOON_UNIVERSE_REVIEW_BUILD=true explicitly.');
 }
 const root=resolve(fileURLToPath(new URL('..',import.meta.url)));
-const destination=resolve(process.argv[2]||'dist/cartoon-universe-review');
+// Render's existing isolated static preview publishes preview-public; explicit paths remain supported for CI.\nconst destination=resolve(process.argv[2]||'preview-public');
 const source=readFileSync(resolve(root,'server/gateway-candidate.mjs'),'utf8');
 const list=source.match(/const ARCADE_FILES=new Set\(\[([\s\S]*?)\]\);/)?.[1];
 if(!list)throw new Error('Cannot determine reviewed front-end asset allowlist.');

@@ -10,7 +10,7 @@ function showAccountActions(signedIn){if(loginLink)loginLink.hidden=signedIn;if(
 // Revoking the Supabase session alone leaves the gateway's owner cookie valid
 // until its short TTL. Explicitly clear that server-side session first.
 async function clearOwnerGatewaySession(){
- if(!location.pathname.startsWith('/__maintenance/arcade/'))return;
+ if(location.pathname!=='/__maintenance/arcade'&&!location.pathname.startsWith('/__maintenance/arcade/'))return;
  const response=await fetch('/__maintenance/verify-session',{method:'DELETE',credentials:'same-origin',redirect:'error',cache:'no-store'});
  if(!response.ok)throw new Error('Owner gateway logout could not be confirmed.');
 }

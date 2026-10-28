@@ -71,7 +71,7 @@ else{
   const {error}=await client.auth.setSession({access_token:result.access_token,refresh_token:result.refresh_token});
   message(error?'Unable to sign in. Try again.':'Signed in!');
   if(!error)await render();
- }catch{message('Login is temporarily unavailable. Try again shortly.')}
+ }catch{message('Username sign-in is not enabled on this preview address yet. Please use your account email and password instead.')}
 });
  $('forgot').addEventListener('submit',async e=>{e.preventDefault();const {error}=await client.auth.resetPasswordForEmail($('forgot-email').value.trim(),{redirectTo:location.origin+location.pathname});message(error?errorText(error):'If the address is registered, a reset email will arrive.')});
  $('password-update').addEventListener('submit',async e=>{e.preventDefault();const password=$('new-password').value;if(password.length<8){message('Use at least 8 characters.');return}const {error}=await client.auth.updateUser({password});message(error?errorText(error):'Password updated.');if(!error){params.delete('type');history.replaceState(null,'',location.pathname);authForms.hidden=false;account.hidden=true;show('login');message('Password updated. You can now sign in.')}});

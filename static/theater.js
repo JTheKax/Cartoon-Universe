@@ -63,3 +63,22 @@ if(youtubeForm){youtubeForm.addEventListener('submit',event=>{
  status.textContent='YouTube preview loaded. Some videos do not permit embedding; playback and ads are controlled by YouTube.';
  iframe.scrollIntoView({behavior:'smooth',block:'center'});
 });}
+
+// Show same-browser owner drafts as playable DVD cases; no shared publication.
+try{
+ const drafts=JSON.parse(localStorage.getItem('cartoon-universe-theater-youtube-drafts-v1')||'[]');
+ if(Array.isArray(drafts)&&dvdShelf){
+  for(const dvd of drafts.slice(0,30)){
+   if(typeof dvd.title!=='string'||!/^[A-Za-z0-9_-]{11}$/.test(dvd.id))continue;
+   const button=document.createElement('button');button.type='button';button.className='dvd-case';button.style.setProperty('--dvd-a','#7133b8');button.style.setProperty('--dvd-b','#d24b86');
+   const art=document.createElement('span');art.className='dvd-art';art.textContent='▶️';
+   const title=document.createElement('strong');title.textContent=dvd.title;
+   const note=document.createElement('small');note.textContent='YouTube • Browser draft';
+   button.append(art,title,note);
+   button.addEventListener('click',()=>{
+    const input=document.getElementById('theater-youtube-url');const form=document.getElementById('theater-youtube-form');
+    if(input&&form){input.value='https://www.youtube.com/watch?v='+dvd.id;form.requestSubmit();}
+   });dvdShelf.append(button);
+  }
+ }
+}catch{/* Browser storage may be disabled. */}

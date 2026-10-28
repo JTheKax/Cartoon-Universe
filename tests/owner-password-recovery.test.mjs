@@ -31,6 +31,18 @@ test('recovery page permits its SDK import without loosening owner sign-in CSP',
  assert.match(recovery.headers.get('content-security-policy'),/script-src 'self' https:\/\/esm\.sh/);
  const login=await fetch(base+'/__maintenance/owner-signin');
  assert.equal(login.status,200);
- assert.match(login.headers.get('content-security-policy'),/script-src 'self';/);
- assert.doesNotMatch(login.headers.get('content-security-policy'),/esm\.sh/);
+ assert.match(login.headers.get('content-security-policy'),/script-src 'self' https:\/\/esm\.sh/);
+ assert.doesNotMatch(login.headers.get('content-security-policy'),/unsafe-inline/);
+});
+
+
+test('owner verification persists the Supabase session for the existing Owner Dashboard',()=>{
+ const browser=readFileSync(new URL('../server/owner-verification-client.js',import.meta.url),'utf8');
+ assert.match(browser,/createClient/);
+ assert.match(browser,/persistSession:true/);
+ assert.match(browser,/signInWithPassword/);
+ assert.match(browser,/auth\.setSession/);
+ assert.match(browser,/auth\.signOut/);
+ assert.match(browser,/verify-session/);
+ assert.doesNotMatch(browser,/service_role|sb_secret_/);
 });

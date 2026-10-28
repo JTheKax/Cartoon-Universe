@@ -7,7 +7,7 @@ if(document.getElementById('theater-chat-toggle')){
 
 // DVD shelf preview selection (sample cases do not imply playable content).
 const dvdShelf=document.getElementById('dvd-shelf');
-if(dvdShelf){dvdShelf.addEventListener('click',event=>{const selected=event.target.closest('.dvd-case');if(!selected)return;document.getElementById('dvd-selection').textContent=selected.dataset.title+' — demo DVD case. Upload and playback integration is coming next.';});}
+if(dvdShelf){dvdShelf.addEventListener('click',event=>{const selected=event.target.closest('.dvd-case');if(!selected)return;document.getElementById('dvd-selection').textContent=selected.dataset.title+' — choose a local video file to preview on the silver screen. The case is not a saved movie.';const fileInput=document.getElementById('theater-local-file');if(fileInput){fileInput.scrollIntoView({behavior:'smooth',block:'center'});fileInput.focus();}});}
 
 // Local-only preview: browser object URLs are never uploaded or persisted.
 const localFile=document.getElementById('theater-local-file');

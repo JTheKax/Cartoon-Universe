@@ -12,6 +12,7 @@ const allowed=new Set([...fileAllowlist.matchAll(/'([^']+)'/g)].map(match=>match
 test('owner gateway preserves a strict script CSP',()=>{
  assert.match(gateway,/script-src 'self' https:\/\/esm\.sh/);
  assert.doesNotMatch(gateway,/script-src[^"\n]*unsafe-inline/);
+ assert.match(gateway,/media-src 'self' blob:/,'Local file previews require blob: video sources');
 });
 
 for(const [page,script] of [

@@ -66,8 +66,11 @@ test('combined arcade navigation, owner dashboard shell, theater DVD cases and a
  }
  await page.goto(origin+'/__maintenance/arcade/static/theater.html');
  assert.ok(await page.locator('#dvd-shelf .dvd-case').count()>=4,'Theater must show custom DVD cases');
- await page.locator('#dvd-shelf .dvd-case').first().click();
- assert.match(await page.locator('#dvd-selection').textContent(),/demo DVD case/i);
+ // The first case is now a season-organized episode collection, not a demo case.
+ await page.locator('#dvd-shelf .dark-side-dvd').click();
+ assert.equal(await page.locator('#dark-side-episodes').isVisible(),true,'Dark Side case should open its episode collection');
+ await page.locator('#dvd-shelf .dvd-case[data-title="Saturday Cartoon Showcase"]').click();
+ assert.match(await page.locator('#dvd-selection').textContent(),/Saturday Cartoon Showcase.*local video file/i);
  const catalog=await page.evaluate(async()=>{
   const response=await fetch('/__maintenance/arcade/sticker-catalog.json');
   return {status:response.status,type:response.headers.get('content-type'),data:await response.json()};

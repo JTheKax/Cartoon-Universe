@@ -170,7 +170,7 @@ test('on-demand Cartoon Theater and DVD shelf are owner-protected during mainten
  assert.equal(theater.status,200);
  const html=await theater.text();
  assert.match(html,/<base href="\/__maintenance\/arcade\/static\/">/);
- assert.match(html,/class="dvd-shelf"/);
+ assert.match(html,/class="dvd-shelf(?: [^"]+)?"/);
  assert.match(html,/src="theater\.js"/);
  assert.match(html,/href="\.\.\/styles\.css"/);
  const script=await fetch(base+'/__maintenance/arcade/static/theater.js',{headers});

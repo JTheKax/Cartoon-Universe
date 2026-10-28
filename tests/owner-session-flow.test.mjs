@@ -4,7 +4,10 @@ import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 
 const clientSource=readFileSync(new URL('../server/owner-verification-client.js',import.meta.url),'utf8')
- .replace(/^import .*;\s*$/gm,'');
+ .replace(/^import .*;\s*$/gm,'')
+ // Replace the browser-only ESM import with a deterministic asynchronous test
+ // dependency. The real client still loads the official Supabase SDK.
+ .replace("await import('https://esm.sh/@supabase/supabase-js@2')","Promise.resolve({createClient:globalThis.__fixtureCreateClient})");
 
 async function fixture({username=false,owner=true,deleteFails=false}={}){
  const handlers=new Map(),calls=[],authCalls=[],events=[];
@@ -35,7 +38,7 @@ async function fixture({username=false,owner=true,deleteFails=false}={}){
   if(url==='/__maintenance/verify-session'&&init.method==='DELETE'){events.push('gateway-delete');if(deleteFails)return {ok:false};verified=false;return {ok:true};}
   throw new Error('Unexpected test request: '+url);
  };
- runInNewContext(clientSource,{createClient,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_KEY:'sb_publishable_fixture',document:{getElementById:name=>elements[name]},fetch});
+ runInNewContext(clientSource,{__fixtureCreateClient:createClient,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_KEY:'sb_publishable_fixture',document:{getElementById:name=>elements[name]},fetch});
  await new Promise(resolve=>setImmediate(resolve));
  const submit=()=>handlers.get('verify-form:submit')({preventDefault(){}});
  const clear=()=>handlers.get('clear:click')();

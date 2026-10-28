@@ -16,27 +16,29 @@ function createCtoonCard(ctoon){
  art.append(badge,symbol);
  if(ctoon.image){const img=document.createElement('img');img.src=ctoon.image;img.alt=ctoon.name;img.addEventListener('load',()=>symbol.remove());img.addEventListener('error',()=>img.remove());art.append(img);}
  const name=document.createElement('h2');name.textContent=ctoon.name;
- const detail=document.createElement('p');detail.className='meta';detail.textContent=ctoon.type||'Ctoon';
+ const detail=document.createElement('p');detail.className='meta';detail.textContent=[ctoon.type||'Ctoon',ctoon.series].filter(Boolean).join(' · ');
  const row=document.createElement('div');row.className='price-row';
  const price=document.createElement('p');price.className='price';price.textContent=ctoon.price==null?'Price TBD':ctoon.price+' coins';
  const buy=document.createElement('button');buy.className='buy';buy.disabled=true;buy.textContent='Buy';buy.title='Purchases are not enabled in this preview';
  row.append(price,buy);card.append(art,name,detail,row);return card;
 }
 const items=[
- createCtoonCard({name:'Golden Tiger Claws',type:'UC',fallback:'🐯',image:'./assets/ctoons/golden-tiger-claws.png',price:150}),
- createCtoonCard({name:'Third Arm Sash',type:'UC',fallback:'✦',image:'./assets/ctoons/third-arm-sash.png',price:100})
+ createCtoonCard({name:'Golden Tiger Claws',type:'UC',fallback:'🐯',image:'./assets/ctoons/golden-tiger-claws.png',series:'Xiaolin Showdown',price:150}),
+ createCtoonCard({name:'Third Arm Sash',type:'UC',fallback:'✦',image:'./assets/ctoons/third-arm-sash.png',series:'Xiaolin Showdown',price:100})
 ];
 function show(section){
  list.replaceChildren();
- if(section==='all'||section==='new')list.append(...items);
- else {empty.textContent=section==='series'?'Series assignments coming soon.':'No featured Ctoons yet.';list.append(empty);}
- status.textContent=(section==='all'||section==='new'?String(items.length):'0')+' Ctoons';
+ if(section==='all'||section==='new'||section==='series')list.append(...items);
+ else {empty.textContent='No featured Ctoons yet.';list.append(empty);}
+ status.textContent=(section==='all'||section==='new'||section==='series'?String(items.length):'0')+' Ctoons';
 }
 show('all');
 search.value='';
 search.disabled=true;
-series.value='';
-series.disabled=true;
+series.replaceChildren(new Option('All series',''),new Option('Xiaolin Showdown','Xiaolin Showdown'));
+series.value='Xiaolin Showdown';
+series.disabled=false;
+series.addEventListener('change',()=>{const active=tabs.find(tab=>tab.getAttribute('aria-selected')==='true');show(active?.dataset.section||'all');});
 
 const tabs=[...document.querySelectorAll('[role="tab"]')];
 const panel=document.getElementById('shop-panel');

@@ -207,7 +207,7 @@ test('owner can load external shop controllers and public sticker catalog, anony
  const verified=await verify('owner-token');
  assert.equal(verified.status,200);
  const headers={Cookie:verified.headers.get('set-cookie').split(';')[0]};
- const files=['nav-account-controls.js','account-redirect.js','shop-collect-controller.js','shop-inventory-controller.js','shop-local-movie.js','sticker-catalog.json'];
+ const files=['nav-account-controls.js','account-redirect.js','shop-collect-controller.js','shop-inventory-controller.js','shop-local-movie.js','sticker-catalog.json','assets/appearance-catalog.json'];
  for(const name of files){
   const url=base+'/__maintenance/arcade/'+name;
   const allowed=await fetch(url,{headers});

@@ -1,0 +1,70 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
+
+const clientSource=readFileSync(new URL('../server/owner-verification-client.js',import.meta.url),'utf8')
+ .replace(/^import .*;\s*$/gm,'');
+
+async function fixture({username=false,owner=true}={}){
+ const handlers=new Map(),calls=[],authCalls=[];
+ const names=['verify-form','status','clear','verify','password','identifier','arcade-entry'];
+ const elements=Object.fromEntries(names.map(name=>[name,{
+  hidden:false,disabled:false,value:'',textContent:'',
+  addEventListener(event,handler){handlers.set(name+':'+event,handler);}
+ }]));
+ elements.identifier.value=username?'JTheKax':'owner@example.com';
+ elements.password.value='not-a-real-password';
+ let verified=false;
+ const session={access_token:'owner-token'};
+ const auth={
+  async signInWithPassword(credentials){authCalls.push(['email',credentials.email]);return {data:{session},error:null};},
+  async setSession(tokens){authCalls.push(['username',tokens]);return {data:{session},error:null};},
+  async signOut(){authCalls.push(['signout']);return {error:null};}
+ };
+ let options;
+ const createClient=(_url,_key,config)=>{options=config;return {auth};};
+ const fetch=async(url,init={})=>{
+  calls.push({url,init});
+  if(url==='/__maintenance/owner-status')return {ok:true,json:async()=>({ownerVerified:verified})};
+  if(url.endsWith('/functions/v1/username-login'))return {ok:true,json:async()=>({access_token:'owner-token',refresh_token:'refresh-token'})};
+  if(url==='/__maintenance/verify-session'&&init.method==='POST'){
+   if(!owner)return {ok:false};
+   verified=true;return {ok:true};
+  }
+  if(url==='/__maintenance/verify-session'&&init.method==='DELETE'){verified=false;return {ok:true};}
+  throw new Error('Unexpected test request: '+url);
+ };
+ runInNewContext(clientSource,{createClient,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_KEY:'sb_publishable_fixture',document:{getElementById:name=>elements[name]},fetch});
+ await new Promise(resolve=>setImmediate(resolve));
+ const submit=()=>handlers.get('verify-form:submit')({preventDefault(){}});
+ const clear=()=>handlers.get('clear:click')();
+ return {submit,clear,options,elements,calls,authCalls};
+}
+
+test('email owner login establishes both a persistent browser session and protected cookie',async()=>{
+ const f=await fixture();
+ assert.equal(f.options.auth.persistSession,true);
+ await f.submit();
+ assert.ok(f.authCalls.some(x=>x[0]==='email'));
+ assert.ok(f.calls.some(x=>x.url==='/__maintenance/verify-session'&&x.init.headers.Authorization==='Bearer owner-token'));
+ assert.equal(f.elements['arcade-entry'].hidden,false);
+ await f.clear();
+ assert.ok(f.authCalls.some(x=>x[0]==='signout'));
+ assert.equal(f.elements['arcade-entry'].hidden,true);
+});
+
+test('username owner login stores the refresh token in the official Supabase client',async()=>{
+ const f=await fixture({username:true});
+ await f.submit();
+ assert.ok(f.authCalls.some(x=>x[0]==='username'&&x[1].refresh_token==='refresh-token'));
+ assert.equal(f.elements['arcade-entry'].hidden,false);
+});
+
+test('nonowner verification failure clears the browser session and denies arcade entry',async()=>{
+ const f=await fixture({owner:false});
+ await f.submit();
+ assert.ok(f.authCalls.some(x=>x[0]==='signout'));
+ assert.equal(f.elements['arcade-entry'].hidden,true);
+ assert.match(f.elements.status.textContent,/Owner access could not be verified/);
+});

@@ -74,6 +74,12 @@ test('maintenance off opens allowlisted public pages but never owner dashboard',
   const response=await fetch(base+path);
   assert.equal(response.status,200,path);
   assert.equal(response.headers.get('cache-control'),'no-store');
+  if(path==='/static/theater.html'){
+   const csp=response.headers.get('content-security-policy')||'';
+   assert.match(csp,/frame-src https:\/\/www\.youtube-nocookie\.com(?:;|$)/);
+   assert.doesNotMatch(csp,/frame-src[^;]*(?:\*|youtube\.com|megacartoons)/);
+   assert.match(csp,/frame-ancestors 'none'/);
+  }
  }
  for(const path of ['/owner.html','/owner.js','/owner-theater.js','/maintenance-controls.js'])
   assert.equal((await fetch(base+path)).status,403,path);

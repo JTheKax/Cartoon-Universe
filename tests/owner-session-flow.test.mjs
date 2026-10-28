@@ -80,7 +80,7 @@ test('failed gateway cookie revocation prevents misleading owner logout',async()
 });
 
 const navSource=readFileSync(new URL('../nav-account-controls.js',import.meta.url),'utf8')
- .replace(/^import .*;\\s*$/gm,'');
+ .replace(/^import .*;\s*$/gm,'');
 
 async function navLogoutFixture({path='/__maintenance/arcade/',deleteFails=false}={}){
  const events=[],alerts=[],handlers=new Map();

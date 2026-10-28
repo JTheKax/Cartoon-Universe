@@ -11,5 +11,7 @@ test('protected account dependencies and forgot password remain usable',()=>{
  assert.match(auth,/from 'https:\/\/esm\.sh\/@supabase\/supabase-js@2'/);
  assert.match(login,/data-show="forgot"/);
  assert.match(auth,/resetPasswordForEmail/);
- assert.match(auth,/redirectTo:location\.origin\+location\.pathname/);
+ assert.match(auth,/location\\.pathname\\.startsWith\\('\\/__maintenance\\/arcade\\/'\\)/);
+ assert.match(auth,/location\\.origin\\+'\\/__maintenance\\/password-recovery'/);
+ assert.match(auth,/redirectTo:location\\.pathname\\.startsWith/);
 });

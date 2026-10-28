@@ -45,7 +45,7 @@ export const SECTION_MUTATION_ROUTES=Object.freeze(Object.keys(mutations));
 export function sectionForRoute({pathname,method='GET'}={}){
  if(typeof pathname!=='string'||!pathname.startsWith('/')||pathname.includes('?')||pathname.includes('#')||pathname.includes('%')||pathname.includes('\\')||pathname.includes('..')||pathname.includes('//'))return null;
  if(method==='GET'||method==='HEAD')return Object.hasOwn(pages,pathname)?pages[pathname]:null;
- if(['POST','PUT','PATCH','DELETE'].includes(method))return Object.hasOwn(mutations,pathname)?mutations[pathname]:null;
+ if(method==='POST')return Object.hasOwn(mutations,pathname)?mutations[pathname]:null;
  return null;
 }
 export function guardSectionRoute({pathname,method='GET',globalMaintenance,sectionStatuses,verifiedOwner=false}={}){

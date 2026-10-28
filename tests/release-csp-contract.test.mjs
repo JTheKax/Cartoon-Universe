@@ -39,3 +39,16 @@ test('public sticker catalog is available for the protected Collect page',()=>{
  const data=JSON.parse(source('sticker-catalog.json'));
  assert.ok(Array.isArray(data.stickers));
 });
+
+
+test('owner appearance controls can load their catalog behind maintenance',()=>{
+ assert.ok(allowed.has('assets/appearance-catalog.json'),'Appearance catalog must be in protected gateway allowlist and review bundle');
+ assert.match(source('logo-preferences.js'),/assets\/appearance-catalog\.json/);
+ const catalog=JSON.parse(source('assets/appearance-catalog.json'));
+ assert.ok(Array.isArray(catalog.logos));
+ assert.ok(Array.isArray(catalog.themes));
+ // Custom file entries need explicit gateway allowlisting before a release.
+ for(const item of [...catalog.logos,...catalog.themes]){
+  if(item?.kind==='file')assert.ok(allowed.has(item.path),'Custom appearance file must be protected and bundled: '+item.path);
+ }
+});

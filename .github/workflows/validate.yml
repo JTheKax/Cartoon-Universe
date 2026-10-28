@@ -31,6 +31,7 @@ jobs:
           test -f /tmp/cartoon-universe-review/shop-collect-controller.js
           test -f /tmp/cartoon-universe-review/shop-inventory-controller.js
           test -f /tmp/cartoon-universe-review/sticker-catalog.json
+          test -f /tmp/cartoon-universe-review/assets/appearance-catalog.json
           test -f /tmp/cartoon-universe-review/static/theater.js
       - name: Validate new client script syntax
         run: |
@@ -55,8 +56,10 @@ jobs:
         run: node --test tests/owner-verification.test.mjs
       - name: Test maintenance-safe owner password recovery
         run: node --test tests/owner-password-recovery.test.mjs
-      - name: Validate recovery client JavaScript syntax
-        run: node --check server/password-recovery-client.js
+      - name: Validate owner sign-in and recovery client JavaScript syntax
+        run: |
+          node --check server/owner-verification-client.js
+          node --check server/password-recovery-client.js
       - name: Test isolated gateway address candidate
         run: node --test tests/gateway-candidate.test.mjs
       - name: Test redirect-only cutover bundle preparation

@@ -81,6 +81,37 @@ if(player){
  const ownerForm=el('theater-program-form');
  ownerForm.elements.namedItem('title').value=suggestedMovie.title;
  ownerForm.elements.namedItem('media_url').value=suggestedMovie.media_url;
+ let pendingUpload=null,previewURL=null;
+ const uploadForm=el('theater-upload-form'),publishButton=el('theater-upload-publish'),uploadMessage=el('theater-upload-message');
+ uploadForm.addEventListener('submit',event=>{
+  event.preventDefault();if(!owner){uploadMessage.textContent='Owner sign-in required.';return}
+  const file=uploadForm.elements.namedItem('movie_file').files[0];
+  const title=uploadForm.elements.namedItem('upload_title').value.trim();
+  if(!file||!title||!['video/mp4','video/webm'].includes(file.type)){uploadMessage.textContent='Choose an MP4 or WebM file and enter a title.';return}
+  if(previewURL)URL.revokeObjectURL(previewURL);
+  previewURL=URL.createObjectURL(file);pendingUpload={file,title};
+  if(hls){hls.destroy();hls=null}
+  activeKey='';embed.replaceChildren();embed.hidden=true;player.hidden=false;player.pause();player.src=previewURL;player.load();
+  el('theater-now').textContent=title+' (local preview)';
+  status.textContent='▶ LOCAL MOVIE PREVIEW';
+  player.play().catch(()=>{});
+  publishButton.disabled=false;
+  uploadMessage.textContent='Previewing on your screen. This file is not uploaded or visible to other visitors.';
+ });
+ publishButton.addEventListener('click',async()=>{
+  if(!owner||!pendingUpload||!client)return;
+  const {file,title}=pendingUpload;
+  publishButton.disabled=true;uploadMessage.textContent='Uploading movie...';
+  const extension=file.type==='video/mp4'?'mp4':'webm';
+  const path=crypto.randomUUID()+'.'+extension;
+  const {error:uploadError}=await client.storage.from('theater-movies').upload(path,file,{contentType:file.type,upsert:false});
+  if(uploadError){uploadMessage.textContent='Upload unavailable: '+uploadError.message+'. Owner-only movie storage must be configured first.';publishButton.disabled=false;return}
+  const {data:urlData}=client.storage.from('theater-movies').getPublicUrl(path);
+  const duration=Number.isFinite(player.duration)&&player.duration>0?Math.ceil(player.duration/60):90;
+  const {error:dbError}=await client.from('theater_programs').insert({title,media_url:urlData.publicUrl,duration_minutes:duration,sort_order:programs.length,enabled:true});
+  if(dbError){uploadMessage.textContent='File uploaded but library entry failed: '+dbError.message;publishButton.disabled=false;return}
+  uploadMessage.textContent='Movie added to DVD Library.';pendingUpload=null;uploadForm.reset();await refresh();
+ });
  el('theater-program-form').addEventListener('submit',async e=>{
   e.preventDefault();if(!owner)return;
   const data=new FormData(e.currentTarget),url=parseMedia(data.get('media_url'))?.url,duration=Number(data.get('duration'));

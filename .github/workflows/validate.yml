@@ -41,6 +41,8 @@ jobs:
         run: node --test tests/section-maintenance-api.test.mjs
       - name: Test section route guard decisions
         run: node --test tests/section-route-guard.test.mjs
+      - name: Test isolated HTTP section gateway end to end
+        run: node --test tests/section-maintenance-review-gateway.test.mjs
       - name: Test section status request validation
         run: node --test tests/section-maintenance-request.test.mjs
       - name: Test fail-closed section status snapshots

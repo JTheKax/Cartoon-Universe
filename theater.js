@@ -77,6 +77,11 @@ if(player){
   el('theater-owner').hidden=!owner;
  }
  const submit=async(table,record)=>{if(!owner)return {error:{message:'Owner verification required'}};return client.from(table).upsert(record)};
+ // Review-only suggested title: owner must verify rights and publish through owner form.
+ const suggestedMovie={title:'Resident Evil: Damnation',media_url:'https://www.youtube.com/watch?v=dT1MNOhU0X8&t=3s'};
+ const ownerForm=el('theater-program-form');
+ ownerForm.elements.namedItem('title').value=suggestedMovie.title;
+ ownerForm.elements.namedItem('media_url').value=suggestedMovie.media_url;
  el('theater-program-form').addEventListener('submit',async e=>{
   e.preventDefault();if(!owner)return;
   const data=new FormData(e.currentTarget),url=parseMedia(data.get('media_url'))?.url,duration=Number(data.get('duration'));

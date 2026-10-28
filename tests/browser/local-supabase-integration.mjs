@@ -39,7 +39,7 @@ try{
  await writeFile(join(directory,'supabase/migrations',migration),sql);
  execFileSync('docker',['network','create','-o','com.docker.network.bridge.host_binding_ipv4=127.0.0.1',network],{stdio:'pipe'});networkCreated=true;
  console.log('Starting local Auth, PostgREST, API gateway and PostgreSQL containers.');
- cli(['start','--network-id',network,'--exclude','realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor,mailpit']);
+ cli(['start','--network-id',network,'--exclude','realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor']);
  const local=JSON.parse(cli(['status','-o','json']));
  const apiUrl=local.API_URL;
  check(apiUrl==='http://127.0.0.1:54321','Refusing a nonlocal API URL');
@@ -73,7 +73,38 @@ try{
   check(!error,'Local Auth password sign-in failed');
  }
  console.log('Real local Supabase sign-in succeeded for disposable owner and player.');
+ // Exercise real self-service registration against disposable local Supabase Auth.
+ const signupEmail='signup-'+randomBytes(6).toString('hex')+'@example.test';
+ const signupClient=client();
+ const {data:signup,error:signupError}=await signupClient.auth.signUp({email:signupEmail,password});
+ check(!signupError&&signup.user,'Disposable player self-registration failed');
+ check(signup.user.email===signupEmail,'Registration returned an unexpected identity');
+ const {data:signupLookup,error:signupLookupError}=await admin.auth.admin.getUserById(signup.user.id);
+ check(!signupLookupError&&signupLookup.user?.email===signupEmail,'Registered player missing from local Auth');
+ const {error:badLoginError}=await client().auth.signInWithPassword({email:signupEmail,password:'DefinitelyWrong!123'});
+ check(badLoginError,'Incorrect password unexpectedly authenticated a registered player');
+ // Request recovery only against the loopback Auth service; never send live email.
+ const {error:recoveryError}=await signupClient.auth.resetPasswordForEmail(signupEmail,{redirectTo:'http://127.0.0.1:54321/reset-password'});
+ check(!recoveryError,'Local password-recovery request failed: '+(recoveryError?.code||'unknown')+' / '+(recoveryError?.status||'unknown'));
+ const {data:recoveryLookup,error:recoveryLookupError}=await admin.auth.admin.getUserById(signup.user.id);
+ check(!recoveryLookupError&&recoveryLookup.user?.email===signupEmail,'Recovery request unexpectedly changed the account');
+ console.log('Disposable registration, invalid-password rejection and recovery request passed.');
+
  psql('update public.site_maintenance set enabled=true where id=true;');
+ // Verify authenticated non-owner cannot read owner membership or another player's wallet.
+ const {data:playerMembership,error:membershipError}=await playerClient.from('owner_members').select('user_id');
+ check(!membershipError&&playerMembership.length===0,'Non-owner could read owner membership');
+ const {data:visibleWallets,error:walletReadError}=await playerClient.from('coin_wallets').select('user_id,balance');
+ check(!walletReadError&&visibleWallets.length===1&&visibleWallets[0].user_id===player.id,'Player wallet SELECT leaked another account');
+ const {data:visibleClaims,error:claimReadError}=await playerClient.from('coin_daily_claims').select('user_id');
+ check(!claimReadError&&visibleClaims.every(row=>row.user_id===player.id),'Player daily-claim SELECT leaked another account');
+ const {data:visibleTransactions,error:transactionReadError}=await playerClient.from('coin_transactions').select('user_id');
+ check(!transactionReadError&&visibleTransactions.every(row=>row.user_id===player.id),'Player transaction SELECT leaked another account');
+ const {error:walletWriteError}=await playerClient.from('coin_wallets').update({balance:999999}).eq('user_id',player.id);
+ check(walletWriteError?.code==='42501','Player wallet balance UPDATE was not denied');
+ const {error:membershipWriteError}=await playerClient.from('owner_members').insert({user_id:player.id});
+ check(membershipWriteError,'Non-owner was able to grant owner membership');
+ console.log('Authenticated player ownership and wallet privilege checks passed.');
  const {data:before,error:readError}=await admin.from('coin_wallets').select('balance').eq('user_id',player.id).single();
  check(!readError&&before.balance===100,'Could not read disposable wallet');
  const blocked=await playerClient.rpc('claim_daily_cartoon_coins');

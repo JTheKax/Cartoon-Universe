@@ -7,7 +7,7 @@ const clientSource=readFileSync(new URL('../server/owner-verification-client.js'
  .replace(/^import .*;\s*$/gm,'')
  // Replace the browser-only ESM import with a deterministic asynchronous test
  // dependency. The real client still loads the official Supabase SDK.
- .replace("await import('https://esm.sh/@supabase/supabase-js@2')","Promise.resolve({createClient:globalThis.__fixtureCreateClient})");
+ .replace("await import('https://esm.sh/@supabase/supabase-js@2')","await Promise.resolve({createClient:globalThis.__fixtureCreateClient})");
 
 async function fixture({username=false,owner=true,deleteFails=false}={}){
  const handlers=new Map(),calls=[],authCalls=[],events=[];

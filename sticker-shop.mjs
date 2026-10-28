@@ -18,11 +18,11 @@ function createCtoonCard(ctoon){
  const name=document.createElement('h2');name.textContent=ctoon.name;
  const detail=document.createElement('p');detail.className='meta';detail.textContent=ctoon.type||'Ctoon';
  const row=document.createElement('div');row.className='price-row';
- const price=document.createElement('p');price.className='price';price.textContent=ctoon.price==null?'Price TBD':ctoon.price+' pts';
+ const price=document.createElement('p');price.className='price';price.textContent=ctoon.price==null?'Price TBD':ctoon.price+' coins';
  const buy=document.createElement('button');buy.className='buy';buy.disabled=true;buy.textContent='Buy';buy.title='Purchases are not enabled in this preview';
  row.append(price,buy);card.append(art,name,detail,row);return card;
 }
-const item=createCtoonCard({name:'Golden Tiger Claws',type:'Ctoon',fallback:'🐯',image:'./assets/ctoons/golden-tiger-claws.png',price:null});
+const item=createCtoonCard({name:'Golden Tiger Claws',type:'UC',fallback:'🐯',image:'./assets/ctoons/golden-tiger-claws.png',price:150});
 function show(section){
  list.replaceChildren();
  if(section==='all'||section==='new')list.append(item);

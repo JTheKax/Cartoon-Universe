@@ -14,7 +14,7 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
  const script=readFileSync(new URL('./owner-verification-client.js',import.meta.url));
  const sessions=new Map();
  const cookie=(id,age)=>`${COOKIE}=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}; Secure`;
- const csp=`default-src 'none'; script-src 'self' https://esm.sh; style-src 'self'; connect-src 'self' ${PROJECT}; form-action 'none'; base-uri 'none'; frame-ancestors 'none'`;
+ const csp=`default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' ${PROJECT}; form-action 'none'; base-uri 'none'; frame-ancestors 'none'`;
  async function api(path,token,method='GET'){
   const response=await fetchImpl(PROJECT+path,{method,headers:{apikey:publishableKey,Authorization:'Bearer '+token},redirect:'error',signal:AbortSignal.timeout(5000)});
   if(!response.ok)throw new Error('Owner verification unavailable');

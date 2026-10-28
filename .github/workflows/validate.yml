@@ -53,6 +53,10 @@ jobs:
         run: node --test tests/maintenance-gateway.test.mjs
       - name: Test read-only owner verification
         run: node --test tests/owner-verification.test.mjs
+      - name: Test maintenance-safe owner password recovery
+        run: node --test tests/owner-password-recovery.test.mjs
+      - name: Validate recovery client JavaScript syntax
+        run: node --check server/password-recovery-client.js
       - name: Test isolated gateway address candidate
         run: node --test tests/gateway-candidate.test.mjs
       - name: Test redirect-only cutover bundle preparation

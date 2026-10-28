@@ -65,62 +65,8 @@ if(youtubeForm){youtubeForm.addEventListener('submit',event=>{
 });}
 
 
-// Import a DVD created on the owner dashboard, even if the gateway uses a separate origin.
-// URL parameters contain only the title and public YouTube video ID, never credentials.
-try{
- const params=new URL(location.href).searchParams;
- const id=params.get('dvd_id'),title=params.get('dvd_title');
- if(id&&title&&/^[A-Za-z0-9_-]{11}$/.test(id)&&title.trim().length<=80){
-  const key='cartoon-universe-theater-youtube-drafts-v1';
-  const existing=JSON.parse(localStorage.getItem(key)||'[]');
-  const drafts=Array.isArray(existing)?existing:[];
-  if(!drafts.some(x=>x.id===id)&&drafts.length<30){drafts.push({id,title:title.trim()});localStorage.setItem(key,JSON.stringify(drafts));}
-  const note=document.getElementById('dvd-selection');if(note)note.textContent='DVD case transferred to this theater browser. Choose the YouTube DVD case below to play it.';
-  const clean=new URL(location.href);clean.searchParams.delete('dvd_id');clean.searchParams.delete('dvd_title');history.replaceState(null,'',clean.href);
- }
-}catch{/* Storage unavailable: the existing preview still works. */}
-
-// Direct save in the theater avoids owner-dashboard cross-origin and login handoff problems.
-const saveDvd=document.getElementById('theater-save-dvd');
-if(saveDvd){saveDvd.addEventListener('click',()=>{
- const id=youtubeVideoId(document.getElementById('theater-youtube-url').value.trim());
- const title=document.getElementById('theater-dvd-title').value.trim();
- const status=document.getElementById('theater-youtube-status');
- if(!id||!title){status.textContent='Enter a YouTube URL and DVD case title before saving.';return;}
- try{
-  const key='cartoon-universe-theater-youtube-drafts-v1';
-  const stored=JSON.parse(localStorage.getItem(key)||'[]');
-  const drafts=Array.isArray(stored)?stored:[];
-  if(drafts.some(x=>x.id===id)){status.textContent='This YouTube video already has a saved DVD case in this browser.';return;}
-  if(drafts.length>=30){status.textContent='Maximum of 30 DVD drafts reached.';return;}
-  drafts.push({id,title:title.slice(0,80)});localStorage.setItem(key,JSON.stringify(drafts));
-  status.textContent='DVD case saved in this browser. Reload the theater to see it on the DVD shelf.';
-  const button=document.createElement('button');button.type='button';button.className='dvd-case';button.style.setProperty('--dvd-a','#7133b8');button.style.setProperty('--dvd-b','#d24b86');
-  const art=document.createElement('span');art.className='dvd-art';art.textContent='▶️';const label=document.createElement('strong');label.textContent=title;const note=document.createElement('small');note.textContent='YouTube • Saved in this browser';button.append(art,label,note);
-  button.addEventListener('click',()=>{document.getElementById('theater-youtube-url').value='https://www.youtube.com/watch?v='+id;youtubeForm.requestSubmit();});
-  dvdShelf.append(button);
- }catch{status.textContent='Could not save this DVD. Check whether browser storage is enabled.';}
-});}
-
-// Show same-browser owner drafts as playable DVD cases; no shared publication.
-try{
- const drafts=JSON.parse(localStorage.getItem('cartoon-universe-theater-youtube-drafts-v1')||'[]');
- if(Array.isArray(drafts)&&dvdShelf){
-  for(const dvd of drafts.slice(0,30)){
-   if(typeof dvd.title!=='string'||!/^[A-Za-z0-9_-]{11}$/.test(dvd.id))continue;
-   const button=document.createElement('button');button.type='button';button.className='dvd-case';button.style.setProperty('--dvd-a','#7133b8');button.style.setProperty('--dvd-b','#d24b86');
-   const art=document.createElement('span');art.className='dvd-art';art.textContent='▶️';
-   const title=document.createElement('strong');title.textContent=dvd.title;
-   const note=document.createElement('small');note.textContent='YouTube • Browser draft';
-   button.append(art,title,note);
-   button.addEventListener('click',()=>{
-    const input=document.getElementById('theater-youtube-url');const form=document.getElementById('theater-youtube-form');
-    if(input&&form){input.value='https://www.youtube.com/watch?v='+dvd.id;form.requestSubmit();}
-   });dvdShelf.append(button);
-  }
- }
-}catch{/* Browser storage may be disabled. */}
-
+// Remove obsolete generic DVD drafts. Dark Side episodes and its cover use separate keys.
+try{localStorage.removeItem('cartoon-universe-theater-youtube-drafts-v1');}catch{}
 // Dark Side of the Ring: episodes grouped and sorted by season and episode number.
 const darkCase=document.querySelector('.dark-side-dvd');
 const darkPanel=document.getElementById('dark-side-episodes');

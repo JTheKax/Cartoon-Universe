@@ -41,7 +41,7 @@ export function createCandidateServer({origin,now=Date.now,ownerVerification,fet
      const protectedBase=name==='static/theater.html'?'/__maintenance/arcade/static/':'/__maintenance/arcade/';
      body=body.toString().replace(/<head([^>]*)>/i,'<head$1><base href="'+protectedBase+'">');
     }
-    return send(200,body,ARCADE_TYPES[extname(name)]||'application/octet-stream',{'Content-Security-Policy':"default-src 'self'; img-src 'self' data:; connect-src 'self' https://gjfyemvcrgrthbrlqqnz.supabase.co; style-src 'self' 'unsafe-inline'; script-src 'self' https://esm.sh; base-uri 'self'; frame-ancestors 'none'"});
+    return send(200,body,ARCADE_TYPES[extname(name)]||'application/octet-stream',{'Content-Security-Policy':"default-src 'self'; img-src 'self' data:; media-src 'self' blob:; connect-src 'self' https://gjfyemvcrgrthbrlqqnz.supabase.co; style-src 'self' 'unsafe-inline'; script-src 'self' https://esm.sh; base-uri 'self'; frame-ancestors 'none'"});
    }catch{return send(503,'Arcade asset unavailable');}
   }
   const nonce=(req.headers.cookie||'').split(';').map(value=>value.trim()).find(value=>value.startsWith(cookieName+'='))?.slice(cookieName.length+1);

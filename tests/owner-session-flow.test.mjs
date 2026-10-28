@@ -39,10 +39,11 @@ async function fixture({username=false,owner=true,deleteFails=false}={}){
   throw new Error('Unexpected test request: '+url);
  };
  runInNewContext(clientSource,{__fixtureCreateClient:createClient,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_KEY:'sb_publishable_fixture',document:{getElementById:name=>elements[name]},fetch});
- await new Promise(resolve=>setImmediate(resolve));
+ for(let i=0;i<20&&elements.verify.disabled;i++)await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(elements.verify.disabled,false,'Owner verification fixture did not finish initialization');
  const submit=()=>handlers.get('verify-form:submit')({preventDefault(){}});
  const clear=()=>handlers.get('clear:click')();
- return {submit,clear,options,elements,calls,authCalls,events};
+ return {submit,clear,get options(){return options;},elements,calls,authCalls,events};
 }
 
 test('email owner login establishes both a persistent browser session and protected cookie',async()=>{
@@ -53,7 +54,7 @@ test('email owner login establishes both a persistent browser session and protec
  assert.ok(f.calls.some(x=>x.url==='/__maintenance/verify-session'&&x.init.headers.Authorization==='Bearer owner-token'));
  assert.equal(f.elements['arcade-entry'].hidden,false);
  await f.clear();
- assert.ok(f.authCalls.some(x=>x[0]==='signout'));
+ assert.ok(f.authCalls.some(x=>x[0]==='signout'),f.elements.status.textContent);
  assert.deepEqual(f.events.slice(-2),['gateway-delete','browser-signout']);
  assert.equal(f.elements['arcade-entry'].hidden,true);
 });
@@ -61,7 +62,7 @@ test('email owner login establishes both a persistent browser session and protec
 test('username owner login stores the refresh token in the official Supabase client',async()=>{
  const f=await fixture({username:true});
  await f.submit();
- assert.ok(f.authCalls.some(x=>x[0]==='username'&&x[1].refresh_token==='refresh-token'));
+ assert.ok(f.authCalls.some(x=>x[0]==='username'&&x[1].refresh_token==='refresh-token'),f.elements.status.textContent);
  assert.equal(f.elements['arcade-entry'].hidden,false);
 });
 

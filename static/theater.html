@@ -13,6 +13,10 @@ main{padding-left:clamp(12px,2vw,30px)!important;padding-right:clamp(12px,2vw,30
 .cinema-screen-shell #theater-player,.cinema-screen-shell #theater-embed{width:100%!important;aspect-ratio:16/9!important}
 @media(min-width:900px){.cinema-screen-shell{width:min(100%,1600px)!important}}
 
+/* Fill the silver screen with the embedded show while preserving its 16:9 proportions. */
+.cinema-screen-shell #theater-embed{position:relative;overflow:hidden;padding:0!important}
+.cinema-screen-shell #theater-embed iframe{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;border:0;aspect-ratio:auto}
+.cinema-screen-shell #theater-player{display:block;object-fit:contain}
 /* Oversized cinema projection: 2x the previous maximum width (1600px -> 3200px), constrained to the viewport without horizontal overflow. */
 @media(min-width:900px){.cinema-screen-shell{width:min(100%,3200px)!important;max-width:3200px!important}}
 .cinema-screen-shell{min-height:0!important}

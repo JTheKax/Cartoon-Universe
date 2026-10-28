@@ -65,12 +65,32 @@ test('combined arcade navigation, owner dashboard shell, theater DVD cases and a
   assert.match(response.headers()['content-type']||'',/text\/html/,'Shop page must be served as HTML: '+name);
  }
  await page.goto(origin+'/__maintenance/arcade/static/theater.html');
- assert.ok(await page.locator('#dvd-shelf .dvd-case').count()>=4,'Theater must show custom DVD cases');
- // The first case is now a season-organized episode collection, not a demo case.
- await page.locator('#dvd-shelf .dark-side-dvd').click();
+ // The owner removed the demonstration DVD cases: the built-in shelf now has
+ // exactly one Dark Side collection. User-created browser-local drafts are separate.
+ assert.equal(await page.locator('#dvd-shelf .dvd-case').count(),1,'Only the requested Dark Side DVD case should be preloaded');
+ const darkCase=page.locator('#dvd-shelf .dark-side-dvd');
+ assert.equal(await darkCase.getAttribute('data-title'),'Dark Side of the Ring');
+ await darkCase.click();
  assert.equal(await page.locator('#dark-side-episodes').isVisible(),true,'Dark Side case should open its episode collection');
- await page.locator('#dvd-shelf .dvd-case[data-title="Saturday Cartoon Showcase"]').click();
- assert.match(await page.locator('#dvd-selection').textContent(),/Saturday Cartoon Showcase.*local video file/i);
+ assert.equal(await darkCase.getAttribute('aria-expanded'),'true');
+ assert.match(await page.locator('#dark-side-episode-status').textContent(),/No episodes added yet/);
+ // Exercise season sorting and browser-local episode saving without contacting YouTube.
+ await page.locator('#dark-side-episode-season').fill('2');
+ await page.locator('#dark-side-episode-number').fill('3');
+ await page.locator('#dark-side-episode-title').fill('Later season fixture');
+ await page.locator('#dark-side-episode-url').fill('https://www.youtube.com/watch?v=AaBbCcDdEe1');
+ await page.locator('#dark-side-episode-form button[type="submit"]').click();
+ await page.locator('#dark-side-episode-season').fill('1');
+ await page.locator('#dark-side-episode-number').fill('2');
+ await page.locator('#dark-side-episode-title').fill('Earlier season fixture');
+ await page.locator('#dark-side-episode-url').fill('https://www.youtube.com/watch?v=ZzYyXxWwVv2');
+ await page.locator('#dark-side-episode-form button[type="submit"]').click();
+ assert.deepEqual(await page.locator('#dark-side-episode-list .dark-side-season').allTextContents(),['Season 1','Season 2']);
+ assert.equal(await page.locator('#dark-side-episode-list .dark-side-episode-row').count(),2);
+ assert.match(await page.locator('#dark-side-episode-status').textContent(),/2 episode\(s\) across 2 season\(s\)/);
+ await page.reload();
+ await page.locator('#dvd-shelf .dark-side-dvd').click();
+ assert.equal(await page.locator('#dark-side-episode-list .dark-side-episode-row').count(),2,'Episode drafts should survive reload in this browser');
  const catalog=await page.evaluate(async()=>{
   const response=await fetch('/__maintenance/arcade/sticker-catalog.json');
   return {status:response.status,type:response.headers.get('content-type'),data:await response.json()};

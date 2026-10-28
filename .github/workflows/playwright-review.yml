@@ -1,0 +1,41 @@
+name: Playwright review checks
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Review preview URL (HTTPS only)'
+        required: false
+        default: 'https://cartoon-universe-integrated-review.onrender.com'
+  pull_request:
+    paths:
+      - '.github/workflows/playwright-review.yml'
+      - 'tests/browser/**'
+      - 'playwright.config.mjs'
+permissions:
+  contents: read
+jobs:
+  browser-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TEST_BASE_URL: ${{ inputs.target_url || 'https://cartoon-universe-integrated-review.onrender.com' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Run read-only browser checks
+        run: npx playwright test --config=playwright.config.mjs
+      - name: Upload screenshots and report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-review-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

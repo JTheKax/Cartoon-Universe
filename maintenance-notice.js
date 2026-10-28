@@ -3,6 +3,9 @@ import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
 const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 async function showMaintenanceNotice(){
+ // Authentication and password recovery must remain accessible during maintenance.
+ const page=location.pathname.split('/').pop().toLowerCase();
+ if(page==='login.html'||page==='register.html')return;
  const {data:state,error}=await client.from('site_maintenance').select('enabled,message').eq('id',true).maybeSingle();
  if(error||!state?.enabled)return;
  const {data:{user}}=await client.auth.getUser();

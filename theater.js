@@ -17,6 +17,7 @@ if(player){
    const id=host==='youtu.be'?u.pathname.slice(1):u.pathname.startsWith('/shorts/')||u.pathname.startsWith('/live/')||u.pathname.startsWith('/embed/')?u.pathname.split('/')[2]:u.searchParams.get('v');
    return id&&/^[a-zA-Z0-9_-]{11}$/.test(id)?{type:'youtube',url:'https://www.youtube-nocookie.com/embed/'+id}:null;
   }
+  if((host==='megacartoons.net'||host==='www.megacartoons.net')&&/^\/[a-z0-9-]+\/$/i.test(u.pathname)&&!u.search&& !u.hash)return {type:'external-embed',url};
   if(/\.m3u8$/i.test(u.pathname))return {type:'hls',url};
   if(/\.(mp4|webm|ogg|ogv)$/i.test(u.pathname))return {type:'video',url};
   return null;
@@ -29,14 +30,14 @@ if(player){
   player.pause();player.removeAttribute('src');player.load();
   if(hls){hls.destroy();hls=null}
   embed.replaceChildren();embed.hidden=true;player.hidden=false;
-  if(media.type==='youtube'){
+  if(media.type==='youtube'||media.type==='external-embed'){
    player.hidden=true;embed.hidden=false;
    const frame=document.createElement('iframe');
    frame.title='Cartoon Universe video';frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';frame.allowFullscreen=true;
    frame.referrerPolicy='strict-origin-when-cross-origin';
-   const u=new URL(media.url);u.searchParams.set('start',String(Math.floor(offset)));u.searchParams.set('autoplay','0');
+   const u=new URL(media.url);if(media.type==='youtube'){u.searchParams.set('start',String(Math.floor(offset)));u.searchParams.set('autoplay','0')}
    frame.src=u.href;embed.append(frame);
-   message.textContent='YouTube playback depends on embedding permissions. Scheduled seeking is approximate.';return;
+   message.textContent=media.type==='external-embed'?'External webpage player: press Play inside the embedded page. Automatic seeking, autoplay, and transitions cannot be guaranteed.':'YouTube playback depends on embedding permissions. Scheduled seeking is approximate.';return;
   }
   const seek=()=>{if(Number.isFinite(player.duration)&&offset<player.duration)try{player.currentTime=offset}catch{};player.removeEventListener('loadedmetadata',seek)};
   player.addEventListener('loadedmetadata',seek);
@@ -85,14 +86,14 @@ if(player){
  el('theater-program-form').addEventListener('submit',async e=>{
   e.preventDefault();if(!owner)return;
   const data=new FormData(e.currentTarget),url=parseMedia(data.get('media_url'))?.url,duration=Number(data.get('duration'));
-  if(!url||!Number.isInteger(duration)||duration<1||duration>1440){say('theater-owner-message','Use a direct HTTPS MP4/WebM/OGG file, HLS .m3u8 playlist, or embeddable YouTube video link, plus a valid duration. Movie webpage URLs will not play.');return}
+  if(!url||!Number.isInteger(duration)||duration<1||duration>1440){say('theater-owner-message','Use an HTTPS MP4/WebM/OGG file, HLS .m3u8 playlist, YouTube video, or supported MegaCartoons episode URL, plus a valid duration.');return}
   const {error}=await client.from('theater_programs').insert({title:String(data.get('title')).trim(),media_url:url,duration_minutes:duration,sort_order:programs.length,enabled:true});
   say('theater-owner-message',error?error.message:'Program saved.');if(!error){e.currentTarget.reset();await refresh()}
  });
  el('theater-live-form').addEventListener('submit',async e=>{
   e.preventDefault();if(!owner)return;
   const data=new FormData(e.currentTarget),url=parseMedia(data.get('media_url'))?.url;
-  if(!url){say('theater-owner-message','Use a direct HTTPS MP4/WebM/OGG file, HLS .m3u8 stream, or embeddable YouTube link. Ordinary movie webpage URLs cannot be played directly.');return}
+  if(!url){say('theater-owner-message','Use an HTTPS MP4/WebM/OGG file, HLS .m3u8 stream, YouTube link, or supported MegaCartoons episode URL.');return}
   const {error}=await submit('theater_live',{id:1,title:String(data.get('title')).trim(),media_url:url,enabled:true,updated_at:new Date().toISOString()});
   say('theater-owner-message',error?error.message:'Live override enabled.');if(!error)await refresh();
  });

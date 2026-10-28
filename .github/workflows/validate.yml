@@ -21,7 +21,16 @@ jobs:
         run: |
           node --check script.js
           if [ -f auth.js ]; then node --check auth.js; fi
-      - name: Verify owner gateway CSP-safe page scripts and public catalog\n        run: node --test tests/release-csp-contract.test.mjs\n      - name: Validate new client script syntax\n        run: |\n          node --check nav-account-controls.js\n          node --check account-redirect.js\n          node --check shop-collect-controller.js\n          node --check shop-inventory-controller.js\n          node --check shop-local-movie.js\n      - name: Validate Cartoon Coin migration security contract
+      - name: Verify owner gateway CSP-safe page scripts and public catalog
+        run: node --test tests/release-csp-contract.test.mjs
+      - name: Validate new client script syntax
+        run: |
+          node --check nav-account-controls.js
+          node --check account-redirect.js
+          node --check shop-collect-controller.js
+          node --check shop-inventory-controller.js
+          node --check shop-local-movie.js
+      - name: Validate Cartoon Coin migration security contract
         run: node --test tests/cartoon-coins.test.mjs
       - name: Test Supabase browser configuration validation
         run: node --test tests/supabase-config.test.mjs

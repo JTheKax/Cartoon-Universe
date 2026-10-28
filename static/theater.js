@@ -7,7 +7,7 @@ if(document.getElementById('theater-chat-toggle')){
 
 // DVD shelf preview selection (sample cases do not imply playable content).
 const dvdShelf=document.getElementById('dvd-shelf');
-if(dvdShelf){dvdShelf.addEventListener('click',event=>{const selected=event.target.closest('.dvd-case');if(!selected)return;document.getElementById('dvd-selection').textContent=selected.dataset.title+' — choose a local video file to preview on the silver screen. The case is not a saved movie.';const fileInput=document.getElementById('theater-local-file');if(fileInput){fileInput.scrollIntoView({behavior:'smooth',block:'center'});fileInput.focus();}});}
+if(dvdShelf){dvdShelf.addEventListener('click',event=>{const selected=event.target.closest('.dvd-case');if(!selected)return;if(selected.classList.contains('dark-side-dvd'))return;document.getElementById('dvd-selection').textContent=selected.dataset.title+' — choose a local video file to preview on the silver screen. The case is not a saved movie.';const fileInput=document.getElementById('theater-local-file');if(fileInput){fileInput.scrollIntoView({behavior:'smooth',block:'center'});fileInput.focus();}});}
 
 // Local-only preview: browser object URLs are never uploaded or persisted.
 const localFile=document.getElementById('theater-local-file');
@@ -120,3 +120,12 @@ try{
   }
  }
 }catch{/* Browser storage may be disabled. */}
+
+// Dark Side of the Ring: expandable multi-episode DVD, using local browser storage.
+const darkCase=document.querySelector('.dark-side-dvd');
+const darkPanel=document.getElementById('dark-side-episodes');
+const darkForm=document.getElementById('dark-side-episode-form');
+const darkKey='cartoon-universe-dark-side-episodes-v1';
+function darkRead(){try{const x=JSON.parse(localStorage.getItem(darkKey)||'[]');return Array.isArray(x)?x.filter(e=>typeof e.title==='string'&&/^[A-Za-z0-9_-]{11}$/.test(e.id)).slice(0,50):[];}catch{return [];}}
+function darkRender(){const list=document.getElementById('dark-side-episode-list');list.replaceChildren();const episodes=darkRead();document.getElementById('dark-side-episode-status').textContent=episodes.length?episodes.length+' episode(s) saved on this browser.':'No episodes added yet.';episodes.forEach((episode,i)=>{const row=document.createElement('div');row.className='dark-side-episode-row';const play=document.createElement('button');play.type='button';play.textContent='▶ '+episode.title;play.addEventListener('click',()=>{const input=document.getElementById('theater-youtube-url');input.value='https://www.youtube.com/watch?v='+episode.id;youtubeForm.requestSubmit();});const remove=document.createElement('button');remove.type='button';remove.textContent='Remove';remove.addEventListener('click',()=>{const next=darkRead();next.splice(i,1);localStorage.setItem(darkKey,JSON.stringify(next));darkRender();});row.append(play,remove);list.append(row);});}
+if(darkCase&&darkPanel&&darkForm){darkCase.addEventListener('click',()=>{darkPanel.hidden=!darkPanel.hidden;darkCase.setAttribute('aria-expanded',String(!darkPanel.hidden));if(!darkPanel.hidden){darkRender();darkPanel.scrollIntoView({behavior:'smooth',block:'nearest'});}});darkForm.addEventListener('submit',event=>{event.preventDefault();const title=document.getElementById('dark-side-episode-title').value.trim();const id=youtubeVideoId(document.getElementById('dark-side-episode-url').value.trim());const status=document.getElementById('dark-side-episode-status');if(!title||!id){status.textContent='Enter an episode title and valid YouTube URL.';return;}try{const episodes=darkRead();if(episodes.length>=50){status.textContent='Maximum of 50 episodes reached.';return;}if(episodes.some(e=>e.id===id)){status.textContent='That episode is already saved.';return;}episodes.push({title:title.slice(0,100),id});localStorage.setItem(darkKey,JSON.stringify(episodes));darkForm.reset();darkRender();}catch{status.textContent='Browser storage unavailable. Episode not saved.';}});}

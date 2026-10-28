@@ -67,3 +67,24 @@ test('owner recovery page can request a reset email while public maintenance rem
  assert.equal((await fetch(base+'/__maintenance/password-recovery.js')).status,200);
  assert.equal((await fetch(base+'/__maintenance/arcade/owner.html')).status,503);
 });
+
+
+test('reset email requests use only the fixed gateway redirect and do not enumerate accounts',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const source=client.replace(/^import .*;\\s*$/gm,'');
+ const handlers={};const calls=[];
+ const button={disabled:false};
+ const requestForm={hidden:false,addEventListener:(name,handler)=>{handlers[name]=handler;},querySelector:()=>button};
+ const email={value:'owner@example.com'};
+ const status={textContent:''};
+ const fields={'#recovery-status':status,'#recovery-request-form':requestForm,'#recovery-email':email,'#recovery-form':{hidden:true},'#password-new':{value:''},'#password-confirm':{value:''}};
+ const auth={resetPasswordForEmail:async(address,options)=>{calls.push({address,options});return {error:null};}};
+ const createClient=()=>({auth});
+ const location={origin:'https://cartoon-universe-gateway.onrender.com',pathname:'/__maintenance/password-recovery',search:'',hash:''};
+ const history={replaceState:()=>{}};
+ await runInNewContext('(async()=>{'+source+'})()',{createClient,SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_KEY:'sb_publishable_fixture',document:{querySelector:selector=>fields[selector]},location,history});
+ await handlers.submit({preventDefault(){}});
+ assert.deepEqual(calls,[{address:'owner@example.com',options:{redirectTo:'https://cartoon-universe-gateway.onrender.com/__maintenance/password-recovery'}}]);
+ assert.match(status.textContent,/If this email belongs to an account/);
+ assert.equal(email.value,'');assert.equal(button.disabled,false);
+});

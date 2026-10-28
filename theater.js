@@ -8,16 +8,17 @@ if(player){
  const safeURL=value=>{try{const u=new URL(value);return u.protocol==='https:'&&!!u.hostname?u.href:null}catch{return null}};
  const say=(id,text)=>{el(id).textContent=text};
  let hls=null;
+ player.addEventListener('error',()=>{const code=player.error?.code;message.textContent=code===4?'This URL is not a supported video stream, or the host blocks playback. Use a direct HTTPS MP4/WebM or HLS .m3u8 URL.':'Video playback failed. Check the media URL, host permissions, and network.'});
  const embed=el('theater-embed');
  const parseMedia=value=>{
   const url=safeURL(value);if(!url)return null;
   const u=new URL(url),host=u.hostname.toLowerCase();
   if(host==='youtu.be'||host==='youtube.com'||host==='www.youtube.com'||host==='m.youtube.com'||host==='www.youtube-nocookie.com'){
-   const id=host==='youtu.be'?u.pathname.slice(1):u.pathname.startsWith('/shorts/')||u.pathname.startsWith('/live/')?u.pathname.split('/')[2]:u.searchParams.get('v');
+   const id=host==='youtu.be'?u.pathname.slice(1):u.pathname.startsWith('/shorts/')||u.pathname.startsWith('/live/')||u.pathname.startsWith('/embed/')?u.pathname.split('/')[2]:u.searchParams.get('v');
    return id&&/^[a-zA-Z0-9_-]{11}$/.test(id)?{type:'youtube',url:'https://www.youtube-nocookie.com/embed/'+id}:null;
   }
   if(/\.m3u8$/i.test(u.pathname))return {type:'hls',url};
-  if(/\.(mp4|webm)$/i.test(u.pathname))return {type:'video',url};
+  if(/\.(mp4|webm|ogg|ogv)$/i.test(u.pathname))return {type:'video',url};
   return null;
  };
  async function play(raw,key,offset=0){
@@ -44,7 +45,7 @@ if(player){
     const {default:Hls}=await import('https://esm.sh/hls.js@1.6.13');
     if(key!==activeKey)return;
     if(!Hls.isSupported())throw Error('HLS is unsupported in this browser');
-    hls=new Hls();hls.loadSource(media.url);hls.attachMedia(player);
+    hls=new Hls();hls.on(Hls.Events.ERROR,(_event,data)=>{if(data.fatal)message.textContent='HLS stream failed ('+data.type+'). Check stream availability, HTTPS and cross-origin (CORS) permissions.'});hls.loadSource(media.url);hls.attachMedia(player);
    }catch{say('theater-message','HLS playback is unavailable. Check your stream URL and browser.');return}
   }else{player.src=media.url;player.load()}
   player.play().catch(()=>say('theater-message','Press play to start watching. Browser autoplay may be blocked.'));
@@ -84,14 +85,14 @@ if(player){
  el('theater-program-form').addEventListener('submit',async e=>{
   e.preventDefault();if(!owner)return;
   const data=new FormData(e.currentTarget),url=parseMedia(data.get('media_url'))?.url,duration=Number(data.get('duration'));
-  if(!url||!Number.isInteger(duration)||duration<1||duration>1440){say('theater-owner-message','Use a valid HTTPS URL and duration.');return}
+  if(!url||!Number.isInteger(duration)||duration<1||duration>1440){say('theater-owner-message','Use a direct HTTPS MP4/WebM/OGG file, HLS .m3u8 playlist, or embeddable YouTube video link, plus a valid duration. Movie webpage URLs will not play.');return}
   const {error}=await client.from('theater_programs').insert({title:String(data.get('title')).trim(),media_url:url,duration_minutes:duration,sort_order:programs.length,enabled:true});
   say('theater-owner-message',error?error.message:'Program saved.');if(!error){e.currentTarget.reset();await refresh()}
  });
  el('theater-live-form').addEventListener('submit',async e=>{
   e.preventDefault();if(!owner)return;
   const data=new FormData(e.currentTarget),url=parseMedia(data.get('media_url'))?.url;
-  if(!url){say('theater-owner-message','Use a valid HTTPS stream URL.');return}
+  if(!url){say('theater-owner-message','Use a direct HTTPS MP4/WebM/OGG file, HLS .m3u8 stream, or embeddable YouTube link. Ordinary movie webpage URLs cannot be played directly.');return}
   const {error}=await submit('theater_live',{id:1,title:String(data.get('title')).trim(),media_url:url,enabled:true,updated_at:new Date().toISOString()});
   say('theater-owner-message',error?error.message:'Live override enabled.');if(!error)await refresh();
  });

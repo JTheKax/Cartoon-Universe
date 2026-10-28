@@ -4,7 +4,7 @@ import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
 const el=id=>document.getElementById(id), player=el('theater-player'),status=el('theater-status'),message=el('theater-message');
 if(player){
  const client=isSupabaseConfigured(SUPABASE_URL,SUPABASE_ANON_KEY)?createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
- let programs=[],live=null,owner=false,activeKey='',started=0;
+ let programs=[],owner=false,activeKey='';
  const safeURL=value=>{try{const u=new URL(value);return u.protocol==='https:'&&!!u.hostname?u.href:null}catch{return null}};
  const say=(id,text)=>{el(id).textContent=text};
  let hls=null;
@@ -50,29 +50,25 @@ if(player){
   player.play().catch(()=>say('theater-message','Press play to start watching. Browser autoplay may be blocked.'));
  }
  function render(){
-  const list=el('theater-schedule');list.replaceChildren();
-  for(const p of programs){const li=document.createElement('li');li.textContent=p.title+' · '+p.duration_minutes+' min';list.append(li)}
-  if(!programs.length){const li=document.createElement('li');li.textContent='No programs scheduled yet.';list.append(li)}
-  if(live?.enabled&&parseMedia(live.media_url)){
-   status.textContent='🔴 LIVE NOW';el('theater-now').textContent=live.title;el('theater-marquee-label').textContent='🔴 LIVE PREMIERE';el('theater-marquee-program').textContent=live.title;
-   play(live.media_url,'live:'+live.id+':'+live.updated_at);
-   message.textContent='Owner live broadcast is on air.';return;
+  const library=el('theater-library');library.replaceChildren();
+  if(!programs.length){const p=document.createElement('p');p.textContent='No movies in the library yet.';library.append(p);return}
+  for(const movie of programs){
+   if(!parseMedia(movie.media_url))continue;
+   const dvd=document.createElement('button');dvd.type='button';dvd.className='dvd-case';dvd.setAttribute('aria-pressed',String(activeKey==='movie:'+movie.id));
+   const icon=document.createElement('span');icon.className='dvd-icon';icon.textContent='📀';
+   const title=document.createElement('strong');title.textContent=movie.title;
+   const duration=document.createElement('small');duration.textContent=movie.duration_minutes+' min · PLAY MOVIE';
+   dvd.append(icon,title,duration);
+   dvd.addEventListener('click',()=>{status.textContent='▶ NOW PLAYING';el('theater-now').textContent=movie.title;el('theater-marquee-label').textContent='NOW SHOWING';el('theater-marquee-program').textContent=movie.title;play(movie.media_url,'movie:'+movie.id);message.textContent='Selected: '+movie.title+'. Press play if autoplay is blocked.';render()});
+   library.append(dvd);
   }
-  const valid=programs.filter(p=>parseMedia(p.media_url)&&p.duration_minutes>0);
-  const total=valid.reduce((sum,p)=>sum+p.duration_minutes*60,0);
-  if(!total){status.textContent='⚫ OFF AIR';el('theater-now').textContent='';el('theater-marquee-label').textContent='COMING SOON';el('theater-marquee-program').textContent='STAY TUNED';play(null);message.textContent='The owner has not scheduled a playable channel yet.';return}
-  // Shared UTC epoch anchors the same schedule across viewers and page reloads.
-  let t=Math.floor(Date.now()/1000)%total,chosen=valid[0],offset=0;
-  for(const p of valid){const duration=p.duration_minutes*60;if(t<duration){chosen=p;offset=t;break}t-=duration}
-  status.textContent='🟢 24/7 PROGRAMMING';el('theater-now').textContent='Now playing: '+chosen.title;el('theater-marquee-label').textContent='NOW PLAYING';el('theater-marquee-program').textContent=chosen.title;
-  play(safeURL(chosen.media_url),'program:'+chosen.id,offset);
-  message.textContent='Scheduled playback; availability depends on the video host.';
+  if(!library.children.length){const p=document.createElement('p');p.textContent='No playable movies are available.';library.append(p)}
  }
  async function refresh(){
-  if(!client){status.textContent='⚫ NOT CONFIGURED';message.textContent='Streaming requires Supabase configuration.';return}
-  const [p,l]=await Promise.all([client.from('theater_programs').select('id,title,media_url,duration_minutes,sort_order').eq('enabled',true).order('sort_order'),client.from('theater_live').select('id,title,media_url,enabled,updated_at').eq('id',1).maybeSingle()]);
-  if(p.error||l.error){status.textContent='⚫ UNAVAILABLE';message.textContent='The theater database is not ready. Apply the reviewed migration before enabling.';return}
-  programs=p.data||[];live=l.data;render();
+  if(!client){status.textContent='⚫ NOT CONFIGURED';message.textContent='Movie library requires Supabase configuration.';return}
+  const {data,error}=await client.from('theater_programs').select('id,title,media_url,duration_minutes,sort_order').eq('enabled',true).order('sort_order');
+  if(error){status.textContent='⚫ UNAVAILABLE';message.textContent='The movie library database is not ready. A reviewed migration is required.';return}
+  programs=data||[];render();
  }
  async function checkOwner(){
   if(!client)return;
@@ -86,21 +82,9 @@ if(player){
   const data=new FormData(e.currentTarget),url=parseMedia(data.get('media_url'))?.url,duration=Number(data.get('duration'));
   if(!url||!Number.isInteger(duration)||duration<1||duration>1440){say('theater-owner-message','Use a valid HTTPS URL and duration.');return}
   const {error}=await client.from('theater_programs').insert({title:String(data.get('title')).trim(),media_url:url,duration_minutes:duration,sort_order:programs.length,enabled:true});
-  say('theater-owner-message',error?error.message:'Program saved.');if(!error){e.currentTarget.reset();await refresh()}
+  say('theater-owner-message',error?error.message:'Movie added to library.');if(!error){e.currentTarget.reset();await refresh()}
  });
- el('theater-live-form').addEventListener('submit',async e=>{
-  e.preventDefault();if(!owner)return;
-  const data=new FormData(e.currentTarget),url=parseMedia(data.get('media_url'))?.url;
-  if(!url){say('theater-owner-message','Use a valid HTTPS stream URL.');return}
-  const {error}=await submit('theater_live',{id:1,title:String(data.get('title')).trim(),media_url:url,enabled:true,updated_at:new Date().toISOString()});
-  say('theater-owner-message',error?error.message:'Live override enabled.');if(!error)await refresh();
- });
- el('theater-stop-live').addEventListener('click',async()=>{
-  if(!owner)return;
-  const {error}=await client.from('theater_live').update({enabled:false,updated_at:new Date().toISOString()}).eq('id',1);
-  say('theater-owner-message',error?error.message:'Playlist resumed.');if(!error)await refresh();
- });
- if(client){client.auth.onAuthStateChange(()=>setTimeout(checkOwner,0));checkOwner();refresh();setInterval(refresh,30000);setInterval(render,10000)}else refresh();
+ if(client){client.auth.onAuthStateChange(()=>setTimeout(checkOwner,0));checkOwner();refresh()}else refresh();
 }
 
 // External chat controller: inline scripts are blocked by the protected owner gateway CSP.

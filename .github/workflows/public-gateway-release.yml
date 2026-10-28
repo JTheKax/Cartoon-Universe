@@ -26,6 +26,12 @@ jobs:
         run: node --check server/public-launch-gateway.mjs
       - name: Test public, owner, maintenance, auth and path protection
         run: node --test tests/public-launch-gateway.test.mjs tests/owner-verification.test.mjs tests/production-gateway.test.mjs
+      - name: Assert public redirect directory contains no website assets
+        run: |
+          test -f deploy/public-gateway-cutover/cutover.txt
+          test "$(find deploy/public-gateway-cutover -type f | wc -l)" -eq 1
+          test ! -f deploy/public-gateway-cutover/index.html
+          test ! -f deploy/public-gateway-cutover/owner.html
       - name: Test website and Coin contracts
         run: |
           node scripts/check-site.mjs

@@ -80,6 +80,28 @@ try{
  }
 }catch{/* Storage unavailable: the existing preview still works. */}
 
+// Direct save in the theater avoids owner-dashboard cross-origin and login handoff problems.
+const saveDvd=document.getElementById('theater-save-dvd');
+if(saveDvd){saveDvd.addEventListener('click',()=>{
+ const id=youtubeVideoId(document.getElementById('theater-youtube-url').value.trim());
+ const title=document.getElementById('theater-dvd-title').value.trim();
+ const status=document.getElementById('theater-youtube-status');
+ if(!id||!title){status.textContent='Enter a YouTube URL and DVD case title before saving.';return;}
+ try{
+  const key='cartoon-universe-theater-youtube-drafts-v1';
+  const stored=JSON.parse(localStorage.getItem(key)||'[]');
+  const drafts=Array.isArray(stored)?stored:[];
+  if(drafts.some(x=>x.id===id)){status.textContent='This YouTube video already has a saved DVD case in this browser.';return;}
+  if(drafts.length>=30){status.textContent='Maximum of 30 DVD drafts reached.';return;}
+  drafts.push({id,title:title.slice(0,80)});localStorage.setItem(key,JSON.stringify(drafts));
+  status.textContent='DVD case saved in this browser. Reload the theater to see it on the DVD shelf.';
+  const button=document.createElement('button');button.type='button';button.className='dvd-case';button.style.setProperty('--dvd-a','#7133b8');button.style.setProperty('--dvd-b','#d24b86');
+  const art=document.createElement('span');art.className='dvd-art';art.textContent='▶️';const label=document.createElement('strong');label.textContent=title;const note=document.createElement('small');note.textContent='YouTube • Saved in this browser';button.append(art,label,note);
+  button.addEventListener('click',()=>{document.getElementById('theater-youtube-url').value='https://www.youtube.com/watch?v='+id;youtubeForm.requestSubmit();});
+  dvdShelf.append(button);
+ }catch{status.textContent='Could not save this DVD. Check whether browser storage is enabled.';}
+});}
+
 // Show same-browser owner drafts as playable DVD cases; no shared publication.
 try{
  const drafts=JSON.parse(localStorage.getItem('cartoon-universe-theater-youtube-drafts-v1')||'[]');

@@ -8,3 +8,25 @@ if(document.getElementById('theater-chat-toggle')){
 // DVD shelf preview selection (sample cases do not imply playable content).
 const dvdShelf=document.getElementById('dvd-shelf');
 if(dvdShelf){dvdShelf.addEventListener('click',event=>{const selected=event.target.closest('.dvd-case');if(!selected)return;document.getElementById('dvd-selection').textContent=selected.dataset.title+' — demo DVD case. Upload and playback integration is coming next.';});}
+
+// Local-only preview: browser object URLs are never uploaded or persisted.
+const localFile=document.getElementById('theater-local-file');
+const localPlayer=document.getElementById('theater-local-player');
+const localStatus=document.getElementById('theater-local-status');
+const placeholder=document.getElementById('theater-library-placeholder');
+if(localFile&&localPlayer&&localStatus&&placeholder){
+ let objectUrl=null;
+ const release=()=>{localPlayer.pause();localPlayer.removeAttribute('src');localPlayer.load();if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}};
+ localFile.addEventListener('change',()=>{
+  release();
+  const file=localFile.files?.[0];
+  if(!file){localPlayer.hidden=true;placeholder.hidden=false;localStatus.textContent='No video selected. Files are not uploaded.';return;}
+  if(!file.type.startsWith('video/')){localPlayer.hidden=true;placeholder.hidden=false;localStatus.textContent='Choose a video file supported by your browser.';return;}
+  objectUrl=URL.createObjectURL(file);
+  localPlayer.src=objectUrl;localPlayer.hidden=false;placeholder.hidden=true;
+  localStatus.textContent='Local preview: '+file.name+'. This file is not uploaded or saved to the movie library.';
+  localPlayer.load();
+ });
+ localPlayer.addEventListener('error',()=>{localStatus.textContent='This video format could not be played in your browser. Try MP4 (H.264) or WebM.';});
+ window.addEventListener('pagehide',release,{once:true});
+}

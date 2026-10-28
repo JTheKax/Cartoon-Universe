@@ -8,6 +8,13 @@ let client=null;
 function message(text){notice.textContent=text;notice.hidden=!text}
 function show(form){document.querySelectorAll('[data-form]').forEach(el=>el.hidden=el.dataset.form!==form);const actions=$('login-actions');if(actions)actions.hidden=form!=='login';const back=$('reset-actions');if(back)back.hidden=form!=='forgot';message('')}
 function errorText(e){return e?.message||'Something went wrong. Try again.'}
+// A Supabase sign-out alone does not revoke the gateway's short-lived owner cookie.
+// Clear server-side owner verification before reporting a protected-arcade logout.
+async function clearOwnerGatewaySession(){
+ if(location.pathname!=='/__maintenance/arcade'&&!location.pathname.startsWith('/__maintenance/arcade/'))return;
+ const response=await fetch('/__maintenance/verify-session',{method:'DELETE',credentials:'same-origin',redirect:'error',cache:'no-store'});
+ if(!response.ok)throw new Error('Could not clear owner gateway access. Please try logging out again.');
+}
 if(!configured){message('Accounts are not connected yet. The owner must configure a new Supabase project before signup is enabled.');document.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=true)}
 else{
  client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
@@ -73,10 +80,26 @@ else{
   if(!error)await render();
  }catch{message('Login is temporarily unavailable. Try again shortly.')}
 });
- $('forgot').addEventListener('submit',async e=>{e.preventDefault();const {error}=await client.auth.resetPasswordForEmail($('forgot-email').value.trim(),{redirectTo:location.origin+location.pathname});message(error?errorText(error):'If the address is registered, a reset email will arrive.')});
+ $('forgot').addEventListener('submit',async e=>{e.preventDefault();const {error}=await client.auth.resetPasswordForEmail($('forgot-email').value.trim(),{redirectTo:location.pathname.startsWith('/__maintenance/arcade/')?location.origin+'/__maintenance/password-recovery':location.origin+location.pathname});message(error?errorText(error):'If the address is registered, a reset email will arrive.')});
  $('password-update').addEventListener('submit',async e=>{e.preventDefault();const password=$('new-password').value;if(password.length<8){message('Use at least 8 characters.');return}const {error}=await client.auth.updateUser({password});message(error?errorText(error):'Password updated.');if(!error){params.delete('type');history.replaceState(null,'',location.pathname);authForms.hidden=false;account.hidden=true;show('login');message('Password updated. You can now sign in.')}});
- $('profile').addEventListener('submit',async e=>{e.preventDefault();const {data:{user}}=await client.auth.getUser();if(!user)return;const username=$('profile-username').value.trim();if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){message('Username must be 3–20 letters, numbers or underscores.');return}const {error}=await client.from('profiles').upsert({id:user.id,username,display_name:$('profile-name').value.trim().slice(0,40),avatar_color:$('profile-color').value},{onConflict:'id'});message(error?errorText(error):'Profile saved!');if(!error)await render()});
- $('logout').addEventListener('click',async()=>{const {error}=await client.auth.signOut();message(error?errorText(error):'Signed out.');if(!error)await render()});
+ $('profile').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const {data:{user}}=await client.auth.getUser();
+  if(!user)return;
+  const username=$('profile-username').value.trim();
+  if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){message('Username must be 3–20 letters, numbers or underscores.');return}
+  const changes={username,display_name:$('profile-name').value.trim().slice(0,40),avatar_color:$('profile-color').value};
+  // An upsert updates id on conflict, which the production column grants forbid.
+  // Update only editable columns for existing profiles; insert id only for a new profile.
+  const {data:existing,error:lookupError}=await client.from('profiles').select('id').eq('id',user.id).maybeSingle();
+  if(lookupError){message(errorText(lookupError));return}
+  const {error}=existing
+   ? await client.from('profiles').update(changes).eq('id',user.id)
+   : await client.from('profiles').insert({id:user.id,...changes});
+  message(error?errorText(error):'Profile saved!');
+  if(!error)await render();
+ });
+ $('logout').addEventListener('click',async()=>{try{await clearOwnerGatewaySession();const {error}=await client.auth.signOut();message(error?errorText(error):'Signed out.');if(!error)await render()}catch(error){message(errorText(error))}});
 }
 document.querySelectorAll('[data-show]').forEach(button=>button.addEventListener('click',()=>show(button.dataset.show)));
 

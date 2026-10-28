@@ -1,0 +1,140 @@
+/* Review-only clean arcade theme: keep existing functionality and IDs. */
+:root{--bg:#06101f;--panel:#0d1c30;--pink:#e34ca7;--cyan:#34adff;--yellow:#ffb629}body{background:#06101f;color:#edf5ff}.header.clean-header{display:block;position:relative;padding:0;background:#071321;border-bottom:1px solid #30435c}.clean-top{display:flex;align-items:center;gap:26px;padding:18px clamp(18px,4vw,60px);border-bottom:1px solid #273a51}.clean-logo{font-size:clamp(24px,2.6vw,38px);font-weight:1000;line-height:.85;letter-spacing:-1.2px;color:#ffb629;text-shadow:2px 3px #78351a;white-space:nowrap}.clean-logo span{display:block;color:#34adff;text-shadow:2px 3px #163a74}.clean-motto{font-size:12px;line-height:1.15;letter-spacing:1px;font-weight:900}.clean-search{flex:1;max-width:650px;margin:auto;padding:13px 18px;background:#0c1a2e;border:1px solid #324c6d;border-radius:8px;color:#a9bed9}.clean-search:hover{border-color:#34adff;color:#fff}.clean-auth{display:flex;gap:12px;white-space:nowrap}.clean-auth a{border:1px solid #197df0;border-radius:7px;padding:12px 19px;font-weight:800}.clean-auth .clean-register{background:#087cff}.clean-header .header-nav-row{background:#06101f;border-bottom:1px solid #30435c}.clean-header #nav{display:flex;align-items:center;justify-content:space-around;gap:8px;padding:0 22px;flex-wrap:wrap}.clean-header #nav>a,.clean-header #nav .nav-trigger{font-size:13px;white-space:nowrap;padding:15px 10px;color:#e8f2ff}.clean-header #nav>a:first-child{background:#102e54;border-bottom:3px solid #1b9dff}.clean-profile-container{max-width:1150px;margin:auto}.clean-profile-container .home-player-dashboard{position:relative;margin:0 auto;max-width:100%;border-radius:0;border-top:0}.clean-header .menu{color:white;border:1px solid #30435c;border-radius:6px;background:#10233d;padding:9px 12px}.dashboard-home{background:radial-gradient(ellipse at 50% 75%,#1a2060,transparent 62%),linear-gradient(110deg,#0a1330,#111029 55%,#09182b);border-bottom:1px solid #30435c}.dashboard-home .dashboard-feature h1{color:#ffb629;text-shadow:3px 4px #7c3418}.dashboard-home .dashboard-feature h1 em{color:#34adff;text-shadow:3px 4px #173e78}.dashboard-home .cta{background:#087cff;color:white;border-color:#197df0}.dashboard-home .dashboard-tiles>a{background:#0d1c30;border:1px solid #30445e;border-radius:10px}.section{scroll-margin-top:20px}@media(max-width:1050px){.clean-motto{display:none}.clean-search{max-width:none}.clean-header #nav{justify-content:flex-start}}@media(max-width:750px){.clean-top{flex-wrap:wrap;gap:12px}.clean-search{order:3;flex-basis:100%;max-width:none}.clean-auth{margin-left:auto}.clean-auth a{padding:9px}.clean-header #nav{gap:0}.clean-header #nav>a,.clean-header #nav .nav-trigger{font-size:12px}.clean-header .menu{display:block}.clean-logo{font-size:25px}}@media(max-width:430px){.clean-auth a{font-size:11px}.clean-logo{font-size:22px}}
+
+
+/* Alternating homepage brand: isolated review branch only. */
+.cu-animated-brand{display:block;flex:0 0 auto;text-decoration:none;overflow:hidden}
+.cu-logo-frame{display:block;position:relative;width:clamp(160px,17vw,260px);height:75px;overflow:hidden;border-radius:10px;isolation:isolate;background:radial-gradient(ellipse at center,#243b6a,#071020 80%);box-shadow:inset 0 0 20px #0008}
+.cu-logo-slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:5px;animation:cu-logo-dragon-cycle 16s ease-in-out infinite}
+.cu-logo-ninja{animation-name:cu-logo-ninja-cycle;background:radial-gradient(ellipse at center,#124e74,#0b1733 85%)}
+.cu-logo-dragon{background:radial-gradient(ellipse at center,#70400e,#16122b 85%)}
+.cu-logo-art{font-size:32px;filter:drop-shadow(0 0 9px #ffcc46);animation:cu-logo-float 3s ease-in-out infinite alternate;z-index:1}
+.cu-logo-ninja .cu-logo-art{filter:drop-shadow(0 0 9px #38d9ff)}
+.cu-logo-words{font-size:clamp(18px,2vw,26px);font-weight:1000;font-style:italic;line-height:.93;letter-spacing:-1px;color:#ffb72a;text-shadow:2px 3px #712513,0 0 12px #ffad4288;z-index:1;white-space:nowrap}
+.cu-logo-words b{display:block;color:#f6602d}
+.cu-logo-ninja .cu-logo-words b{color:#43caff;text-shadow:2px 3px #133d82,0 0 12px #43caffaa}
+.cu-logo-energy{position:absolute;width:130%;height:100%;border:2px solid #ffc34b77;border-radius:50%;transform:rotate(-15deg);animation:cu-logo-pulse 2.7s ease-in-out infinite alternate;box-shadow:0 0 18px #ffc34b66}
+.cu-logo-ninja .cu-logo-energy{border-color:#42d9ff88;box-shadow:0 0 18px #42d9ff77}
+@keyframes cu-logo-dragon-cycle{0%,43%{opacity:1;transform:scale(1)}49%,94%{opacity:0;transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+@keyframes cu-logo-ninja-cycle{0%,43%{opacity:0;transform:scale(1.08)}49%,94%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.08)}}
+@keyframes cu-logo-float{to{transform:translateY(-5px) rotate(7deg)}}
+@keyframes cu-logo-pulse{to{opacity:.25;transform:rotate(10deg) scale(1.2)}}
+@media(max-width:750px){.cu-logo-frame{width:175px;height:62px}.cu-logo-art{font-size:24px}.cu-logo-words{font-size:19px}}
+@media(prefers-reduced-motion:reduce){.cu-logo-slide,.cu-logo-art,.cu-logo-energy{animation:none!important}.cu-logo-ninja{display:none}}
+
+/* Admin dropdown grouping, with scrollable access on smaller screens. */
+#nav-admin{max-height:min(75vh,580px);overflow-y:auto;overscroll-behavior:contain}
+#nav-admin .admin-menu-heading{display:block;padding:12px 14px 5px;color:#ffb629;font-size:10px;font-weight:900;letter-spacing:1.2px;pointer-events:none;border-top:1px solid #30445e}
+#nav-admin a:focus-visible{outline:2px solid #34adff;outline-offset:-2px}
+
+/* Flat top-level tabs: no dropdowns. Keep hidden owner link hidden even with flex nav rules. */
+.clean-header #nav>a{display:inline-flex;align-items:center;font-size:13px;white-space:nowrap;padding:15px 10px;color:#e8f2ff;text-decoration:none}
+.clean-header #nav>a[hidden]{display:none!important}
+.clean-header #nav>a.active,.clean-header #nav>a[aria-current=page]{background:#102e54;border-bottom:3px solid #1b9dff}
+@media(max-width:750px){.clean-header #nav>a{font-size:12px}}
+
+/* Fail closed: ADMIN must remain hidden until verified owner membership is returned. */
+#nav #admin-nav[hidden]{display:none!important}
+
+/* Owner-only ADMIN dropdown; other tabs remain flat. */
+#nav .owner-menu[hidden],#nav .owner-menu:not(.verified-owner){display:none!important}
+#nav .owner-menu{position:relative;display:flex;align-items:center}
+#nav .owner-menu-trigger{font:800 13px system-ui,sans-serif;letter-spacing:.04em;color:#ffbf43;background:transparent;border:0;padding:15px 12px;cursor:pointer}
+#nav .owner-menu-trigger:hover,#nav .owner-menu-trigger:focus-visible{background:#173453;outline-offset:-2px}
+#nav .owner-menu-dropdown{position:absolute;top:100%;right:0;z-index:100;min-width:185px;background:#0d1c30;border:1px solid #35506d;border-radius:10px;box-shadow:0 12px 30px #0009;padding:6px}
+#nav .owner-menu-dropdown[hidden]{display:none!important}
+#nav .owner-menu-dropdown a{display:block;padding:12px 14px;border-radius:7px;color:#e8f2ff;text-decoration:none;white-space:nowrap}
+#nav .owner-menu-dropdown a:hover,#nav .owner-menu-dropdown a:focus-visible{background:#173453;color:#ffbf43}
+@media(max-width:1000px){#nav .owner-menu{width:100%;display:block}#nav .owner-menu-trigger{width:100%;text-align:left}#nav .owner-menu-dropdown{position:static;box-shadow:none;width:100%;box-sizing:border-box}}
+
+/* Browser-local logo mode selection, preserving the default alternating cycle. */
+html[data-logo-mode="dragon"] .cu-logo-dragon,html[data-logo-mode="ninja"] .cu-logo-ninja{animation:none!important;opacity:1!important;transform:none!important;display:flex!important}
+html[data-logo-mode="dragon"] .cu-logo-ninja,html[data-logo-mode="ninja"] .cu-logo-dragon{animation:none!important;opacity:0!important;display:none!important}
+@media(prefers-reduced-motion:reduce){html[data-logo-mode="ninja"] .cu-logo-ninja{display:flex!important}}
+
+/* Uploaded logo image overrides built-in slides in custom mode. */
+.cu-animated-brand{position:relative}
+.cu-custom-logo{display:block;max-width:230px;max-height:75px;object-fit:contain}
+.cu-custom-logo[hidden]{display:none!important}
+html[data-logo-mode="custom"] .cu-animated-brand .cu-logo-frame{display:none!important}
+
+/* Accessible review-only arcade navigation dropdowns. */
+#nav .cu-nav-dropdown{position:relative;display:inline-flex;align-items:center;min-width:0}
+#nav .cu-nav-dropdown summary{list-style:none;cursor:pointer;color:#e9faff;font-weight:800;padding:12px 13px;border-radius:9px;white-space:nowrap}
+#nav .cu-nav-dropdown summary::-webkit-details-marker{display:none}
+#nav .cu-nav-dropdown summary:hover,#nav .cu-nav-dropdown[open] summary{color:#4cfce5;background:rgba(25,255,226,.12)}
+#nav .cu-nav-options{position:absolute;top:100%;left:0;z-index:1000;min-width:180px;padding:8px;background:#090b22;border:1px solid #34e9fc;border-radius:10px;box-shadow:0 10px 25px #000b,0 0 16px #13e6ff55}
+#nav .cu-nav-options a{display:block;padding:11px 13px;white-space:nowrap;color:#e8faff;text-decoration:none;border-radius:6px;font-size:14px}
+#nav .cu-nav-options a:hover,#nav .cu-nav-options a:focus-visible{background:#182a4c;color:#60fff1}
+#nav .cu-nav-dropdown summary:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:800px){#nav .cu-nav-dropdown{display:block;width:100%}#nav .cu-nav-options{position:static;box-shadow:none;min-width:0;margin:0 8px 8px}}
+/* Correct owner menu visibility: its parent, not the trigger, owns verification. */
+#nav #admin-nav-group[hidden]{display:none!important}
+#nav #admin-nav-group:not(.verified-owner):not([data-owner-verified="true"]){display:none!important}
+
+/* Appearance preview: uncluttered full-screen arcade stage. */
+body:has(.clean-header) .dashboard-home{min-height:calc(100vh - 155px);display:block;padding:0;background:transparent!important}
+body:has(.clean-header) .dashboard-home .dashboard-main,
+body:has(.clean-header) .dashboard-home .dashboard-tiles{display:none!important}
+body:has(.clean-header) .clean-profile-container{display:none!important}
+body:has(.clean-header) .header.clean-header{z-index:10;background:rgba(5,12,32,.91);backdrop-filter:blur(8px)}
+body:has(.clean-header){background:linear-gradient(180deg,#050b2b 0%,#152e65 48%,#ee6e69 72%,#111d58 76%,#03192c 100%) fixed!important}
+body:has(.clean-header) .dashboard-home::before{content:"★";display:block;text-align:center;font-size:clamp(100px,22vw,230px);line-height:1.25;color:#ffdf66;text-shadow:0 0 28px #ffb736,0 0 80px #ff722a;pointer-events:none}
+body:has(.clean-header) .dashboard-home::after{content:"";display:block;height:34vh;background:repeating-linear-gradient(90deg,transparent 0 9%,#37e5ff99 9.2% 9.5%,transparent 9.8% 18%),repeating-linear-gradient(0deg,transparent 0 23%,#37e5ff99 24% 25%,transparent 26% 48%);transform:perspective(230px) rotateX(56deg);transform-origin:bottom;opacity:.7;pointer-events:none}
+@media(max-width:800px){body:has(.clean-header) .dashboard-home{min-height:75vh}body:has(.clean-header) .dashboard-home::after{height:25vh}}
+
+/* Sticker gallery window — catalog connection follows in isolated sticker development. */
+.sticker-gallery-window{margin:24px auto;max-width:1100px;min-height:310px;padding:22px;border:2px solid #42d8ff;border-radius:22px;background:linear-gradient(145deg,rgba(10,19,53,.96),rgba(37,17,70,.95));box-shadow:0 0 25px #1bceff55,inset 0 0 20px #ffffff0a;color:#f4f7ff}
+.sticker-gallery-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:24px}
+.sticker-gallery-toolbar label{font-weight:700;font-size:.88rem}
+.sticker-gallery-toolbar input,.sticker-gallery-toolbar select{background:#111d43;color:#fff;border:1px solid #72d9ff;border-radius:9px;padding:10px;min-width:140px;max-width:100%}
+.sticker-gallery-toolbar input{flex:1;min-width:180px}
+.sticker-gallery-empty{min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;border:1px dashed #6c8db7;border-radius:16px;padding:24px}
+.sticker-gallery-empty span{font-size:44px}
+.sticker-gallery-empty p{max-width:530px;margin:0;color:#d2d9ef}
+@media(max-width:600px){.sticker-gallery-window{padding:14px}.sticker-gallery-toolbar{align-items:stretch;flex-direction:column}.sticker-gallery-toolbar input,.sticker-gallery-toolbar select{width:100%}}
+
+/* Shop hub preview: navigation and feature cards (no purchase actions). */
+.shop-hub .shop-status{display:flex;flex-wrap:wrap;gap:.45rem 1rem;align-items:center;padding:1rem 1.25rem;margin:1.2rem 0;background:rgba(17,15,46,.85);border:1px solid #55e8ee;border-radius:16px;color:#fff}
+.shop-hub .shop-status span{color:#d8e4ff}
+.shop-jump{display:flex;flex-wrap:wrap;gap:.65rem;margin:1.2rem 0 1.5rem}
+.shop-jump a{padding:.65rem 1rem;border-radius:999px;border:1px solid #fbb8f4;background:rgba(62,20,89,.8);color:#fff;text-decoration:none;font-weight:700}
+.shop-jump a:hover,.shop-jump a:focus-visible{background:#71349e;outline-offset:3px}
+.shop-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.shop-feature{scroll-margin-top:5rem;padding:1.4rem;background:linear-gradient(150deg,rgba(46,24,94,.95),rgba(18,22,59,.95));border:1px solid #6feaf0;border-radius:20px;box-shadow:0 5px 22px rgba(3,4,20,.25);color:#fff}
+.shop-feature-icon{font-size:2.2rem;display:block;margin-bottom:.5rem}
+.shop-feature h3{margin:.4rem 0 .6rem;color:#fff;font-size:1.35rem}
+.shop-feature p:not(.eyebrow){line-height:1.6;color:#e1e6ff}
+.shop-feature-tag{display:inline-block;margin:.4rem .5rem .4rem 0;padding:.35rem .65rem;border:1px solid #f7c1ef;border-radius:999px;font-size:.82rem;color:#ffe5fa}
+.shop-feature a{display:inline-block;margin-top:.6rem;color:#8ffaff;font-weight:700}
+@media(max-width:680px){.shop-feature-grid{grid-template-columns:1fr}.shop-feature{padding:1.1rem}}
+
+/* cMart-inspired original Cartoon Universe storefront */
+.cmart-inspired{background:#06325b;border:2px solid #258ac3;border-radius:18px;padding:1.1rem;color:white}
+.cmart-heading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem}.cmart-heading h2{color:#fff}.cmart-preview{font-size:.75rem;padding:.5rem .75rem;border-radius:6px;background:#0a2441;color:#b5eaff;border:1px solid #4c9cc5}
+.cmart-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:12px;margin-top:1rem}.cmart-sidebar{background:#32699a;border:2px solid #39a7e6;border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:8px;align-self:start}.cmart-sidebar label,.cmart-sidebar legend{font-size:.72rem;font-weight:800;letter-spacing:.05em;color:#b9e3ff}.cmart-sidebar input,.cmart-sidebar select{box-sizing:border-box;width:100%;min-width:0;border-radius:5px;border:1px solid #5fa8da;background:#214c78;color:white;padding:8px}.cmart-sidebar input::placeholder{color:#c3d8ed}.cmart-sidebar fieldset{border:0;padding:0;margin:0}.cmart-rarities{display:flex;flex-wrap:wrap;gap:3px}.cmart-rarities button{border:0;background:#234c79;color:white;border-radius:4px;padding:5px 7px;font-size:.7rem;cursor:pointer}.cmart-rarities button.active,.cmart-tabs button.active{background:#68c930;color:#10243b}.cmart-player{display:flex;flex-direction:column;gap:6px;background:#23547e;padding:9px;border-radius:6px}.cmart-player small{color:#c4e1fb}.cmart-player a{color:#fff;font-size:.8rem}.cmart-reset{background:#1d4b75;border:1px solid #6baee2;border-radius:5px;color:#fff;padding:9px;cursor:pointer}.cmart-disclaimer{font-size:.75rem;color:#e1efff;line-height:1.5}
+.cmart-main{min-width:0;border:2px solid #36a7e3;border-radius:9px;background:#306a9d;overflow:hidden}.cmart-tabs{display:flex;gap:6px;flex-wrap:wrap;background:#123e65;padding:8px}.cmart-tabs button,.cmart-tabs a{font:inherit;font-weight:700;font-size:.83rem;color:#fff;background:#1684bb;border:1px solid #70c9f3;border-radius:5px;padding:8px 12px;text-decoration:none;cursor:pointer}.cmart-results{display:flex;justify-content:space-between;gap:8px;background:#3094c9;color:white;padding:9px 12px}.cmart-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;padding:8px;max-height:540px;overflow:auto}.cmart-item{min-width:0;background:#16588c;border:2px solid #7ad5ff;border-radius:7px;padding:4px;color:#fff;text-align:center}.cmart-item-art{position:relative;display:grid;place-items:center;aspect-ratio:1/1;font-size:clamp(2.4rem,5vw,4.5rem);background:repeating-conic-gradient(from 0deg at 50% 55%,#8deaff 0deg 13deg,#54c2f4 13deg 26deg);border-radius:4px;text-shadow:0 3px 3px #245}.cmart-item-flag{position:absolute;top:3px;right:3px;background:#163a61;color:white;font-size:.6rem;padding:2px 4px;border-radius:3px;text-shadow:none}.cmart-item h3{font-size:.82rem;line-height:1.25;margin:7px 0 2px;color:#fff;overflow-wrap:anywhere}.cmart-item-meta{font-size:.67rem;color:#d5f2ff}.cmart-item-foot{display:flex;justify-content:space-between;align-items:center;gap:4px;margin-top:5px;font-size:.7rem}.cmart-item-foot strong{color:#ffe84d}.cmart-rarity{background:#235179;padding:2px 4px;border-radius:3px}.cmart-empty{padding:1rem}.cmart-secondary{margin-top:1rem;grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:850px){.cmart-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:650px){.cmart-layout{grid-template-columns:1fr}.cmart-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.cmart-player,.cmart-sidebar fieldset,.cmart-disclaimer{grid-column:1/-1}.cmart-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cmart-secondary{grid-template-columns:1fr}}
+
+
+/* Dedicated destination pages: top-first sticky navigation and neutral neon background. */
+body:has(.arcade-destination){background:#080f26 !important;background-image:linear-gradient(145deg,#080f26 0%,#122b49 58%,#090e20 100%) !important;background-attachment:fixed !important}
+body:has(.arcade-destination)::before,body:has(.arcade-destination)::after{background:none !important;animation:none !important}
+.arcade-destination:has(nav[aria-label="Main areas"]){display:flex;flex-direction:column;gap:12px;isolation:isolate}
+.arcade-destination:has(nav[aria-label="Main areas"]) > nav[aria-label="Main areas"]{order:-2;position:sticky;top:0;z-index:30;margin:0 !important;border:1px solid #5ebee9;border-radius:9px;box-shadow:0 6px 20px #0008}
+.arcade-destination:has(nav[aria-label="Main areas"]) > nav[aria-label$="pages"]{order:-1;position:sticky;top:54px;z-index:29;margin:0 !important;border:1px solid #5ebee9;border-radius:9px}
+.arcade-destination .cmart-tabs a[aria-current="page"]{background:#5bbcf0;color:#071b32;border-color:#d4f6ff}
+@media(max-width:720px){.arcade-destination:has(nav[aria-label="Main areas"]) > nav[aria-label="Main areas"],.arcade-destination:has(nav[aria-label="Main areas"]) > nav[aria-label$="pages"]{position:relative;top:auto}.arcade-destination .cmart-tabs{gap:5px}.arcade-destination .cmart-tabs a{padding:7px 9px}}
+
+/* Same top navigation as homepage, on all standalone pages. */
+.cu-shared-header{position:sticky;top:0;z-index:100;background:#09152ded;border-bottom:1px solid #3aa8e5;backdrop-filter:blur(12px);padding:8px max(12px,calc((100vw - 1200px)/2))}
+.cu-shared-brand{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:5px 8px 10px}
+.cu-shared-brand a{color:#fff;text-decoration:none;font-weight:900;letter-spacing:.12em}
+.cu-shared-brand span{color:#a8d8f7;font-size:.75rem;letter-spacing:.09em}
+.cu-shared-header .header-nav-row{display:block}
+.cu-shared-header #nav{display:flex !important;align-items:center;flex-wrap:wrap;gap:8px}
+.cu-shared-header .cu-nav-dropdown{position:relative}
+.cu-shared-header .cu-nav-options{position:absolute;top:100%;left:0;z-index:110;min-width:190px;max-height:65vh;overflow:auto;background:#102f55;border:1px solid #57b9ec;border-radius:8px;padding:8px;box-shadow:0 12px 26px #000b}
+.cu-shared-header .cu-nav-options a{display:block;padding:8px;color:white;text-decoration:none}
+.cu-shared-header .cu-nav-options a:hover{background:#245d91}
+@media(max-width:700px){.cu-shared-header{position:sticky}.cu-shared-header #nav{gap:4px}.cu-shared-header .cu-nav-options{position:absolute}}

@@ -112,6 +112,14 @@ try{
  await page.locator('#login-email').fill(owner.email);await page.locator('#login-password').fill(password);
  await page.locator('#login button[type=submit]').click();
  await page.getByRole('link',{name:'Open staging owner dashboard'}).waitFor({state:'visible'});
+ // Browser profile saves must work with the restricted column-level UPDATE grants.
+ // An INSERT ... ON CONFLICT upsert would attempt to update immutable id and fail.
+ await page.locator('#account-panel').waitFor({state:'visible'});
+ await page.locator('#profile-name').fill('Browser Saved Owner');
+ await page.locator('#profile button[type=submit]').click();
+ await page.getByText('Profile saved!',{exact:true}).waitFor();
+ const {data:savedOwner,error:saveReadError}=await admin.from('profiles').select('display_name').eq('id',owner.id).single();
+ check(!saveReadError&&savedOwner.display_name==='Browser Saved Owner','Owner profile browser save failed under restricted grants');
  check((await context.cookies()).some(cookie=>cookie.name==='cu_staging_owner'&&cookie.httpOnly),'Owner browser did not receive its gateway cookie');
  await page.getByRole('link',{name:'Open staging owner dashboard'}).click();
  await page.locator('#owner-content').waitFor({state:'visible'});

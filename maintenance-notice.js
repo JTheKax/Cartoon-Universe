@@ -3,6 +3,9 @@ import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
 const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 async function showMaintenanceNotice(){
+ // The isolated design preview must not inherit the live site's visual maintenance overlay.
+ // This does not grant access to protected server routes or disable production maintenance.
+ if(window.location.hostname==='cartoon-universe-clean-arcade-preview.onrender.com')return;
  const {data:state,error}=await client.from('site_maintenance').select('enabled,message').eq('id',true).maybeSingle();
  if(error||!state?.enabled)return;
  const {data:{user}}=await client.auth.getUser();

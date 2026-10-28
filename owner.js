@@ -6,7 +6,16 @@ const setStatus=(text)=>{status.textContent=text;status.hidden=false;};
 async function init(){
  const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
  const {data:{user},error:authError}=await client.auth.getUser();
- if(authError||!user){setStatus('Please sign in through Player Account to access this page.');return;}
+ if(authError||!user){
+  setStatus('Your gateway verification is active, but the arcade Player Account session is missing. Sign in to Player Account on this gateway, then return to the Owner Dashboard.');
+  const link=document.createElement('a');
+  link.href='account.html';
+  link.textContent='Open Player Account sign-in';
+  link.style.display='inline-block';
+  link.style.marginTop='12px';
+  status.append(document.createElement('br'),link);
+  return;
+ }
  const {data:membership,error:roleError}=await client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();
  if(roleError){setStatus('Could not verify owner permissions. Please try again.');return;}
  if(!membership){setStatus('Access denied. This page is reserved for the Cartoon Universe owner.');return;}

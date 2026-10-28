@@ -21,6 +21,34 @@ jobs:
         run: |
           node --check script.js
           if [ -f auth.js ]; then node --check auth.js; fi
+      - name: Verify owner gateway CSP-safe page scripts and public catalog
+        run: node --test tests/release-csp-contract.test.mjs
+      - name: Build isolated static review bundle and verify required assets
+        run: |
+          CARTOON_UNIVERSE_REVIEW_BUILD=true node scripts/build-review-static.mjs /tmp/cartoon-universe-review
+          test -f /tmp/cartoon-universe-review/nav-account-controls.js
+          test -f /tmp/cartoon-universe-review/shop-local-movie.js
+          test -f /tmp/cartoon-universe-review/shop-collect-controller.js
+          test -f /tmp/cartoon-universe-review/shop-inventory-controller.js
+          test -f /tmp/cartoon-universe-review/sticker-catalog.json
+          test -f /tmp/cartoon-universe-review/assets/appearance-catalog.json
+          test -f /tmp/cartoon-universe-review/static/theater.js
+          test -f /tmp/cartoon-universe-review/static/dark-side-ring-blue-cover.svg
+          # Exercise Render's actual no-argument build command and publish directory.
+          CARTOON_UNIVERSE_REVIEW_BUILD=true node scripts/build-review-static.mjs
+          test -f preview-public/index.html
+          test -f preview-public/nav-account-controls.js
+          test -f preview-public/sticker-catalog.json
+          test -f preview-public/static/theater.html
+          test -f preview-public/static/theater.js
+          test -f preview-public/static/dark-side-ring-blue-cover.svg
+      - name: Validate new client script syntax
+        run: |
+          node --check nav-account-controls.js
+          node --check account-redirect.js
+          node --check shop-collect-controller.js
+          node --check shop-inventory-controller.js
+          node --check shop-local-movie.js
       - name: Validate Cartoon Coin migration security contract
         run: node --test tests/cartoon-coins.test.mjs
       - name: Test Supabase browser configuration validation
@@ -35,6 +63,14 @@ jobs:
         run: node --test tests/maintenance-gateway.test.mjs
       - name: Test read-only owner verification
         run: node --test tests/owner-verification.test.mjs
+      - name: Test maintenance-safe owner password recovery
+        run: node --test tests/owner-password-recovery.test.mjs tests/gateway-account-recovery.test.mjs
+      - name: Test isolated owner browser session continuity
+        run: node --test tests/owner-session-flow.test.mjs
+      - name: Validate owner sign-in and recovery client JavaScript syntax
+        run: |
+          node --check server/owner-verification-client.js
+          node --check server/password-recovery-client.js
       - name: Test isolated gateway address candidate
         run: node --test tests/gateway-candidate.test.mjs
       - name: Test redirect-only cutover bundle preparation

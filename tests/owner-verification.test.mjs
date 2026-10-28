@@ -184,3 +184,20 @@ test('on-demand Cartoon Theater and DVD shelf are owner-protected during mainten
  const homepage=await (await fetch(base+'/__maintenance/arcade/',{headers})).text();
  assert.match(homepage,/Visit Movie Theater/);
 });
+
+
+test('every reviewed shop and Watch page is reachable only by verified owners during maintenance',async t=>{
+ const {base,verify}=await fixture(t);
+ const response=await verify('owner-token');
+ assert.equal(response.status,200);
+ const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
+ const pages=["shop-auctions.html","shop-cards-battle.html","shop-cards-deck-build.html","shop-cards.html","shop-collect-encyclopedia.html","shop-collect-my-collection.html","shop-collect-my-scene.html","shop-collect-wishlist.html","shop-collect.html","shop-collectibles.html","shop-community-forums.html","shop-community-help.html","shop-community-support.html","shop-community.html","shop-games-arcade.html","shop-games-claw-machine.html","shop-games-monster-catcher.html","shop-games-prize-wheel.html","shop-games-retro-games.html","shop-games.html","shop-my-shop.html","shop-packs.html","shop-recycler.html","shop-shop.html","shop-watch-anime.html","shop-watch-cartoons.html","shop-watch-misc.html","shop-watch-movies.html","shop-watch.html"];
+ for(const page of pages){
+  const url=base+'/__maintenance/arcade/'+page;
+  const ownerPage=await fetch(url,{headers});
+  assert.equal(ownerPage.status,200,'Protected owner route: '+page);
+  assert.match(ownerPage.headers.get('content-type'),/text\/html/);
+  const denied=await fetch(url);
+  assert.equal(denied.status,503,'Anonymous route denied: '+page);
+ }
+});

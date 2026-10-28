@@ -78,3 +78,53 @@ test('failed gateway cookie revocation prevents misleading owner logout',async()
  assert.equal(f.authCalls.some(x=>x[0]==='signout'),false);
  assert.match(f.elements.status.textContent,/Unable to clear verification/);
 });
+
+const navSource=readFileSync(new URL('../nav-account-controls.js',import.meta.url),'utf8')
+ .replace(/^import .*;\\s*$/gm,'');
+
+async function navLogoutFixture({path='/__maintenance/arcade/',deleteFails=false}={}){
+ const events=[],alerts=[],handlers=new Map();
+ const names=['nav-player-name','nav-player-balance','nav-owner-badge','nav-owner-tab','nav-login-link','nav-logout-button','nav-register-link'];
+ const elements=Object.fromEntries(names.map(name=>[name,{
+  hidden:false,disabled:false,textContent:'',
+  addEventListener(event,handler){handlers.set(name+':'+event,handler);}
+ }]));
+ const auth={
+  async getSession(){return {data:{session:null}};},
+  onAuthStateChange(){},
+  async signOut(){events.push('browser-signout');return {error:null};}
+ };
+ const fetch=async(url,init)=>{
+  if(url!=='/__maintenance/verify-session'||init.method!=='DELETE')throw new Error('Unexpected request');
+  events.push('gateway-delete');return {ok:!deleteFails};
+ };
+ runInNewContext(navSource,{
+  document:{getElementById:name=>elements[name]},
+  window:{addEventListener(){}},
+  location:{pathname:path},
+  fetch,createClient:()=>({auth}),SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_ANON_KEY:'sb_publishable_fixture',
+  alert:message=>alerts.push(message),setTimeout
+ });
+ await new Promise(resolve=>setImmediate(resolve));
+ return {logout:()=>handlers.get('nav-logout-button:click')(),events,alerts,elements};
+}
+
+test('navigation logout clears protected owner cookie before browser sign-out',async()=>{
+ const f=await navLogoutFixture();
+ await f.logout();
+ assert.deepEqual(f.events,['gateway-delete','browser-signout']);
+ assert.equal(f.alerts.length,0);
+});
+
+test('navigation logout fails closed when owner cookie cannot be revoked',async()=>{
+ const f=await navLogoutFixture({deleteFails:true});
+ await f.logout();
+ assert.deepEqual(f.events,['gateway-delete']);
+ assert.equal(f.alerts.length,1);
+});
+
+test('normal public navigation logout does not call owner gateway',async()=>{
+ const f=await navLogoutFixture({path:'/'});
+ await f.logout();
+ assert.deepEqual(f.events,['browser-signout']);
+});

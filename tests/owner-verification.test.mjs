@@ -201,3 +201,18 @@ test('every reviewed shop and Watch page is reachable only by verified owners du
   assert.equal(denied.status,503,'Anonymous route denied: '+page);
  }
 });
+
+test('owner can load external shop controllers and public sticker catalog, anonymous users cannot',async t=>{
+ const {base,verify}=await fixture(t);
+ const verified=await verify('owner-token');
+ assert.equal(verified.status,200);
+ const headers={Cookie:verified.headers.get('set-cookie').split(';')[0]};
+ const files=['nav-account-controls.js','account-redirect.js','shop-collect-controller.js','shop-inventory-controller.js','shop-local-movie.js','sticker-catalog.json'];
+ for(const name of files){
+  const url=base+'/__maintenance/arcade/'+name;
+  const allowed=await fetch(url,{headers});
+  assert.equal(allowed.status,200,'Owner should load '+name);
+  assert.match(allowed.headers.get('content-type'),name.endsWith('.json')?/application\/json/:/text\/javascript/);
+  assert.equal((await fetch(url)).status,503,'Anonymous user should not load '+name);
+ }
+});

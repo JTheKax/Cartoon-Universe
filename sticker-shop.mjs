@@ -22,7 +22,7 @@ function createCtoonCard(ctoon){
  const buy=document.createElement('button');buy.className='buy';buy.disabled=true;buy.textContent='Buy';buy.title='Purchases are not enabled in this preview';
  row.append(price,buy);card.append(art,name,detail,row);return card;
 }
-const item=createCtoonCard({name:'Golden Tiger Claws',type:'Ctoon',fallback:'🐯',price:null});
+const item=createCtoonCard({name:'Golden Tiger Claws',type:'Ctoon',fallback:'🐯',image:'./assets/ctoons/golden-tiger-claws.png',price:null});
 function show(section){
  list.replaceChildren();
  if(section==='all'||section==='new')list.append(item);

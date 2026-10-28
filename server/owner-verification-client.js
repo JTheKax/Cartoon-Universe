@@ -46,12 +46,16 @@ clear.addEventListener('click',async()=>{
  if(initializing||inFlight)return;
  inFlight=true;busy(true);
  try{
-  // Clear the normal browser session as well as the protected gateway cookie.
-  // The gateway DELETE is still attempted if Supabase sign-out fails.
-  try{await client.auth.signOut({scope:'local'});}catch{}
+  // Clear the server-side owner cookie before the browser session. A local
+  // Supabase sign-out does not invalidate a still-authorized gateway cookie.
   const response=await fetch('/__maintenance/verify-session',{method:'DELETE',credentials:'same-origin',redirect:'error',cache:'no-store'});
   if(!response.ok)throw new Error('Unable to clear verification. Try again.');
-  show(false);status.textContent='Verification session cleared.';
+  show(false);
+  try{
+   const {error}=await client.auth.signOut({scope:'local'});
+   if(error)throw error;
+   status.textContent='Verification session cleared.';
+  }catch{status.textContent='Owner gateway access cleared, but browser sign-out could not be confirmed. Try again.';}
  }catch(error){status.textContent=error.message;}
  finally{password.value='';inFlight=false;busy(false);}
 });

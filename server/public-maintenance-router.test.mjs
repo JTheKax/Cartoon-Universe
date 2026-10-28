@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {decidePublicRoute} from './public-maintenance-router.mjs';
+const base={routingConfirmed:true,masterMaintenance:false,routeStates:{home:'live',arcade:'maintenance',shop:'live'}};
+test('live routes open only after routing confirmation',()=>{assert.equal(decidePublicRoute({...base,pathname:'/shop/'}).action,'public');assert.equal(decidePublicRoute({...base,pathname:'/shop/cart'}).action,'public');assert.equal(decidePublicRoute({...base,routingConfirmed:false,pathname:'/shop/'}).action,'maintenance')});
+test('maintenance blocks direct nested routes',()=>assert.equal(decidePublicRoute({...base,pathname:'/arcade/game'}).action,'maintenance'));
+test('verified owner can preview maintained feature',()=>assert.equal(decidePublicRoute({...base,pathname:'/arcade/game',ownerVerified:true}).action,'owner_preview'));
+test('master maintenance overrides public route',()=>assert.equal(decidePublicRoute({...base,pathname:'/shop/',masterMaintenance:true}).action,'maintenance'));
+test('unknown routes fail closed',()=>assert.equal(decidePublicRoute({...base,pathname:'/unreleased/'}).action,'maintenance'));
+test('unsafe encoded paths fail closed',()=>assert.equal(decidePublicRoute({...base,pathname:'/shop/%2fadmin'}).action,'maintenance'));
+test('home does not catch unrelated routes',()=>assert.equal(decidePublicRoute({...base,pathname:'/other'}).action,'maintenance'));

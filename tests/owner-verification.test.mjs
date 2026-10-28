@@ -178,6 +178,11 @@ test('on-demand Cartoon Theater and DVD shelf are owner-protected during mainten
  assert.equal(script.status,200);
  const js=await script.text();
  assert.match(js,/DVD shelf preview selection/);
+ assert.match(html,/id="dark-side-episodes"/,'Dark Side episode browser must exist');
+ assert.match(html,/id="dark-side-episode-season"/,'Season organization control must exist');
+ assert.match(html,/id="dark-side-episode-list"/,'Episode list must exist');
+ assert.equal((html.match(/class="dvd-case /g)||[]).length,1,'Only the Dark Side DVD case should remain');
+ assert.match(js,/img\.onerror=\(\)=>/,'Invalid saved cover images must recover automatically');
  assert.doesNotMatch(js,/setInterval\(render/);
  assert.equal((await fetch(base+'/__maintenance/arcade/static/theater.js')).status,503);
  const coverUrl=base+'/__maintenance/arcade/static/dark-side-ring-blue-cover.svg';

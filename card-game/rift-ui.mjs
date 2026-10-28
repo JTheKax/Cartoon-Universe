@@ -2,6 +2,8 @@ import {CARDS,STARTER,validateDeck,newGame,playCard,endTurn,byId} from './rift-c
 const $=id=>document.getElementById(id);
 let deck=[...STARTER],game=null;
 const label=id=>byId[id].name;
+const symbols={spark:'⚡',moss:'🌿',nova:'☄️',glitch:'🦊',tide:'🌊',orbit:'🛡️',pixel:'✨',echo:'🔮'};
+function cardButton(card,count){const b=document.createElement('button');b.type='button';b.className='rift-card '+card.kind;const art=document.createElement('span');art.className='sigil';art.textContent=symbols[card.id];const name=document.createElement('span');name.className='name';name.textContent=card.name+' ('+count+'/2)';const stats=document.createElement('span');stats.className='stats';stats.textContent='⚡ '+card.cost+' · ⚔ '+card.power+' · 🛡 '+card.guard;const effect=document.createElement('span');effect.className='effect';effect.textContent={pulse:'Pulse: 1 direct damage',shield:'Shield: +1 guard',trick:'Trick: draw 1 card'}[card.kind];b.append(art,name,stats,effect);return b;}
 function renderDeck(){
  $('deck-count').textContent=deck.length+'/16 cards';
  $('deck-list').replaceChildren(...CARDS.map(card=>{
@@ -23,12 +25,11 @@ function renderGame(){
  $('battle-status').textContent=game.winner!==null?'Winner: '+(game.winner==='draw'?'Draw':game.winner===0?'You':'CPU'):'Round '+game.round+' · '+(game.turn===0?'Your turn':'CPU turn');
  $('battle-stats').textContent='You: '+you.health+' HP, '+you.energy+' energy · CPU: '+bot.health+' HP · CPU hand: '+bot.hand.length;
  const field=(id,p)=>$(id).replaceChildren(...p.field.map(unit=>{
-  const c=byId[unit.id],s=document.createElement('span');s.className='rift-unit';s.textContent=c.name+' | '+c.power+' power / '+unit.guard+' guard';return s;
+  const c=byId[unit.id],s=document.createElement('span');s.className='rift-unit';s.textContent=(symbols[c.id]||'✦')+' '+c.name+' | '+c.power+' power / '+unit.guard+' guard';return s;
  }));
  field('your-field',you);field('cpu-field',bot);
  $('your-hand').replaceChildren(...you.hand.map((id,i)=>{
-  const c=byId[id],b=document.createElement('button');b.type='button';
-  b.textContent=c.name+' · '+c.cost+' energy · '+c.power+' power';
+  const c=byId[id],b=cardButton(c,0);b.querySelector('.name').textContent=c.name;
   b.disabled=game.turn!==0||game.winner!==null||c.cost>you.energy||you.field.length>=3;
   b.onclick=()=>{playCard(game,i);renderGame();};return b;
  }));

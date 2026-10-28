@@ -1,8 +1,14 @@
 // Browser-side owner verification also keeps the normal Supabase session on this
 // origin, so the verified owner's dashboard can use its existing RLS-protected APIs.
-import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 import {SUPABASE_URL,SUPABASE_KEY} from '/__maintenance/owner-verification-config.js';
-const client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+let client;
+async function getClient(){
+ if(!client){
+  const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2');
+  client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+ }
+ return client;
+}
 const form=document.getElementById('verify-form'),status=document.getElementById('status'),clear=document.getElementById('clear'),verify=document.getElementById('verify');
 const password=document.getElementById('password');
 let initializing=true,inFlight=false;
@@ -19,6 +25,7 @@ form.addEventListener('submit',async event=>{
  try{
   const identifier=document.getElementById('identifier').value.trim(),secret=password.value;
   if(!identifier.includes('@')&&!/^[A-Za-z0-9_]{3,20}$/.test(identifier))throw new Error('Enter a valid username or email.');
+  const client=await getClient();
   let session;
   if(identifier.includes('@')){
    const {data,error}=await client.auth.signInWithPassword({email:identifier,password:secret});
@@ -39,7 +46,7 @@ form.addEventListener('submit',async event=>{
   const verified=await fetch('/__maintenance/verify-session',{method:'POST',headers:{Authorization:'Bearer '+session.access_token},credentials:'same-origin',redirect:'error',cache:'no-store'});
   if(!verified.ok)throw new Error('Owner access could not be verified.');
   signedInThisAttempt=false;clear.hidden=false;await refresh();
- }catch(error){if(signedInThisAttempt)try{await client.auth.signOut({scope:'local'});}catch{}status.textContent=error.message||'Verification unavailable. Try again.';}
+ }catch(error){if(signedInThisAttempt&&client)try{await client.auth.signOut({scope:'local'});}catch{}status.textContent=error.message||'Sign-in library could not load. Check browser blocking or VPN and retry.';}
  finally{password.value='';inFlight=false;busy(false);}
 });
 clear.addEventListener('click',async()=>{
@@ -52,7 +59,8 @@ clear.addEventListener('click',async()=>{
   if(!response.ok)throw new Error('Unable to clear verification. Try again.');
   show(false);
   try{
-   const {error}=await client.auth.signOut({scope:'local'});
+   const activeClient=client||await getClient();
+   const {error}=await activeClient.auth.signOut({scope:'local'});
    if(error)throw error;
    status.textContent='Verification session cleared.';
   }catch{status.textContent='Owner gateway access cleared, but browser sign-out could not be confirmed. Try again.';}

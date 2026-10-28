@@ -1,0 +1,31 @@
+name: Public launch readiness gate (isolated)
+on:
+  pull_request:
+    branches: [public-maintenance-cutover]
+    paths:
+      - 'scripts/check-public-launch.mjs'
+      - 'tests/check-public-launch.test.mjs'
+      - 'deploy/PUBLIC-LAUNCH-GATE.md'
+      - '.github/workflows/public-launch-readiness.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-only-launch-gate:
+    name: Read-only launch diagnostic tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check launch diagnostic syntax
+        run: node --check scripts/check-public-launch.mjs
+      - name: Test gateway readiness failure cases offline
+        run: node --test tests/check-public-launch.test.mjs
+      - name: Confirm production static holding page remains asset-free
+        run: |
+          test -f deploy/public-maintenance/index.html
+          test ! -f deploy/public-maintenance/owner.html
+          test ! -f deploy/public-maintenance/coin-wallet.html

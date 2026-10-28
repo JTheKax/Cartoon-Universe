@@ -24,7 +24,7 @@ function createCtoonCard(ctoon){
 }
 const items=[
  createCtoonCard({name:'Golden Tiger Claws',type:'UC',fallback:'🐯',image:'./assets/ctoons/golden-tiger-claws.png',price:150}),
- createCtoonCard({name:'Third Arm Sash',type:'Rarity TBD',fallback:'✦',price:null})
+ createCtoonCard({name:'Third Arm Sash',type:'UC',fallback:'✦',price:100})
 ];
 function show(section){
  list.replaceChildren();

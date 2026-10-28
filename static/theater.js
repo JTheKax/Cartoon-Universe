@@ -22,6 +22,7 @@ if(localFile&&localPlayer&&localStatus&&placeholder){
   const file=localFile.files?.[0];
   if(!file){localPlayer.hidden=true;placeholder.hidden=false;localStatus.textContent='No video selected. Files are not uploaded.';return;}
   if(!file.type.startsWith('video/')){localPlayer.hidden=true;placeholder.hidden=false;localStatus.textContent='Choose a video file supported by your browser.';return;}
+  const youtube=document.getElementById('theater-youtube-player');if(youtube){youtube.hidden=true;youtube.removeAttribute('src');}
   objectUrl=URL.createObjectURL(file);
   localPlayer.src=objectUrl;localPlayer.hidden=false;placeholder.hidden=true;
   localStatus.textContent='Local preview: '+file.name+'. This file is not uploaded or saved to the movie library.';
@@ -30,3 +31,35 @@ if(localFile&&localPlayer&&localStatus&&placeholder){
  localPlayer.addEventListener('error',()=>{localStatus.textContent='This video format could not be played in your browser. Try MP4 (H.264) or WebM.';});
  window.addEventListener('pagehide',release,{once:true});
 }
+
+// YouTube preview uses only the official iframe player; no downloading or ad bypass.
+function youtubeVideoId(raw){
+ try{
+  const url=new URL(raw);
+  if(url.protocol!=='https:')return null;
+  const host=url.hostname.toLowerCase();
+  let id=null;
+  if(host==='youtu.be')id=url.pathname.split('/')[1];
+  else if(host==='youtube.com'||host==='www.youtube.com'||host==='m.youtube.com'||host==='youtube-nocookie.com'||host==='www.youtube-nocookie.com'){
+   const parts=url.pathname.split('/').filter(Boolean);
+   if(parts[0]==='watch')id=url.searchParams.get('v');
+   else if(['shorts','embed','live'].includes(parts[0]))id=parts[1];
+  }
+  return /^[a-zA-Z0-9_-]{11}$/.test(id||'')?id:null;
+ }catch{return null;}
+}
+const youtubeForm=document.getElementById('theater-youtube-form');
+if(youtubeForm){youtubeForm.addEventListener('submit',event=>{
+ event.preventDefault();
+ const input=document.getElementById('theater-youtube-url');
+ const status=document.getElementById('theater-youtube-status');
+ const iframe=document.getElementById('theater-youtube-player');
+ const id=youtubeVideoId(input.value.trim());
+ if(!id){status.textContent='Enter a valid YouTube video, Shorts, or youtu.be URL.';return;}
+ if(localPlayer){localPlayer.pause();localPlayer.hidden=true;}
+ if(placeholder)placeholder.hidden=true;
+ iframe.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?rel=0';
+ iframe.hidden=false;
+ status.textContent='YouTube preview loaded. Some videos do not permit embedding; playback and ads are controlled by YouTube.';
+ iframe.scrollIntoView({behavior:'smooth',block:'center'});
+});}

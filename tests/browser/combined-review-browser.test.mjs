@@ -3,6 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
+import {readFileSync} from 'node:fs';
 import {chromium} from 'playwright';
 import {createCandidateServer} from '../../server/gateway-candidate.mjs';
 
@@ -38,6 +39,7 @@ test('combined arcade navigation, owner dashboard shell, theater DVD cases and a
  assert.equal((await anonymousPage.goto(origin+'/__maintenance/arcade/')).status(),503);
  assert.equal((await anonymousPage.goto(origin+'/__maintenance/arcade/owner.html')).status(),503);
  assert.equal((await anonymousPage.goto(origin+'/__maintenance/arcade/sticker-catalog.json')).status(),503);
+ assert.equal((await anonymousPage.goto(origin+'/__maintenance/arcade/shop-watch-movies.html')).status(),503);
  const context=await fixture();t.after(()=>context.close());
  const page=await context.newPage();
  assert.equal((await page.goto(origin+'/__maintenance/owner-signin')).status(),200);
@@ -50,6 +52,19 @@ test('combined arcade navigation, owner dashboard shell, theater DVD cases and a
   const response=await page.goto(origin+'/__maintenance/arcade/'+path);
   assert.equal(response.status(),200,'Verified owner should reach '+(path||'homepage'));
  }
+ // Exercise every reviewed shop destination, not just the top-level Watch/Collect tabs.
+ // The gateway allowlist is the same contract used to construct the isolated bundle.
+ const gatewaySource=readFileSync(new URL('../../server/gateway-candidate.mjs',import.meta.url),'utf8');
+ const allowlist=gatewaySource.match(/const ARCADE_FILES=new Set\(\[([\s\S]*?)\]\);/)?.[1];
+ assert.ok(allowlist,'Owner gateway must declare an explicit reviewed asset allowlist');
+ const shopPages=[...allowlist.matchAll(/'([^']+)'/g)].map(match=>match[1]).filter(name=>/^shop-[a-z-]+\.html$/.test(name));
+ assert.ok(shopPages.length>=25,'Expected the combined release to include its full shop navigation');
+ for(const name of shopPages){
+  const response=await page.goto(origin+'/__maintenance/arcade/'+name);
+  assert.equal(response.status(),200,'Verified owner must reach '+name);
+  assert.match(response.headers()['content-type']||'',/text\/html/,'Shop page must be served as HTML: '+name);
+ }
+ await page.goto(origin+'/__maintenance/arcade/static/theater.html');
  assert.ok(await page.locator('#dvd-shelf .dvd-case').count()>=4,'Theater must show custom DVD cases');
  await page.locator('#dvd-shelf .dvd-case').first().click();
  assert.match(await page.locator('#dvd-selection').textContent(),/demo DVD case/i);

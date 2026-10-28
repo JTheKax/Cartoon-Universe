@@ -52,3 +52,13 @@ test('owner appearance controls can load their catalog behind maintenance',()=>{
   if(item?.kind==='file')assert.ok(allowed.has(item.path),'Custom appearance file must be protected and bundled: '+item.path);
  }
 });
+
+
+test('profile saves respect production column-scoped grants',()=>{
+ const auth=source('auth.js');
+ assert.doesNotMatch(auth,/from\('profiles'\)\.upsert\(/,'Upsert conflict would attempt to UPDATE immutable id');
+ assert.match(auth,/from\('profiles'\)\.select\('id'\)\.eq\('id',user\.id\)\.maybeSingle\(\)/);
+ assert.match(auth,/from\('profiles'\)\.update\(changes\)\.eq\('id',user\.id\)/,'Existing profiles must update editable columns only');
+ assert.match(auth,/from\('profiles'\)\.insert\(\{id:user\.id,\.\.\.changes\}\)/,'New profiles may insert their own id');
+ assert.match(auth,/const changes=\{username,display_name:/,'Profile edit payload must not include immutable id or timestamps');
+});

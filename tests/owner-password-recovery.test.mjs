@@ -71,7 +71,7 @@ test('owner recovery page can request a reset email while public maintenance rem
 
 test('reset email requests use only the fixed gateway redirect and do not enumerate accounts',async()=>{
  const {runInNewContext}=await import('node:vm');
- const source=client.replace(/^import .*;\\s*$/gm,'');
+ const source=client.replace(/^import .*;\s*$/gm,'');
  const handlers={};const calls=[];
  const button={disabled:false};
  const requestForm={hidden:false,addEventListener:(name,handler)=>{handlers[name]=handler;},querySelector:()=>button};

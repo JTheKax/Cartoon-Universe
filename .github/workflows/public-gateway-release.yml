@@ -1,5 +1,7 @@
 name: Public gateway release candidate (isolated)
 on:
+  push:
+    branches: [review/production-public-gateway-20261028]
   pull_request:
     branches: [public-maintenance-cutover]
     paths:

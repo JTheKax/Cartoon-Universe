@@ -15,7 +15,7 @@ async function refresh(){
 form.addEventListener('submit',async event=>{
  event.preventDefault();
  if(initializing||inFlight)return;
- inFlight=true;busy(true);
+ inFlight=true;busy(true);let signedInThisAttempt=false;
  try{
   const identifier=document.getElementById('identifier').value.trim(),secret=password.value;
   if(!identifier.includes('@')&&!/^[A-Za-z0-9_]{3,20}$/.test(identifier))throw new Error('Enter a valid username or email.');
@@ -23,7 +23,7 @@ form.addEventListener('submit',async event=>{
   if(identifier.includes('@')){
    const {data,error}=await client.auth.signInWithPassword({email:identifier,password:secret});
    if(error||!data?.session)throw new Error('Sign-in failed. Check your email and password.');
-   session=data.session;
+   session=data.session;signedInThisAttempt=true;
   }else{
    const response=await fetch(SUPABASE_URL+'/functions/v1/username-login',{
     method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},credentials:'omit',redirect:'error',cache:'no-store',
@@ -34,12 +34,12 @@ form.addEventListener('submit',async event=>{
    if(typeof tokens.access_token!=='string'||typeof tokens.refresh_token!=='string')throw new Error('Sign-in could not be verified.');
    const {data,error}=await client.auth.setSession({access_token:tokens.access_token,refresh_token:tokens.refresh_token});
    if(error||!data?.session)throw new Error('Sign-in could not be verified.');
-   session=data.session;
+   session=data.session;signedInThisAttempt=true;
   }
   const verified=await fetch('/__maintenance/verify-session',{method:'POST',headers:{Authorization:'Bearer '+session.access_token},credentials:'same-origin',redirect:'error',cache:'no-store'});
-  if(!verified.ok){await client.auth.signOut({scope:'local'});throw new Error('Owner access could not be verified.');}
-  clear.hidden=false;await refresh();
- }catch(error){status.textContent=error.message||'Verification unavailable. Try again.';}
+  if(!verified.ok)throw new Error('Owner access could not be verified.');
+  signedInThisAttempt=false;clear.hidden=false;await refresh();
+ }catch(error){if(signedInThisAttempt)try{await client.auth.signOut({scope:'local'});}catch{}status.textContent=error.message||'Verification unavailable. Try again.';}
  finally{password.value='';inFlight=false;busy(false);}
 });
 clear.addEventListener('click',async()=>{

@@ -64,6 +64,22 @@ if(youtubeForm){youtubeForm.addEventListener('submit',event=>{
  iframe.scrollIntoView({behavior:'smooth',block:'center'});
 });}
 
+
+// Import a DVD created on the owner dashboard, even if the gateway uses a separate origin.
+// URL parameters contain only the title and public YouTube video ID, never credentials.
+try{
+ const params=new URL(location.href).searchParams;
+ const id=params.get('dvd_id'),title=params.get('dvd_title');
+ if(id&&title&&/^[A-Za-z0-9_-]{11}$/.test(id)&&title.trim().length<=80){
+  const key='cartoon-universe-theater-youtube-drafts-v1';
+  const existing=JSON.parse(localStorage.getItem(key)||'[]');
+  const drafts=Array.isArray(existing)?existing:[];
+  if(!drafts.some(x=>x.id===id)&&drafts.length<30){drafts.push({id,title:title.trim()});localStorage.setItem(key,JSON.stringify(drafts));}
+  const note=document.getElementById('dvd-selection');if(note)note.textContent='DVD case transferred to this theater browser. Choose the YouTube DVD case below to play it.';
+  const clean=new URL(location.href);clean.searchParams.delete('dvd_id');clean.searchParams.delete('dvd_title');history.replaceState(null,'',clean.href);
+ }
+}catch{/* Storage unavailable: the existing preview still works. */}
+
 // Show same-browser owner drafts as playable DVD cases; no shared publication.
 try{
  const drafts=JSON.parse(localStorage.getItem('cartoon-universe-theater-youtube-drafts-v1')||'[]');

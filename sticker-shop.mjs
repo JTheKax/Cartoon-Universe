@@ -7,18 +7,22 @@ const series=document.getElementById('series');
 const empty=document.createElement('p');
 empty.className='empty';
 empty.textContent='No Ctoons available yet. New Ctoons will appear here when added.';
-const item=document.createElement('article');
-item.className='pack';
-item.style.setProperty('--accent','#e4b73d');
-const art=document.createElement('div');art.className='pack-art';
-art.setAttribute('aria-label','Golden Tiger Claws artwork awaiting upload');
-const symbol=document.createElement('span');symbol.className='emoji';symbol.textContent='🐯';
-art.append(symbol);
-const name=document.createElement('h2');name.textContent='Golden Tiger Claws';
-const detail=document.createElement('p');detail.className='meta';detail.textContent='Ctoon · Artwork pending upload · 182 × 282';
-const price=document.createElement('p');price.className='price';price.textContent='Cartoon Coin price: TBD';
-const buy=document.createElement('button');buy.disabled=true;buy.textContent='Coming soon';
-item.append(art,name,detail,price,buy);
+// All Ctoon listings share this purple arcade card component.
+function createCtoonCard(ctoon){
+ const card=document.createElement('article');card.className='pack';
+ const art=document.createElement('div');art.className='pack-art';
+ const badge=document.createElement('span');badge.className='ownership';badge.textContent='Unowned';
+ const symbol=document.createElement('span');symbol.className='emoji';symbol.textContent=ctoon.fallback||'✦';
+ art.append(badge,symbol);
+ if(ctoon.image){const img=document.createElement('img');img.src=ctoon.image;img.alt=ctoon.name;img.addEventListener('load',()=>symbol.remove());img.addEventListener('error',()=>img.remove());art.append(img);}
+ const name=document.createElement('h2');name.textContent=ctoon.name;
+ const detail=document.createElement('p');detail.className='meta';detail.textContent=ctoon.type||'Ctoon';
+ const row=document.createElement('div');row.className='price-row';
+ const price=document.createElement('p');price.className='price';price.textContent=ctoon.price==null?'Price TBD':ctoon.price+' pts';
+ const buy=document.createElement('button');buy.className='buy';buy.disabled=true;buy.textContent='Buy';buy.title='Purchases are not enabled in this preview';
+ row.append(price,buy);card.append(art,name,detail,row);return card;
+}
+const item=createCtoonCard({name:'Golden Tiger Claws',type:'Ctoon',fallback:'🐯',price:null});
 function show(section){
  list.replaceChildren();
  if(section==='all'||section==='new')list.append(item);
@@ -26,7 +30,6 @@ function show(section){
  status.textContent=(section==='all'||section==='new'?'1':'0')+' Ctoons';
 }
 show('all');
-status.textContent='0 Ctoons';
 search.value='';
 search.disabled=true;
 series.value='';

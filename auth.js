@@ -8,6 +8,13 @@ let client=null;
 function message(text){notice.textContent=text;notice.hidden=!text}
 function show(form){document.querySelectorAll('[data-form]').forEach(el=>el.hidden=el.dataset.form!==form);const actions=$('login-actions');if(actions)actions.hidden=form!=='login';const back=$('reset-actions');if(back)back.hidden=form!=='forgot';message('')}
 function errorText(e){return e?.message||'Something went wrong. Try again.'}
+// A Supabase sign-out alone does not revoke the gateway's short-lived owner cookie.
+// Clear server-side owner verification before reporting a protected-arcade logout.
+async function clearOwnerGatewaySession(){
+ if(!location.pathname.startsWith('/__maintenance/arcade/'))return;
+ const response=await fetch('/__maintenance/verify-session',{method:'DELETE',credentials:'same-origin',redirect:'error',cache:'no-store'});
+ if(!response.ok)throw new Error('Could not clear owner gateway access. Please try logging out again.');
+}
 if(!configured){message('Accounts are not connected yet. The owner must configure a new Supabase project before signup is enabled.');document.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=true)}
 else{
  client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
@@ -92,7 +99,7 @@ else{
   message(error?errorText(error):'Profile saved!');
   if(!error)await render();
  });
- $('logout').addEventListener('click',async()=>{const {error}=await client.auth.signOut();message(error?errorText(error):'Signed out.');if(!error)await render()});
+ $('logout').addEventListener('click',async()=>{try{await clearOwnerGatewaySession();const {error}=await client.auth.signOut();message(error?errorText(error):'Signed out.');if(!error)await render()}catch(error){message(errorText(error))}});
 }
 document.querySelectorAll('[data-show]').forEach(button=>button.addEventListener('click',()=>show(button.dataset.show)));
 

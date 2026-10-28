@@ -22,12 +22,15 @@ function createCtoonCard(ctoon){
  const buy=document.createElement('button');buy.className='buy';buy.disabled=true;buy.textContent='Buy';buy.title='Purchases are not enabled in this preview';
  row.append(price,buy);card.append(art,name,detail,row);return card;
 }
-const item=createCtoonCard({name:'Golden Tiger Claws',type:'UC',fallback:'🐯',image:'./assets/ctoons/golden-tiger-claws.png',price:150});
+const items=[
+ createCtoonCard({name:'Golden Tiger Claws',type:'UC',fallback:'🐯',image:'./assets/ctoons/golden-tiger-claws.png',price:150}),
+ createCtoonCard({name:'Third Arm Sash',type:'Rarity TBD',fallback:'✦',price:null})
+];
 function show(section){
  list.replaceChildren();
- if(section==='all'||section==='new')list.append(item);
+ if(section==='all'||section==='new')list.append(...items);
  else {empty.textContent=section==='series'?'Series assignments coming soon.':'No featured Ctoons yet.';list.append(empty);}
- status.textContent=(section==='all'||section==='new'?'1':'0')+' Ctoons';
+ status.textContent=(section==='all'||section==='new'?String(items.length):'0')+' Ctoons';
 }
 show('all');
 search.value='';

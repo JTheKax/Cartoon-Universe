@@ -142,3 +142,23 @@ if(player){
 if(document.getElementById('theater-chat-toggle')){
 (()=>{const toggle=document.getElementById('theater-chat-toggle'),win=document.getElementById('theater-chat-window'),close=document.getElementById('theater-chat-close'),form=document.getElementById('theater-chat-form'),input=document.getElementById('theater-chat-input'),messages=document.getElementById('theater-chat-messages');function setOpen(open){win.hidden=!open;toggle.setAttribute('aria-expanded',String(open));if(open)input.focus()}toggle.addEventListener('click',()=>setOpen(win.hidden));close.addEventListener('click',()=>setOpen(false));form.addEventListener('submit',event=>{event.preventDefault();const value=input.value.trim();if(!value)return;const item=document.createElement('div');item.className='theater-chat-message mine';item.textContent=value;messages.append(item);messages.scrollTop=messages.scrollHeight;input.value='';input.focus()})})();
 }
+
+// Temporary preview-only third-party iframe test. Not persisted to movie library.
+document.getElementById('test-cinescr-embed')?.addEventListener('click',()=>{
+ const embed=document.getElementById('theater-embed'),player=document.getElementById('theater-player');
+ if(!embed||!player)return;
+ player.pause();player.removeAttribute('src');player.load();player.hidden=true;
+ embed.replaceChildren();
+ const iframe=document.createElement('iframe');
+ iframe.title='Temporary movie embed test';
+ iframe.src='https://cinescr.st/embed/82690';
+ iframe.allow='fullscreen; encrypted-media; picture-in-picture; autoplay';
+ iframe.allowFullscreen=true;iframe.referrerPolicy='strict-origin-when-cross-origin';
+ iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-presentation');
+ iframe.style.cssText='display:block;width:100%;height:100%;min-height:360px;border:0';
+ embed.append(iframe);embed.hidden=false;
+ document.getElementById('theater-status').textContent='🎞️ EMBED TEST';
+ document.getElementById('theater-message').textContent='Click Play inside the embedded player. If blank or blocked, this provider does not support this theater embed.';
+ document.getElementById('test-cinescr-result').textContent='External player loaded for testing; actual playback is not yet verified.';
+ document.querySelector('.cinema-screen-shell')?.scrollIntoView({behavior:'smooth',block:'center'});
+});

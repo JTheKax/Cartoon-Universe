@@ -19,7 +19,7 @@ test('owner verification browser flow keeps passwords at Supabase and isolates i
  server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port;
  t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
  const browser=await chromium.launch({headless:true});t.after(()=>browser.close());
- const sdkFixture=\`export function createClient(url,key,options){
+ const sdkFixture=`export function createClient(url,key,options){
   const storageKey='sb-disposable-owner-auth-token';
   const remember=session=>{if(options.auth.persistSession)localStorage.setItem(storageKey,JSON.stringify(session));return session;};
   return {auth:{
@@ -31,7 +31,7 @@ test('owner verification browser flow keeps passwords at Supabase and isolates i
    async setSession(tokens){return {data:{session:remember(tokens)},error:null};},
    async signOut(){localStorage.removeItem(storageKey);return {error:null};}
   }};
- }\`;
+ }`;
 
  for(const identifier of ['owner@example.test','test_owner','player@example.test']){
   await t.test(identifier,async()=>{

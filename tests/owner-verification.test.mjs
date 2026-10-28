@@ -157,3 +157,30 @@ test('owner arcade homepage assets resolve only through the protected route',asy
  const client=await (await fetch(base+'/__maintenance/owner-verification.js')).text();
  assert.match(client,/getElementById\('arcade-entry'\)\.hidden=!verified/);
 });
+
+
+test('on-demand Cartoon Theater and DVD shelf are owner-protected during maintenance',async t=>{
+ const {base,verify}=await fixture(t);
+ const anonymous=await fetch(base+'/__maintenance/arcade/static/theater.html');
+ assert.equal(anonymous.status,503);
+ const response=await verify('owner-token');
+ assert.equal(response.status,200);
+ const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
+ const theater=await fetch(base+'/__maintenance/arcade/static/theater.html',{headers});
+ assert.equal(theater.status,200);
+ const html=await theater.text();
+ assert.match(html,/<base href="\/__maintenance\/arcade\/">/);
+ assert.match(html,/class="dvd-shelf"/);
+ assert.match(html,/src="theater\.js"/);
+ assert.match(html,/href="styles\.css"/);
+ const script=await fetch(base+'/__maintenance/arcade/theater.js',{headers});
+ assert.equal(script.status,200);
+ const js=await script.text();
+ assert.match(js,/DVD shelf preview selection/);
+ assert.doesNotMatch(js,/setInterval\(render/);
+ assert.equal((await fetch(base+'/__maintenance/arcade/theater.js')).status,503);
+ const owner=await (await fetch(base+'/__maintenance/arcade/owner.html',{headers})).text();
+ assert.match(owner,/Open Theater Preview/);
+ const homepage=await (await fetch(base+'/__maintenance/arcade/',{headers})).text();
+ assert.match(homepage,/Visit Movie Theater/);
+});

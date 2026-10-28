@@ -11,7 +11,7 @@ function errorText(e){return e?.message||'Something went wrong. Try again.'}
 // A Supabase sign-out alone does not revoke the gateway's short-lived owner cookie.
 // Clear server-side owner verification before reporting a protected-arcade logout.
 async function clearOwnerGatewaySession(){
- if(!location.pathname.startsWith('/__maintenance/arcade/'))return;
+ if(location.pathname!=='/__maintenance/arcade'&&!location.pathname.startsWith('/__maintenance/arcade/'))return;
  const response=await fetch('/__maintenance/verify-session',{method:'DELETE',credentials:'same-origin',redirect:'error',cache:'no-store'});
  if(!response.ok)throw new Error('Could not clear owner gateway access. Please try logging out again.');
 }

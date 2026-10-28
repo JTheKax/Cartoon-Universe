@@ -19,8 +19,8 @@ test('protected account dependencies and forgot password remain usable',()=>{
 
 test('protected owner logout clears gateway verification before Supabase sign-out',()=>{
  for(const [name,source] of [['account',auth],['navigation',nav]]){
-  assert.match(source,/location\\.pathname\\.startsWith\\('\\/__maintenance\\/arcade\\/'\\)/,name+' must detect protected arcade');
-  assert.match(source,/fetch\\('\\/__maintenance\\/verify-session',\\{method:'DELETE',credentials:'same-origin'/,name+' must clear gateway cookie');
+  assert.ok(source.includes("location.pathname.startsWith('/__maintenance/arcade/')"),name+' must detect protected arcade');
+  assert.ok(source.includes("fetch('/__maintenance/verify-session',{method:'DELETE',credentials:'same-origin'"),name+' must clear gateway cookie');
   const gateway=source.indexOf('await clearOwnerGatewaySession()');
   const signOut=source.indexOf('await client.auth.signOut()',gateway);
   assert.ok(gateway>=0&&signOut>gateway,name+' must clear gateway access before sign-out');

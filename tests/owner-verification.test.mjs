@@ -39,7 +39,7 @@ test('nonowners and unverified claims cannot establish verification cookies',asy
 });
 test('verified owner status uses a separate secure cookie and never unlocks the arcade',async t=>{
  const {base,state,verify}=await fixture(t);const response=await verify('owner-token');assert.equal(response.status,200);
- const cookie=response.headers.get('set-cookie');assert.match(cookie,/^__Host-cu_owner_verify=[0-9a-f]{64}; Path=\/; HttpOnly; SameSite=Strict; Max-Age=300; Secure$/);
+ const cookie=response.headers.get('set-cookie');assert.match(cookie,/^__Host-cu_owner_verify=[0-9a-f]{64}; Path=\/; HttpOnly; SameSite=Lax; Max-Age=300; Secure$/);
  const headers={Cookie:cookie.split(';')[0]};assert.deepEqual(await (await fetch(base+'/__maintenance/owner-status',{headers})).json(),{ownerVerified:true,readOnly:true});
  assert.equal((await fetch(base+'/owner.html',{headers})).status,503);
  assert.ok(state.calls.every(call=>call.options.method==='GET'));
@@ -156,4 +156,75 @@ test('owner arcade homepage assets resolve only through the protected route',asy
  assert.doesNotMatch(signin,/cartoon-universe-3\.onrender\.com/);
  const client=await (await fetch(base+'/__maintenance/owner-verification.js')).text();
  assert.match(client,/getElementById\('arcade-entry'\)\.hidden=!verified/);
+});
+
+
+test('on-demand Cartoon Theater and DVD shelf are owner-protected during maintenance',async t=>{
+ const {base,verify}=await fixture(t);
+ const anonymous=await fetch(base+'/__maintenance/arcade/static/theater.html');
+ assert.equal(anonymous.status,503);
+ const response=await verify('owner-token');
+ assert.equal(response.status,200);
+ const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
+ const theater=await fetch(base+'/__maintenance/arcade/static/theater.html',{headers});
+ assert.equal(theater.status,200);
+ const html=await theater.text();
+ assert.match(html,/<base href="\/__maintenance\/arcade\/static\/">/);
+ assert.match(html,/class="dvd-shelf(?: [^"]+)?"/);
+ assert.match(html,/src="theater\.js"/);
+ assert.match(html,/src="dark-side-ring-blue-cover\.svg"/);
+ assert.match(html,/href="\.\.\/styles\.css"/);
+ const script=await fetch(base+'/__maintenance/arcade/static/theater.js',{headers});
+ assert.equal(script.status,200);
+ const js=await script.text();
+ assert.match(js,/DVD shelf preview selection/);
+ assert.match(html,/id="dark-side-episodes"/,'Dark Side episode browser must exist');
+ assert.match(html,/id="dark-side-episode-season"/,'Season organization control must exist');
+ assert.match(html,/id="dark-side-episode-list"/,'Episode list must exist');
+ assert.equal((html.match(/class="dvd-case /g)||[]).length,1,'Only the Dark Side DVD case should remain');
+ assert.match(js,/img\.onerror=\(\)=>/,'Invalid saved cover images must recover automatically');
+ assert.doesNotMatch(js,/setInterval\(render/);
+ assert.equal((await fetch(base+'/__maintenance/arcade/static/theater.js')).status,503);
+ const coverUrl=base+'/__maintenance/arcade/static/dark-side-ring-blue-cover.svg';
+ const cover=await fetch(coverUrl,{headers});
+ assert.equal(cover.status,200,'Verified owner must be able to load the DVD cover');
+ assert.match(cover.headers.get('content-type'),/image\/svg\+xml/);
+ assert.match(await cover.text(),/data:image\/jpeg;base64,/);
+ assert.equal((await fetch(coverUrl)).status,503,'Anonymous requests for the cover must fail closed');
+ const owner=await (await fetch(base+'/__maintenance/arcade/owner.html',{headers})).text();
+ assert.match(owner,/Open Theater Preview/);
+ const homepage=await (await fetch(base+'/__maintenance/arcade/',{headers})).text();
+ assert.match(homepage,/Visit Movie Theater/);
+});
+
+
+test('every reviewed shop and Watch page is reachable only by verified owners during maintenance',async t=>{
+ const {base,verify}=await fixture(t);
+ const response=await verify('owner-token');
+ assert.equal(response.status,200);
+ const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
+ const pages=["shop-auctions.html","shop-cards-battle.html","shop-cards-deck-build.html","shop-cards.html","shop-collect-encyclopedia.html","shop-collect-my-collection.html","shop-collect-my-scene.html","shop-collect-wishlist.html","shop-collect.html","shop-collectibles.html","shop-community-forums.html","shop-community-help.html","shop-community-support.html","shop-community.html","shop-games-arcade.html","shop-games-claw-machine.html","shop-games-monster-catcher.html","shop-games-prize-wheel.html","shop-games-retro-games.html","shop-games.html","shop-my-shop.html","shop-packs.html","shop-recycler.html","shop-shop.html","shop-watch-anime.html","shop-watch-cartoons.html","shop-watch-misc.html","shop-watch-movies.html","shop-watch.html"];
+ for(const page of pages){
+  const url=base+'/__maintenance/arcade/'+page;
+  const ownerPage=await fetch(url,{headers});
+  assert.equal(ownerPage.status,200,'Protected owner route: '+page);
+  assert.match(ownerPage.headers.get('content-type'),/text\/html/);
+  const denied=await fetch(url);
+  assert.equal(denied.status,503,'Anonymous route denied: '+page);
+ }
+});
+
+test('owner can load external shop controllers and public sticker catalog, anonymous users cannot',async t=>{
+ const {base,verify}=await fixture(t);
+ const verified=await verify('owner-token');
+ assert.equal(verified.status,200);
+ const headers={Cookie:verified.headers.get('set-cookie').split(';')[0]};
+ const files=['nav-account-controls.js','account-redirect.js','shop-collect-controller.js','shop-inventory-controller.js','shop-local-movie.js','sticker-catalog.json','assets/appearance-catalog.json'];
+ for(const name of files){
+  const url=base+'/__maintenance/arcade/'+name;
+  const allowed=await fetch(url,{headers});
+  assert.equal(allowed.status,200,'Owner should load '+name);
+  assert.match(allowed.headers.get('content-type'),name.endsWith('.json')?/application\/json/:/text\/javascript/);
+  assert.equal((await fetch(url)).status,503,'Anonymous user should not load '+name);
+ }
 });

@@ -1,0 +1,37 @@
+{
+  "series": [
+    {
+      "id": "disney",
+      "name": "Disney"
+    },
+    {
+      "id": "dragon-ball-z",
+      "name": "Dragon Ball Z"
+    },
+    {
+      "id": "family-guy",
+      "name": "Family Guy"
+    },
+    {
+      "id": "futurama",
+      "name": "Futurama"
+    },
+    {
+      "id": "spongebob-squarepants",
+      "name": "SpongeBob SquarePants"
+    },
+    {
+      "id": "the-simpsons",
+      "name": "The Simpsons"
+    },
+    {
+      "id": "xiaolin-showdown",
+      "name": "Xiaolin Showdown"
+    },
+    {
+      "id": "misc",
+      "name": "Misc."
+    }
+  ],
+  "stickers": []
+}

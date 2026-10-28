@@ -36,7 +36,7 @@ if(player){
    frame.title='Cartoon Universe video';frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';frame.allowFullscreen=true;
    frame.referrerPolicy='strict-origin-when-cross-origin';
    const u=new URL(media.url);if(media.type==='youtube'){u.searchParams.set('start',String(Math.floor(offset)));u.searchParams.set('autoplay','0')}
-   if(media.type==='external-embed'){frame.allow='autoplay; fullscreen; picture-in-picture';frame.loading='eager'}
+   if(media.type==='external-embed'){frame.allow='autoplay; fullscreen; picture-in-picture';frame.loading='eager';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-presentation');}
    frame.src=u.href;embed.append(frame);
    message.textContent=media.type==='external-embed'?'Episode loaded automatically. Press Play inside the embedded player if your browser or the video host prevents autoplay.':'YouTube playback depends on embedding permissions. Scheduled seeking is approximate.';return;
   }

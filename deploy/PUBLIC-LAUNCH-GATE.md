@@ -8,8 +8,8 @@ This branch is isolated from the live maintenance deployment. Do not change the 
 - Integrated preview `cartoon-universe-integrated-review.onrender.com` exposes a review-only front-end bundle, not a secure public release.
 
 ## Launch blockers
-1. Implement a production public HTTP entry point that serves the explicitly allowlisted public arcade assets, with owner-only pages/actions protected at the server and Supabase RLS levels.
-2. Integrate a canonical origin, verified login/logout, owner role, and maintenance state with fail-closed behavior. The existing `server/production-maintenance-gateway.mjs` is owner-maintenance-only and is not the public entry point.
+1. Review and integrate the distinct production-safe HTTP entry point proposed in draft PR #66 (`server/public-launch-gateway.mjs`), which has isolated mocked security CI. It is **not yet merged or live**; do not confuse its passing CI with production verification.
+2. Verify canonical-origin login/logout, owner membership, and maintenance fail-closed behavior **on the deployed separate gateway** with real owner and player accounts. Mocked tests and the old candidate gateway do not satisfy this requirement.
 3. Update Render gateway build/start commands and production environment with appropriate publishable (not service-role) Supabase credentials; never copy secrets into GitHub.
 4. Coordinate the public hostname's routing to the verified public gateway. Render's static publishPath cannot be changed by the currently connected Render tool; avoid changing it to the review-only bundle.
 5. Run integration CI and live anonymous/player/owner access tests, including denied owner routes, Cartoon Coin grants and RLS. Only then turn off maintenance.
@@ -23,3 +23,7 @@ This branch is isolated from the live maintenance deployment. Do not change the 
 - Production public and gateway URLs pass real smoke checks, not only simulated CI.
 
 Do not declare the public launch complete or disable maintenance before these checks pass.
+
+## Automated diagnostic (review branch only)
+
+`node --test tests/check-public-launch.test.mjs` runs offline negative tests. `node scripts/check-public-launch.mjs` makes **read-only** live HTTP requests and intentionally fails while the old candidate gateway is deployed. The diagnostic requires the distinct public gateway's health marker, anonymous owner denial, maintenance-gated public pages, recovery route, and absence of source exposure. Passing it is **not launch approval** and cannot replace real owner/player authentication, browser, Supabase recovery redirect, and RLS tests. Do not run credential-bearing tests on public static previews.

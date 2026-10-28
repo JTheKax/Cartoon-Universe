@@ -15,7 +15,7 @@ create table public.stickers (
  set_id uuid not null references public.sticker_sets(id) on delete restrict,
  name text not null check(length(btrim(name)) between 1 and 70),
  rarity text not null check(rarity in ('Common','Uncommon','Rare','Epic','Legendary','Prize Only')),
- image_path text check(image_path is null or image_path ~ '^assets/stickers/[A-Za-z0-9_/-]+\\.(png|jpg|jpeg|webp)$'),
+ image_path text check(image_path is null or image_path ~ '^assets/stickers/[A-Za-z0-9_/-]+\.(png|jpg|jpeg|webp)$'),
  published boolean not null default false,
  created_by uuid references auth.users(id),
  created_at timestamptz not null default now()
@@ -47,14 +47,13 @@ alter table public.player_stickers enable row level security;
 alter table public.sticker_inventory_events enable row level security;
 -- RLS protects all tables, including the audit ledger. No client write policies.
 create policy sticker_sets_read on public.sticker_sets for select to authenticated
- using (published or exists(select 1 from public.owner_members where user_id=(select auth.uid())));
+ using (published);
 create policy stickers_read on public.stickers for select to authenticated
- using ((published and exists(select 1 from public.sticker_sets where id=set_id and published))
-  or exists(select 1 from public.owner_members where user_id=(select auth.uid())));
+ using (published and exists(select 1 from public.sticker_sets where id=set_id and published));
 create policy own_sticker_inventory_read on public.player_stickers for select to authenticated
  using (user_id=(select auth.uid()));
 create policy own_sticker_events_read on public.sticker_inventory_events for select to authenticated
- using (recipient_id=(select auth.uid()) or exists(select 1 from public.owner_members where user_id=(select auth.uid())));
+ using (recipient_id=(select auth.uid()));
 
 revoke all on public.sticker_sets,public.stickers,public.player_stickers,public.sticker_inventory_events from public,anon,authenticated;
 grant select on public.sticker_sets,public.stickers,public.player_stickers,public.sticker_inventory_events to authenticated;

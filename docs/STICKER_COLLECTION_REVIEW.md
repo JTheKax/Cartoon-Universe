@@ -24,10 +24,15 @@ The catalog starts empty. No copyrighted franchise stickers or public image URLs
 
 ## Known limitations
 - Current production Supabase has not been changed. Until the reviewed schema is applied in an authorized environment, collection pages intentionally show "not enabled" instead of fake balances.
-- Client queries cap each catalog/inventory section at 1,000 rows; pagination must be implemented before public launch.
+- Client catalog/inventory reads now use deterministic 500-row pages (up to 40 pages per section). If the limit is reached, the page fails closed rather than displaying misleading partial totals. Large catalogs still need performance/load testing before launch.
 - No packs, player trading, uploads, or published sticker creator yet.
 - The existing protected maintenance gateway needs a deliberate allowlist/CSP and packaging review for the new pages and scripts. **Do not deploy this branch to a publicly accessible static preview that bypasses maintenance.**
 - Visual styling is adapted from the existing Cartoon Arcade and clean-arcade review; it is not a merge of those branches.
+
+## Pagination follow-up (October 29, 2026)
+- Added `collectPagedRows` with ordered, bounded, read-only pagination for sets, stickers, and the signed-in player's inventory.
+- Added mock tests for a 1,203-row catalog, error propagation, invalid responses, and safe-limit exhaustion.
+- The catalog remains empty until approved artwork and a reviewed backend are available. No production data was touched.
 
 ## Testing
 ```sh

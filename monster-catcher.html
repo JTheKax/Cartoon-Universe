@@ -8,7 +8,7 @@
 'use strict';
 const c=document.getElementById('game'),ctx=c.getContext('2d'),msg=document.getElementById('message'),actions=document.getElementById('actions');
 const key='cu-monster-catcher-v1',W=20,H=15;
-const species=[{name:'Embercub',type:'Fire',color:'#ed7b48',hp:28},{name:'Brookit',type:'Water',color:'#4f9fe8',hp:30},{name:'Spriglet',type:'Grass',color:'#75bd5b',hp:32}];
+const species=[{name:'Ignisaur',type:'Fire',color:'#ed7b48',hp:28,evolutions:['Flamora','Inferdrake']},{name:'Wavepup',type:'Water',color:'#4f9fe8',hp:30,evolutions:['Surfino','Aqualord']},{name:'Terranox',type:'Grass',color:'#75bd5b',hp:32,evolutions:['Bramblegon','Verdantitan']}];
 let state,mode='starter',enemy=null,playerHP=0;
 function fresh(){return {x:10,y:7,team:[],captures:0,steps:0};}
 try{const saved=JSON.parse(localStorage.getItem(key));state=saved&&Number.isInteger(saved.x)&&Array.isArray(saved.team)?saved:fresh();if(state.team.length)mode='world';}catch{state=fresh();}

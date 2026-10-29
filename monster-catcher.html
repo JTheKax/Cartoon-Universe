@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Monster Catcher | Cartoon Universe</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#111827;color:#f8fafc;font:16px system-ui,sans-serif;text-align:center}main{max-width:760px;margin:auto;padding:16px}h1{color:#facc15;margin:10px}canvas{width:min(100%,640px);image-rendering:pixelated;border:6px solid #facc15;background:#77b85a;display:block;margin:auto;aspect-ratio:4/3}button{font:inherit;border:2px solid #facc15;border-radius:7px;background:#26375a;color:white;padding:10px 14px;cursor:pointer;margin:3px}button:focus-visible{outline:3px solid white}#message{min-height:3em;padding:10px}#actions{min-height:56px}.pad{display:grid;grid-template-columns:repeat(3,65px);justify-content:center;gap:3px}.pad button{margin:0}.hint{color:#cbd5e1;font-size:13px}
+</style></head><body><main><h1>⚡ MONSTER CATCHER</h1><p>Cartoon Universe • Pixel Adventure</p><canvas id="game" width="320" height="240" aria-label="Pixel adventure game"></canvas><div id="message" role="status" aria-live="polite"></div><div id="actions"></div><div class="pad"><span></span><button data-dir="up" aria-label="Move up">▲</button><span></span><button data-dir="left" aria-label="Move left">◀</button><button data-dir="down" aria-label="Move down">▼</button><button data-dir="right" aria-label="Move right">▶</button></div><p class="hint">Move: arrow keys / WASD or touch controls. Save data stays on this device.</p><button id="reset">New Game</button><a href="index.html" style="color:#facc15">Back to Arcade</a></main>
+<script>
+(()=>{
+'use strict';
+const c=document.getElementById('game'),ctx=c.getContext('2d'),msg=document.getElementById('message'),actions=document.getElementById('actions');
+const key='cu-monster-catcher-v1',W=20,H=15;
+const species=[{name:'Embercub',type:'Fire',color:'#ed7b48',hp:28},{name:'Brookit',type:'Water',color:'#4f9fe8',hp:30},{name:'Spriglet',type:'Grass',color:'#75bd5b',hp:32}];
+let state,mode='starter',enemy=null,playerHP=0;
+function fresh(){return {x:10,y:7,team:[],captures:0,steps:0};}
+try{const saved=JSON.parse(localStorage.getItem(key));state=saved&&Number.isInteger(saved.x)&&Array.isArray(saved.team)?saved:fresh();if(state.team.length)mode='world';}catch{state=fresh();}
+function save(){try{localStorage.setItem(key,JSON.stringify(state));}catch{}}
+function say(s){msg.textContent=s;}
+function buttons(items){actions.replaceChildren();for(const [label,fn] of items){const b=document.createElement('button');b.textContent=label;b.addEventListener('click',fn);actions.append(b);}}
+function tile(x,y){if(x===0||y===0||x===W-1||y===H-1)return 'wall';if((x>=8&&x<=11)||(y===7))return 'path';const n=(x*37+y*71+x*y*13)%11;return n<6?'grass':'field';}
+function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
+function monster(m,x,y,size){rect(x+size*.22,y+size*.35,size*.56,size*.48,m.color);rect(x+size*.31,y+size*.19,size*.38,size*.25,m.color);rect(x+size*.26,y+size*.14,size*.12,size*.17,m.color);rect(x+size*.62,y+size*.14,size*.12,size*.17,m.color);rect(x+size*.37,y+size*.32,3,3,'#14213d');rect(x+size*.59,y+size*.32,3,3,'#14213d');rect(x+size*.38,y+size*.7,size*.23,3,'#f8fafc');}
+function draw(){ctx.clearRect(0,0,320,240);if(mode==='world'){for(let y=0;y<H;y++)for(let x=0;x<W;x++){const t=tile(x,y),px=x*16,py=y*16;rect(px,py,16,16,t==='wall'?'#275c3b':t==='path'?'#d8bc81':t==='grass'?'#4b9b52':'#83bd63');if(t==='grass'){rect(px+3,py+5,3,6,'#2b713d');rect(px+10,py+3,3,8,'#347d43');}if(t==='wall')rect(px+4,py+3,8,9,'#1e4a32');}rect(state.x*16+3,state.y*16+2,10,12,'#facc15');rect(state.x*16+4,state.y*16,8,5,'#304cbd');rect(state.x*16+5,state.y*16+6,2,2,'#172554');rect(state.x*16+11,state.y*16+6,2,2,'#172554');rect(3,3,125,15,'#182c4e');ctx.fillStyle='white';ctx.font='9px monospace';ctx.fillText('TEAM '+state.team.length+'  CAUGHT '+state.captures,8,13);}else{rect(0,0,320,240,'#b9d9b0');rect(0,166,320,74,'#7ba55d');rect(0,0,320,23,'#243b60');ctx.fillStyle='white';ctx.font='12px monospace';ctx.fillText(mode==='starter'?'CHOOSE YOUR STARTER':'WILD MONSTER BATTLE',12,16);if(mode==='starter'){species.forEach((s,i)=>{monster(s,23+i*105,75,55);ctx.fillStyle='#20314e';ctx.font='11px monospace';ctx.fillText(s.name,16+i*105,148);});}else if(enemy){monster(enemy,200,53,80);monster(state.team[0],25,128,60);ctx.fillStyle='#172554';ctx.font='12px monospace';ctx.fillText(enemy.name+' HP '+enemy.hpNow,168,45);ctx.fillText(state.team[0].name+' HP '+playerHP,15,120);}}}
+function start(i){const s=species[i];state.team=[{...s,hpNow:s.hp}];playerHP=s.hp;mode='world';save();say('You chose '+s.name+'! Explore the tall grass.');buttons([]);draw();}
+function encounter(){const base=species[Math.floor(Math.random()*species.length)];enemy={...base,hpNow:base.hp};playerHP=state.team[0].hp;mode='battle';say('A wild '+enemy.name+' appeared!');battleButtons();draw();}
+function battleButtons(){buttons([['Attack',()=>{enemy.hpNow=Math.max(0,enemy.hpNow-(5+Math.floor(Math.random()*8)));if(enemy.hpNow===0){say('Wild '+enemy.name+' fainted!');endBattle();return;}retaliate();}],['Capture',()=>{const chance=.25+.65*(1-enemy.hpNow/enemy.hp);if(Math.random()<chance){state.team.push({...enemy,hpNow:enemy.hp});state.captures++;say('Captured '+enemy.name+'! Team size: '+state.team.length);endBattle();}else{say('The capsule broke!');retaliate();}}],['Run',()=>{say('Escaped safely.');endBattle();}]]);}
+function retaliate(){playerHP=Math.max(0,playerHP-(2+Math.floor(Math.random()*6)));if(!playerHP){say('Your monster needs rest. Returned to the field fully healed.');endBattle();}draw();}
+function endBattle(){mode='world';enemy=null;save();buttons([]);draw();}
+function move(dx,dy){if(mode!=='world')return;const x=state.x+dx,y=state.y+dy;if(tile(x,y)==='wall')return;state.x=x;state.y=y;state.steps++;save();if(tile(x,y)==='grass'&&Math.random()<.16){encounter();return;}say('Explore the grass to find wild monsters. Captured: '+state.captures);draw();}
+document.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('click',()=>{const d=b.dataset.dir;move(d==='left'?-1:d==='right'?1:0,d==='up'?-1:d==='down'?1:0);}));
+document.addEventListener('keydown',e=>{const d={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]}[e.key];if(d){e.preventDefault();move(...d);}});
+document.getElementById('reset').addEventListener('click',()=>{if(!confirm('Erase Monster Catcher progress on this device?'))return;state=fresh();mode='starter';enemy=null;save();setup();});
+function setup(){if(mode==='starter'){say('Pick your first monster to begin your adventure.');buttons(species.map((s,i)=>[s.name,()=>start(i)]));}else{say('Welcome back! Explore the tall grass.');buttons([]);}draw();}
+setup();
+})();
+</script></body></html>

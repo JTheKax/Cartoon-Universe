@@ -33,4 +33,4 @@ document.getElementById('reset').addEventListener('click',()=>{if(!confirm('Eras
 function setup(){if(mode==='starter'){say('Pick your first monster to begin your adventure.');buttons(species.map((s,i)=>[s.name,()=>start(i)]));}else{say('Welcome back! Explore the tall grass.');buttons([]);}draw();}
 setup();
 })();
-</script></body></html>
+</script><script type="module" src="monster-catcher-online.js"></script></body></html>

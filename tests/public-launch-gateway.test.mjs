@@ -54,8 +54,8 @@ test('maintenance blocks public HTML, assets and scripts; owner routes stay prot
   assert.match(body,/Under Maintenance/);
   assert.doesNotMatch(body,/<script>unsafe<\/script>/);
  }
- assert.equal((await fetch(base+'/owner.html')).status,403);
- assert.equal((await fetch(base+'/__maintenance/arcade/')).status,403);
+ assert.equal((await fetch(base+'/owner.html',{redirect:'manual'})).status,302);
+ assert.equal((await fetch(base+'/__maintenance/arcade/',{redirect:'manual'})).status,302);
  assert.equal((await fetch(base+'/__maintenance/owner-signin')).status,200);
  assert.equal((await fetch(base+'/__maintenance/password-recovery')).status,200);
  assert.equal((await fetch(base+'/__maintenance/health')).status,200);
@@ -66,7 +66,7 @@ test('upstream failure fails closed and never publishes public files',async t=>{
  const {base}=await fixture(t,{enabled:false,fail:true});
  assert.equal((await fetch(base+'/')).status,503);
  assert.equal((await fetch(base+'/shop-shop.html')).status,503);
- assert.equal((await fetch(base+'/__maintenance/arcade/')).status,403);
+ assert.equal((await fetch(base+'/__maintenance/arcade/',{redirect:'manual'})).status,302);
 });
 test('maintenance off opens allowlisted public pages but never owner dashboard',async t=>{
  const {base}=await fixture(t,{enabled:false});
@@ -82,7 +82,7 @@ test('maintenance off opens allowlisted public pages but never owner dashboard',
   }
  }
  for(const path of ['/owner.html','/owner.js','/owner-theater.js','/maintenance-controls.js'])
-  assert.equal((await fetch(base+path)).status,403,path);
+  assert.equal((await fetch(base+path,{redirect:'manual'})).status,302,path);
  for(const path of ['/server/public-launch-gateway.mjs','/sql/tests/ci_bootstrap.sql','/.env','/package.json'])
   assert.equal((await fetch(base+path)).status,404,path);
  for(const path of ['/../server/owner-verification.mjs','/%2e%2e/server','//owner.html','/static/../owner.html'])
@@ -97,7 +97,7 @@ test('owner cookie unlocks protected arcade only after server-side membership ch
  const response=await fetch(base+'/__maintenance/verify-session',{method:'POST',headers:{Origin:config.origin,Authorization:'Bearer mock-owner-token'}});
  assert.equal(response.status,200);
  const cookie=response.headers.get('set-cookie');
- assert.match(cookie,/^__Host-cu_owner_verify=[0-9a-f]{64}; Path=\/; HttpOnly; SameSite=Lax; Max-Age=300; Secure$/);
+ assert.match(cookie,/^__Host-cu_owner_verify=[0-9a-f]{64}; Path=\/; HttpOnly; SameSite=Lax; Max-Age=1800; Secure$/);
  const headers={Cookie:cookie.split(';')[0]};
  for(const path of ['/__maintenance/arcade/','/__maintenance/arcade/owner.html','/__maintenance/arcade/owner-theater.js','/__maintenance/arcade/static/theater.html','/__maintenance/arcade/static/dark-side-ring-blue-cover.svg']){
   const r=await fetch(base+path,{headers});
@@ -108,11 +108,11 @@ test('owner cookie unlocks protected arcade only after server-side membership ch
  assert.equal((await fetch(base+'/owner.html',{headers})).status,200);
  const logout=await fetch(base+'/__maintenance/verify-session',{method:'DELETE',headers:{...headers,Origin:config.origin}});
  assert.equal(logout.status,200);
- assert.equal((await fetch(base+'/owner.html',{headers})).status,403);
+ assert.equal((await fetch(base+'/owner.html',{headers,redirect:'manual'})).status,302);
 });
 test('nonowner access token never opens protected pages',async t=>{
  const {base,config}=await fixture(t,{enabled:false,member:false});
  const r=await fetch(base+'/__maintenance/verify-session',{method:'POST',headers:{Origin:config.origin,Authorization:'Bearer mock-player-token'}});
  assert.equal(r.status,403);
- assert.equal((await fetch(base+'/owner.html')).status,403);
+ assert.equal((await fetch(base+'/owner.html',{redirect:'manual'})).status,302);
 });

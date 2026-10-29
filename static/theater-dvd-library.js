@@ -47,10 +47,10 @@ load().catch(error=>{if(note)note.textContent='DVD display failed: '+error.messa
 /* Owner-managed Coming Soon movie announcements. No playback link required. */
 function normalizePosterUrl(value){const raw=String(value||'').trim();if(!raw)return null;try{const u=new URL(raw);if(u.protocol!=='https:'||!u.hostname||raw.length>2048)return null;return u.href;}catch{return null;}}
 async function setupComingSoon(){
- const library=document.getElementById('dvd-library');if(!library)return;
+ const library=document.querySelector('main');if(!library)return;
  const section=document.createElement('section');section.className='coming-soon-library';section.id='theater-coming-soon';
  section.innerHTML='<h2>✨ Coming Soon to the Theater</h2><p>Upcoming movies we plan to add to Cartoon Universe.</p><div class="coming-soon-grid" aria-live="polite"></div>';
- library.append(section);
+ const screenSection=document.getElementById('watch');if(screenSection)screenSection.before(section);else library.prepend(section);
  const grid=section.querySelector('.coming-soon-grid');
  const feedback=document.createElement('p');feedback.setAttribute('role','status');section.append(feedback);
  async function refresh(){

@@ -12,7 +12,7 @@ const ASSETS=new Set(`
 index.html login.html register.html account.html coin-wallet.html owner.html
 styles.css account.css owner.css clean-arcade.css script.js auth.js config.js
 supabase-config.js theme.js logo-preferences.js admin-nav.js home-profile.js
-coin-wallet.js owner.js owner-coin-adjustments.js owner-theater.js maintenance-preview.js maintenance-controls.js maintenance-notice.js
+coin-wallet.js global-chat.js owner.js owner-coin-adjustments.js owner-theater.js maintenance-preview.js maintenance-controls.js maintenance-notice.js
 nav-account-controls.js shop-preview.js shop-collect-controller.js
 shop-inventory-controller.js shop-local-movie.js account-redirect.js sticker-catalog.json
 assets/appearance-catalog.json static/cartoon-carnival.png static/haunted-arcade.gif
@@ -105,6 +105,7 @@ export function createPublicGateway({config,fetchImpl=fetch,now=Date.now,
    const file=await realpath(resolve(base,name));
    if(!file.startsWith(base+sep))return send(404,'Not found');
    let body=await readFile(file);
+   if(extname(name)==='.html')body=body.toString().replace('</body>','<script type="module" src="'+(protectedRoute?prefix:'/')+'global-chat.js"></script></body>');
    if(protectedRoute&&extname(name)==='.html'){
     const baseHref=name==='static/theater.html'?prefix+'static/':prefix;
     body=body.toString().replace(/<head([^>]*)>/i,'<head$1><base href="'+baseHref+'">');

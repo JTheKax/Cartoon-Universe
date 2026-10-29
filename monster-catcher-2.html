@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monster Catcher 2 | 3D Prototype</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#091524;color:#eef9ff;font:16px system-ui,sans-serif}main{max-width:1080px;margin:auto;padding:16px}h1{margin:6px 0;color:#8ee6ff}p{line-height:1.5}.viewport{position:relative;border:2px solid #4bbedc;border-radius:14px;overflow:hidden;background:#132c45}canvas{display:block;width:100%;height:min(65vh,600px);touch-action:none}.hud{position:absolute;top:12px;left:12px;background:#061626d9;padding:10px 14px;border-radius:8px;pointer-events:none}.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}button,a{background:#14364f;border:1px solid #5ac7ed;color:white;border-radius:8px;padding:10px 14px;font:inherit}button:focus-visible,a:focus-visible{outline:3px solid #facc15}.pad{display:grid;grid-template-columns:repeat(3,58px);gap:4px}.pad button{margin:0}.muted{color:#b8d4e6}
+</style></head><body><main>
+<h1>Monster Catcher 2 <small>3D Prototype</small></h1>
+<p class="muted">An independent 3D adventure. Your original Monster Catcher save is untouched.</p>
+<div class="viewport"><canvas id="scene" aria-label="3D Starter Meadow exploration"></canvas><div class="hud"><strong>Starter Meadow · 3D</strong><div id="status" role="status">Loading 3D scene…</div></div></div>
+<div class="controls"><button id="camera">Switch camera</button><button id="reset">Reset position</button><span>WASD / arrow keys to move · Drag to rotate camera</span></div>
+<div class="pad"><span></span><button data-dir="up" aria-label="Forward">▲</button><span></span><button data-dir="left" aria-label="Left">◀</button><button data-dir="down" aria-label="Back">▼</button><button data-dir="right" aria-label="Right">▶</button></div>
+<p><a href="monster-catcher.html">Play Monster Catcher Classic</a> <a href="index.html">Back to Arcade</a></p>
+<p class="muted">Prototype uses original low-poly models and browser-based WebGL. Multiplayer, catching, and persistent teams are not yet connected.</p>
+</main><script type="module" src="monster-catcher-2.js"></script></body></html>

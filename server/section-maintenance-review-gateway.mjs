@@ -4,7 +4,7 @@
 import {createServer} from 'node:http';
 import {createSectionMaintenanceGatewayAdapter} from './section-maintenance-gateway-adapter.mjs';
 import {guardSectionRoute,sectionForRoute} from './section-route-guard.mjs';
-import {normalizeSectionStatuses} from './section-maintenance-store.mjs';
+import {normalizeSectionStatuses,isCompleteSectionSnapshot} from './section-maintenance-store.mjs';
 
 export function createSectionMaintenanceReviewGateway({origin,loadSnapshot,verifyOwner,saveChange,servePage,performMutation}={}){
  if(typeof loadSnapshot!=='function'||typeof verifyOwner!=='function'
@@ -27,6 +27,9 @@ export function createSectionMaintenanceReviewGateway({origin,loadSnapshot,verif
    let snapshot;
    try{snapshot=await loadSnapshot();}catch{return send(503,{error:'maintenance-state-unavailable'});}
    if(snapshot?.globalMaintenance!==true&&snapshot?.globalMaintenance!==false)
+    return send(503,{error:'maintenance-state-unavailable'});
+   // A malformed or partial section snapshot is not trustworthy, even for owners.
+   if(!isCompleteSectionSnapshot(snapshot.sectionRows))
     return send(503,{error:'maintenance-state-unavailable'});
    const sectionStatuses=normalizeSectionStatuses(snapshot.sectionRows);
    let identity;

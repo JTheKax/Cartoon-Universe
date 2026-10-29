@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {once} from 'node:events';
 import {createSectionMaintenanceReviewGateway} from '../server/section-maintenance-review-gateway.mjs';
 import {SECTION_KEYS} from '../server/section-maintenance-policy.mjs';
+import {SECTION_PAGE_ROUTES,SECTION_MUTATION_ROUTES,sectionForRoute} from '../server/section-route-guard.mjs';
 const origin='https://cartoon-universe-review.test';
 const rows=()=>SECTION_KEYS.map(section_key=>({section_key,maintenance_enabled:false}));
 async function fixture({snapshot=()=>({globalMaintenance:false,sectionRows:rows()}),saveChange=async()=>({saved:true,audited:true})}={}){
@@ -82,4 +83,56 @@ test('unconfirmed audit never produces a successful HTTP write response',async()
   const response=await f.request('/__maintenance/section-status',{method:'POST',headers:{'Content-Type':'application/json',Origin:origin,'x-test-owner':'owner-session'},body:JSON.stringify({section:'radio',maintenanceEnabled:true})});
   assert.equal(response.status,503);
  }finally{await f.close();}
+});
+
+test('HTTP route matrix: every registered page and mutation is guarded independently',async()=>{
+ let globalMaintenance=false;
+ let blockedSection=null;
+ const f=await fixture({snapshot:()=>({
+  globalMaintenance,
+  sectionRows:rows().map(row=>row.section_key===blockedSection?{...row,maintenance_enabled:true}:row)
+ })});
+ try{
+  const routes=[
+   ...SECTION_PAGE_ROUTES.map(path=>[path,'GET']),
+   ...SECTION_MUTATION_ROUTES.map(path=>[path,'POST'])
+  ];
+  assert.ok(routes.length>=35,'route catalog unexpectedly shrank');
+  for(const [path,method] of routes){
+   const section=sectionForRoute({pathname:path,method});
+   assert.ok(SECTION_KEYS.includes(section),path);
+   blockedSection=null;globalMaintenance=false;
+   assert.equal((await f.request(path,{method})).status,200,'live '+method+' '+path);
+   blockedSection=section;
+   assert.equal((await f.request(path,{method})).status,503,'section maintenance '+method+' '+path);
+   assert.equal((await f.request(path,{method,headers:{'x-test-owner':'owner-session'}})).status,200,'owner section bypass '+method+' '+path);
+   blockedSection=null;globalMaintenance=true;
+   assert.equal((await f.request(path,{method})).status,503,'global maintenance '+method+' '+path);
+   assert.equal((await f.request(path,{method,headers:{'x-test-owner':'owner-session'}})).status,200,'owner global bypass '+method+' '+path);
+  }
+  globalMaintenance=false;blockedSection=null;
+  for(const path of SECTION_PAGE_ROUTES){
+   assert.equal((await f.request(path,{method:'HEAD'})).status,200,'HEAD '+path);
+   assert.equal((await f.request(path,{method:'POST'})).status,404,'page POST must not mutate '+path);
+  }
+  for(const path of SECTION_MUTATION_ROUTES){
+   assert.equal((await f.request(path,{method:'GET'})).status,404,'mutation GET must not read '+path);
+   assert.equal((await f.request(path,{method:'PUT'})).status,404,'mutation PUT must not write '+path);
+  }
+ }finally{await f.close();}
+});
+test('HTTP route matrix: missing or duplicate section records never open a player route',async()=>{
+ const cases=[
+  rows().filter(row=>row.section_key!=='movie-theater'),
+  [...rows(),{section_key:'movie-theater',maintenance_enabled:false}],
+  rows().map(row=>row.section_key==='movie-theater'?{...row,maintenance_enabled:'false'}:row)
+ ];
+ for(const sectionRows of cases){
+  const f=await fixture({snapshot:()=>({globalMaintenance:false,sectionRows})});
+  try{
+   assert.equal((await f.request('/shop-watch-movies.html')).status,503);
+   assert.equal((await f.request('/api/theater/schedule',{method:'POST'})).status,503);
+   assert.equal((await f.request('/shop-community.html')).status,200);
+  }finally{await f.close();}
+ }
 });

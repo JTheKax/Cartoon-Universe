@@ -16,7 +16,7 @@ coin-wallet.js owner.js owner-coin-adjustments.js owner-theater.js maintenance-p
 nav-account-controls.js shop-preview.js shop-collect-controller.js
 shop-inventory-controller.js shop-local-movie.js account-redirect.js sticker-catalog.json
 assets/appearance-catalog.json static/cartoon-carnival.png static/haunted-arcade.gif
-static/theater.html static/theater.js static/theater-dvd-library.js static/dark-side-ring-blue-cover.svg
+static/theater.html static/theater.js static/theater-dvd-library.js static/dark-side-ring-blue-cover.svg static/yu-gi-oh-gx-cover.jpg
 shop-auctions.html shop-cards-battle.html shop-cards-deck-build.html shop-cards.html
 shop-collect-encyclopedia.html shop-collect-my-collection.html
 shop-collect-my-scene.html shop-collect-wishlist.html shop-collect.html

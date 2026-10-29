@@ -20,7 +20,7 @@ const gxEpisodes=(data||[]).map(item=>({...item,gx:parseGX(item.title)})).filter
 const section=document.createElement('section');section.className='gx-episode-library';section.id='gx-episodes';section.style.cssText='margin:1rem 0;padding:1rem;border:2px solid #8d64d9;border-radius:12px;background:#170f2f;color:white';
 const heading=document.createElement('h3');heading.textContent='Yu-Gi-Oh! GX — Seasons & Episodes';section.append(heading);
 const seasonSelect=document.createElement('select');seasonSelect.setAttribute('aria-label','Select Yu-Gi-Oh GX season');seasonSelect.style.cssText='padding:8px;margin-bottom:10px;border-radius:8px';
-const seasonIds=[...new Set([1,...gxEpisodes.map(item=>item.gx.season)])].sort((a,b)=>a-b);
+const seasonIds=[...new Set([1,2,3,4,...gxEpisodes.map(item=>item.gx.season)])].sort((a,b)=>a-b);
 for(const n of seasonIds)seasonSelect.add(new Option('Season '+n,String(n)));
 const episodeList=document.createElement('div');section.append(seasonSelect,episodeList);
 function renderSeason(){episodeList.replaceChildren();const selected=gxEpisodes.filter(item=>item.gx.season===Number(seasonSelect.value));if(!selected.length){const empty=document.createElement('p');empty.textContent='No episodes uploaded for this season yet. Add them through the Owner Dashboard.';episodeList.append(empty);return;}

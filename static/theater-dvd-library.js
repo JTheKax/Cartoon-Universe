@@ -44,6 +44,7 @@ load().catch(error=>{if(note)note.textContent='DVD display failed: '+error.messa
 
 
 /* Owner-managed Coming Soon movie announcements. No playback link required. */
+function normalizePosterUrl(value){const raw=String(value||'').trim();if(!raw)return null;try{const u=new URL(raw);if(u.protocol!=='https:'||!u.hostname||raw.length>2048)return null;return u.href;}catch{return null;}}
 async function setupComingSoon(){
  const library=document.getElementById('dvd-library');if(!library)return;
  const section=document.createElement('section');section.className='coming-soon-library';section.id='theater-coming-soon';
@@ -59,7 +60,7 @@ async function setupComingSoon(){
   for(const movie of data||[]){
    const card=document.createElement('article');card.className='coming-soon-card';
    const poster=document.createElement('div');poster.className='coming-soon-poster';
-   if(movie.poster_url){const img=document.createElement('img');img.src=movie.poster_url;img.alt=movie.title+' poster';img.loading='lazy';poster.append(img);}
+   if(movie.poster_url){const img=document.createElement('img');img.alt=movie.title+' poster';img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{img.remove();poster.insertAdjacentText('afterbegin','🎬');};img.src=movie.poster_url;poster.append(img);}
    else poster.textContent='🎬';
    const ribbon=document.createElement('span');ribbon.className='coming-soon-ribbon';ribbon.textContent='COMING SOON';poster.append(ribbon);
    const title=document.createElement('strong');title.textContent=movie.title;card.append(poster,title);
@@ -71,7 +72,8 @@ async function setupComingSoon(){
  const ownerForm=document.createElement('form');ownerForm.className='coming-soon-owner';ownerForm.hidden=true;
  ownerForm.innerHTML='<h3>Owner: Announce an upcoming movie</h3><label>Movie title <input name="title" maxlength="120" required></label><label>Poster image URL (optional) <input name="poster" type="url" placeholder="https://..."></label><label>Release note (optional) <input name="note" maxlength="120" placeholder="Coming this winter"></label><button type="submit">Add to Coming Soon</button>';
  section.append(ownerForm);
- ownerForm.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(ownerForm);const title=String(fd.get('title')||'').trim(),poster_url=String(fd.get('poster')||'').trim()||null,release_note=String(fd.get('note')||'').trim()||null;if(!title)return;if(poster_url&&!poster_url.startsWith('https://')){feedback.textContent='Poster must use HTTPS.';return;}const button=ownerForm.querySelector('button');button.disabled=true;const {error}=await db.from('theater_coming_soon').insert({title,poster_url,release_note});button.disabled=false;if(error){feedback.textContent=error.message;return;}ownerForm.reset();refresh();});
+ const posterInput=ownerForm.querySelector('[name="poster"]');const preview=document.createElement('img');preview.alt='Coming Soon poster preview';preview.hidden=true;preview.style.cssText='display:block;max-width:150px;max-height:220px;object-fit:contain;margin:10px 0;border:2px solid #d6ad77';const previewMessage=document.createElement('small');previewMessage.setAttribute('role','status');posterInput.closest('label').append(preview,previewMessage);preview.onerror=()=>{preview.hidden=true;previewMessage.textContent='Image could not load. Use a direct public image URL, not a webpage or search-result link.';};preview.onload=()=>{preview.hidden=false;previewMessage.textContent='Poster image loaded successfully.';};posterInput.addEventListener('change',()=>{const url=normalizePosterUrl(posterInput.value);preview.hidden=true;previewMessage.textContent=url?'Checking poster image…':posterInput.value?'Enter a valid HTTPS image URL.':'';if(url)preview.src=url;});
+ ownerForm.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(ownerForm);const title=String(fd.get('title')||'').trim(),posterInput=String(fd.get('poster')||'').trim(),poster_url=normalizePosterUrl(posterInput),release_note=String(fd.get('note')||'').trim()||null;if(!title)return;if(posterInput&&!poster_url){feedback.textContent='Enter a valid direct HTTPS image URL (ending in .jpg, .png, or .webp is recommended).';return;}const button=ownerForm.querySelector('button');button.disabled=true;const {error}=await db.from('theater_coming_soon').insert({title,poster_url,release_note});button.disabled=false;if(error){feedback.textContent=error.message;return;}ownerForm.reset();preview.hidden=true;previewMessage.textContent='';refresh();});
  db.auth.getUser().then(async({data:{user}})=>{if(!user)return;const {data}=await db.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();if(data){ownerEditor=true;ownerForm.hidden=false;refresh();}}).catch(()=>{});
  await refresh();
 }

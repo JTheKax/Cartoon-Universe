@@ -1,0 +1,9 @@
+create table if not exists public.home_news (id bigint generated always as identity primary key, category text not null check(category in ('announcement','release','coming_soon')), title text not null check(char_length(title) between 1 and 120), description text not null check(char_length(description) between 1 and 2000), image_url text check(image_url is null or (image_url ~ '^https://[^ ]+$' and char_length(image_url)<=1000)), link_url text check(link_url is null or (link_url ~ '^https://[^ ]+$' and char_length(link_url)<=1000)), published boolean not null default false, release_date date, created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+alter table public.home_news enable row level security;
+revoke all on public.home_news from anon, authenticated;
+grant select on public.home_news to anon, authenticated;
+grant insert, update, delete on public.home_news to authenticated;
+create policy "Public sees published news" on public.home_news for select to anon, authenticated using (published or exists (select 1 from public.owner_members m where m.user_id=(select auth.uid())));
+create policy "Owner creates news" on public.home_news for insert to authenticated with check (exists (select 1 from public.owner_members m where m.user_id=(select auth.uid())));
+create policy "Owner edits news" on public.home_news for update to authenticated using (exists (select 1 from public.owner_members m where m.user_id=(select auth.uid()))) with check (exists (select 1 from public.owner_members m where m.user_id=(select auth.uid())));
+create policy "Owner deletes news" on public.home_news for delete to authenticated using (exists (select 1 from public.owner_members m where m.user_id=(select auth.uid())));

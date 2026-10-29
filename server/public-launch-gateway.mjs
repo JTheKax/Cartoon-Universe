@@ -12,7 +12,7 @@ const ASSETS=new Set(`
 index.html login.html register.html account.html coin-wallet.html owner.html
 styles.css account.css owner.css clean-arcade.css script.js auth.js config.js
 supabase-config.js theme.js logo-preferences.js admin-nav.js home-profile.js
-coin-wallet.js global-chat.js owner.js owner-coin-adjustments.js owner-theater.js maintenance-preview.js maintenance-controls.js maintenance-notice.js
+coin-wallet.js global-chat.js home-news.js owner.js owner-coin-adjustments.js owner-theater.js maintenance-preview.js maintenance-controls.js maintenance-notice.js
 nav-account-controls.js retro-game-library.js shop-preview.js shop-collect-controller.js
 shop-inventory-controller.js shop-local-movie.js account-redirect.js sticker-catalog.json
 assets/appearance-catalog.json static/cartoon-carnival.png static/haunted-arcade.gif

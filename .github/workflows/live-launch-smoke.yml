@@ -43,3 +43,20 @@ jobs:
         run: node scripts/check-site.mjs
       - name: Run isolated gateway, owner, CSP, and Coin contracts
         run: node --test tests/public-launch-gateway.test.mjs tests/owner-verification.test.mjs tests/release-csp-contract.test.mjs tests/cartoon-coins.test.mjs
+  simulated-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser dependencies
+        working-directory: tests/browser
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium for simulated browser checks
+        working-directory: tests/browser
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Run isolated owner, login and navigation browser tests
+        working-directory: tests/browser
+        run: npm test

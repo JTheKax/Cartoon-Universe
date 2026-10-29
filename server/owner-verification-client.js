@@ -67,5 +67,6 @@ clear.addEventListener('click',async()=>{
  }catch(error){status.textContent=error.message;}
  finally{password.value='';inFlight=false;busy(false);}
 });
+async function restoreExistingOwnerSession(){try{const active=await getClient();const {data:{session}}=await active.auth.getSession();if(!session?.access_token)return false;const response=await fetch('/__maintenance/verify-session',{method:'POST',headers:{Authorization:'Bearer '+session.access_token},credentials:'same-origin',redirect:'error',cache:'no-store'});if(!response.ok)return false;await refresh();return true;}catch{return false;}}
 busy(true);
-refresh().catch(()=>{status.textContent='Verification status unavailable. Try again shortly.';}).finally(()=>{initializing=false;busy(false);});
+refresh().then(async()=>{if(!form.hidden){const restored=await restoreExistingOwnerSession();if(restored)status.textContent='Owner access restored from your existing signed-in account.';}}).catch(()=>{status.textContent='Verification status unavailable. Try again shortly.';}).finally(()=>{initializing=false;busy(false);});

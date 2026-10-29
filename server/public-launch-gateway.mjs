@@ -91,7 +91,7 @@ export function createPublicGateway({config,fetchImpl=fetch,now=Date.now,
    if(!ASSETS.has(name))return send(404,'Not found');
    const verified=protectedRoute||OWNER_ONLY.has(name)?await owner.authorized(req):false;
    if((protectedRoute||OWNER_ONLY.has(name))&&!verified)
-    return send(403,'Owner verification required');
+    return send(403,'<!doctype html><html lang="en"><meta charset="utf-8"><title>Owner verification</title><h1>Owner verification required</h1><p>Your owner gateway session may have expired after a deployment. You can restore access using your existing signed-in account.</p><p><a href="/__maintenance/owner-signin">Restore owner access</a></p>','text/html; charset=utf-8');
    // Every normal public request is maintenance-gated. Upstream errors fail closed.
    if(!protectedRoute){
     const state=await maintenance();

@@ -79,3 +79,21 @@ async function setupComingSoon(){
  await refresh();
 }
 setupComingSoon().catch(error=>console.error('Coming Soon failed',error));
+async function setupPlaybackReportsDashboard(){
+ const panel=document.getElementById('dvd-library');if(!panel)return;
+ const {data:{user}}=await db.auth.getUser();if(!user)return;
+ const {data:member}=await db.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();if(!member)return;
+ const section=document.createElement('details');section.className='dvd-report-dashboard';const summary=document.createElement('summary');summary.textContent='⚑ Owner: Broken video reports';section.append(summary);
+ const list=document.createElement('div');section.append(list);panel.append(section);
+ async function refresh(){
+  const {data,error}=await db.from('theater_playback_reports').select('id,dvd_id,reason,created_at').is('resolved_at',null).order('created_at',{ascending:false}).limit(100);
+  list.replaceChildren();if(error){list.textContent='Could not load reports: '+error.message;return;}
+  if(!data?.length){list.textContent='No unresolved video reports.';return;}
+  const ids=[...new Set(data.map(x=>x.dvd_id))];const {data:movies}=await db.from('theater_dvd_library').select('id,title').in('id',ids);
+  const titles=new Map((movies||[]).map(x=>[x.id,x.title]));
+  for(const report of data){const row=document.createElement('div');row.className='dvd-report-row';const description=document.createElement('span');description.textContent=(titles.get(report.dvd_id)||'Removed DVD')+' — '+report.reason+' ('+new Date(report.created_at).toLocaleDateString()+')';const resolve=document.createElement('button');resolve.type='button';resolve.textContent='Mark resolved';resolve.addEventListener('click',async()=>{resolve.disabled=true;const {error}=await db.from('theater_playback_reports').update({resolved_at:new Date().toISOString()}).eq('id',report.id);if(error){resolve.disabled=false;alert(error.message);}else refresh();});row.append(description,resolve);list.append(row);}
+ }
+ section.addEventListener('toggle',()=>{if(section.open)refresh();});
+}
+setupPlaybackReportsDashboard().catch(error=>console.error('Playback reports failed',error));
+

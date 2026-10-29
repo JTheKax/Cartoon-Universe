@@ -21,3 +21,17 @@ export function normalizeSectionStatuses(rows){
  for(const [key,count] of counts)if(count>1)statuses[key]=true;
  return Object.freeze(statuses);
 }
+
+// The HTTP gateway must not grant an owner bypass from a partial or corrupt
+// snapshot. A complete set of unique, boolean-valued rows is required first.
+export function isCompleteSectionSnapshot(rows){
+ if(!Array.isArray(rows)||rows.length!==SECTION_KEYS.length)return false;
+ const seen=new Set();
+ for(const row of rows){
+  if(!row||typeof row!=='object'||Array.isArray(row)
+     ||!keys.has(row.section_key)||seen.has(row.section_key)
+     ||typeof row.maintenance_enabled!=='boolean')return false;
+  seen.add(row.section_key);
+ }
+ return seen.size===SECTION_KEYS.length;
+}

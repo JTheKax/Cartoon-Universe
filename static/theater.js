@@ -10,10 +10,10 @@ if(document.getElementById('theater-chat-toggle')){
  messages.replaceChildren();
  const status=document.createElement('p');status.setAttribute('role','status');status.className='theater-chat-status';form.before(status);
  let user=null,owner=false,profileName='Player',loading=false;
- function setOpen(open){win.hidden=!open;toggle.setAttribute('aria-expanded',String(open));if(open)input.focus();}
+ function setOpen(open){win.hidden=!open;toggle.setAttribute('aria-expanded',String(open));toggle.textContent=open?'💬 Hide Chat':'💬 Open Chat';if(open&&!input.disabled)input.focus();}
  toggle.addEventListener('click',()=>setOpen(win.hidden));close.addEventListener('click',()=>setOpen(false));
  async function identity(){
-  const {data:{user:current}}=await db.auth.getUser();user=current;owner=false;profileName='Player';
+  const {data:{user:current},error:authError}=await db.auth.getUser();if(authError)console.warn('Chat authentication:',authError.message);user=current;owner=false;profileName='Player';
   if(user){const [{data:p},{data:o}]=await Promise.all([db.from('profiles').select('display_name,username').eq('id',user.id).maybeSingle(),db.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle()]);profileName=String(p?.display_name?.trim()||p?.username?.trim()||'Player').slice(0,40);owner=Boolean(o);}
   input.disabled=!user;form.querySelector('button[type="submit"]').disabled=!user;
   input.placeholder=user?'Message the theater…':'Sign in to join the live chat';
@@ -29,7 +29,7 @@ if(document.getElementById('theater-chat-toggle')){
   meta.append(name,time);line.append(meta);
   const body=document.createElement('div');body.textContent=item.body;line.append(body);
   if(owner){const remove=document.createElement('button');remove.type='button';remove.className='theater-chat-delete';remove.textContent='Remove';remove.setAttribute('aria-label','Remove message from '+item.display_name);remove.addEventListener('click',async()=>{remove.disabled=true;const {error}=await db.from('theater_chat_messages').delete().eq('id',item.id);if(error){status.textContent='Could not remove message: '+error.message;remove.disabled=false;}else{seen.delete(item.id);line.remove();}});line.append(remove);}
-  line.dataset.id=String(item.id);messages.append(line);while(messages.children.length>100){seen.delete(Number(messages.firstChild.dataset.id));messages.firstChild.remove();}messages.scrollTop=messages.scrollHeight;
+  line.dataset.id=String(item.id);messages.append(line);while(messages.children.length>100){seen.delete(messages.firstChild.dataset.id);messages.firstChild.remove();}messages.scrollTop=messages.scrollHeight;
  }
  async function load(){
   if(loading)return;loading=true;

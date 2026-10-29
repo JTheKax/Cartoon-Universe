@@ -40,3 +40,38 @@ if(randomMovies.length){const chosen=randomMovies[Math.floor(Math.random()*rando
 
 for(const movie of (data||[]).filter(m=>!parseSeries(m.title)&&m.title.trim().toLowerCase()!=='yu-gi-oh! gx')){if(!/^[A-Za-z0-9_-]{11}$/.test(movie.youtube_id))continue;const button=document.createElement('button');button.type='button';button.className='dvd-case';const indicator=document.createElement('span');indicator.className='dvd-playback-dot';function updateIndicator(){const state=movie.playback_status||'untested';indicator.dataset.status=state;indicator.title=state==='working'?'Playback confirmed working':state==='broken'?'Playback reported not working':'Playback not tested';indicator.setAttribute('aria-label',indicator.title);}updateIndicator();const cover=document.createElement('img');cover.src=movie.cover_url||'https://img.youtube.com/vi/'+movie.youtube_id+'/hqdefault.jpg';cover.alt=movie.title+' DVD cover';cover.loading='lazy';cover.onerror=()=>{cover.onerror=null;cover.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="140" height="210"><rect width="140" height="210" fill="#2b1749"/><text x="70" y="105" fill="white" font-size="15" text-anchor="middle">DVD CASE</text></svg>');};cover.style.cssText='display:block;width:140px;max-width:100%;height:210px;object-fit:contain;object-position:center;background:#20152e;border-radius:4px';const title=document.createElement('strong');title.textContent=movie.title;const label=document.createElement('small');label.textContent='▶ Play '+(movie.category==='movies'?'movie':'video');button.append(indicator,cover,title,label);button.addEventListener('click',()=>{const play=()=>{const url=document.getElementById('theater-youtube-url');const form=document.getElementById('theater-youtube-form');if(url&&form){url.value='https://www.youtube.com/watch?v='+movie.youtube_id;form.requestSubmit();}else{player.src='https://www.youtube-nocookie.com/embed/'+movie.youtube_id+'?autoplay=1';player.hidden=false;placeholder.hidden=true;}showOnMarquee(movie.title);note.textContent='Now selected: '+movie.title;window.scrollTo({top:0,behavior:'smooth'});};if(ownerEditor)editDvd(movie,play,updated=>{const previousCategory=movie.category;Object.assign(movie,updated);updateIndicator();title.textContent=movie.title;label.textContent='▶ Play '+(movie.category==='movies'?'movie':'video');cover.src=movie.cover_url?(movie.cover_url+(movie.cover_url.includes('?')?'&':'?')+'dvd_updated='+Date.now()):'https://img.youtube.com/vi/'+movie.youtube_id+'/hqdefault.jpg';cover.alt=movie.title+' DVD cover';if(previousCategory!==movie.category)location.reload();else {sortAllDvdShelves();if(note)note.textContent='DVD changes saved: '+movie.title;}});else play();});const key=panels.has(movie.category)?movie.category:'movies';const index=counts.get(key)||0;const groupKey=key+'-'+Math.floor(index/6);let group=groups.get(groupKey);if(!group){const section=document.createElement('section');section.className='dvd-shelf-section';section.style.cssText='margin:1.5rem 0;padding:1rem;border-bottom:8px solid #8b5a2b;border-radius:8px;background:rgba(24,14,27,.7)';const heading=document.createElement('h3');heading.textContent='DVD Shelf '+(Math.floor(index/6)+1);const row=document.createElement('div');row.className='dvd-shelf';row.style.cssText='display:flex;gap:1rem;flex-wrap:wrap';section.append(heading,row);panels.get(key).append(section);groups.set(groupKey,row);group=row;}if(index===0){const empty=group.querySelector('.dvd-shelf-empty');if(empty)empty.remove();}group.append(button);counts.set(key,index+1);}sortAllDvdShelves();}
 load().catch(error=>{if(note)note.textContent='DVD display failed: '+error.message;for(const panel of panels.values())panel?.querySelectorAll('.dvd-shelf-empty').forEach(el=>{el.textContent='DVD shelf error: '+(error?.message||String(error));});console.error('DVD library display error',error);});
+
+
+/* Owner-managed Coming Soon movie announcements. No playback link required. */
+async function setupComingSoon(){
+ const library=document.getElementById('dvd-library');if(!library)return;
+ const section=document.createElement('section');section.className='coming-soon-library';section.id='theater-coming-soon';
+ section.innerHTML='<h2>✨ Coming Soon to the Theater</h2><p>Upcoming movies we plan to add to Cartoon Universe.</p><div class="coming-soon-grid" aria-live="polite"></div>';
+ library.append(section);
+ const grid=section.querySelector('.coming-soon-grid');
+ const feedback=document.createElement('p');feedback.setAttribute('role','status');section.append(feedback);
+ async function refresh(){
+  const {data,error}=await db.from('theater_coming_soon').select('id,title,poster_url,release_note').order('title',{ascending:true});
+  grid.replaceChildren();
+  if(error){feedback.textContent='Coming Soon titles could not be loaded.';return;}
+  feedback.textContent=data?.length?'':'More movies will be announced soon!';
+  for(const movie of data||[]){
+   const card=document.createElement('article');card.className='coming-soon-card';
+   const poster=document.createElement('div');poster.className='coming-soon-poster';
+   if(movie.poster_url){const img=document.createElement('img');img.src=movie.poster_url;img.alt=movie.title+' poster';img.loading='lazy';poster.append(img);}
+   else poster.textContent='🎬';
+   const ribbon=document.createElement('span');ribbon.className='coming-soon-ribbon';ribbon.textContent='COMING SOON';poster.append(ribbon);
+   const title=document.createElement('strong');title.textContent=movie.title;card.append(poster,title);
+   if(movie.release_note){const note=document.createElement('small');note.textContent=movie.release_note;card.append(note);}
+   if(ownerEditor){const remove=document.createElement('button');remove.type='button';remove.textContent='Remove announcement';remove.addEventListener('click',async()=>{if(!confirm('Remove '+movie.title+' from Coming Soon?'))return;const {error}=await db.from('theater_coming_soon').delete().eq('id',movie.id);if(error)feedback.textContent=error.message;else refresh();});card.append(remove);}
+   grid.append(card);
+  }
+ }
+ const ownerForm=document.createElement('form');ownerForm.className='coming-soon-owner';ownerForm.hidden=true;
+ ownerForm.innerHTML='<h3>Owner: Announce an upcoming movie</h3><label>Movie title <input name="title" maxlength="120" required></label><label>Poster image URL (optional) <input name="poster" type="url" placeholder="https://..."></label><label>Release note (optional) <input name="note" maxlength="120" placeholder="Coming this winter"></label><button type="submit">Add to Coming Soon</button>';
+ section.append(ownerForm);
+ ownerForm.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(ownerForm);const title=String(fd.get('title')||'').trim(),poster_url=String(fd.get('poster')||'').trim()||null,release_note=String(fd.get('note')||'').trim()||null;if(!title)return;if(poster_url&&!poster_url.startsWith('https://')){feedback.textContent='Poster must use HTTPS.';return;}const button=ownerForm.querySelector('button');button.disabled=true;const {error}=await db.from('theater_coming_soon').insert({title,poster_url,release_note});button.disabled=false;if(error){feedback.textContent=error.message;return;}ownerForm.reset();refresh();});
+ db.auth.getUser().then(async({data:{user}})=>{if(!user)return;const {data}=await db.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();if(data){ownerEditor=true;ownerForm.hidden=false;refresh();}}).catch(()=>{});
+ await refresh();
+}
+setupComingSoon().catch(error=>console.error('Coming Soon failed',error));

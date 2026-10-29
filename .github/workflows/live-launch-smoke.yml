@@ -4,7 +4,8 @@ on:
     branches: [review/production-public-gateway-20261028]
     paths:
       - 'scripts/live-launch-smoke.mjs'
-      - 'tests/live-launch-smoke.test.mjs'
+      - 'tests/**'
+      - 'server/**'
       - '.github/workflows/live-launch-smoke.yml'
   workflow_dispatch:
 permissions:

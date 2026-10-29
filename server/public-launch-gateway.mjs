@@ -52,7 +52,7 @@ export function createPublicGateway({config,fetchImpl=fetch,now=Date.now,
   origin:config.origin,supabaseUrl:config.supabaseUrl,
   publishableKey:config.key,fetchImpl,now
  });
- const csp=`default-src 'self'; script-src 'self' https://esm.sh; connect-src 'self' ${PROJECT}; img-src 'self' data: ${PROJECT}; media-src 'self' blob:; frame-src https://www.youtube-nocookie.com; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`;
+ const csp=`default-src 'self'; script-src 'self' https://esm.sh; connect-src 'self' ${PROJECT} wss://gjfyemvcrgrthbrlqqnz.supabase.co; img-src 'self' data: ${PROJECT}; media-src 'self' blob:; frame-src https://www.youtube-nocookie.com; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`;
  async function maintenance(){
   try{
    const response=await fetchImpl(PROJECT+'/rest/v1/site_maintenance?select=enabled,message&id=eq.true',{

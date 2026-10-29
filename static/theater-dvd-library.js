@@ -5,7 +5,7 @@ const shelf=document.getElementById('dvd-shelf');
 const player=document.getElementById('theater-youtube-player');
 const placeholder=document.getElementById('theater-library-placeholder');
 const note=document.getElementById('dvd-selection');
-const categories=[['cartoons-animes','Cartoons/Animes'],['movies','Movies'],['wrestling','Wrestling']];
+const categories=[['cartoons-animes','Cartoons/Animes'],['movies','Movies'],['wrestling','Not Recommended For Kids']];
 const panels=new Map(categories.map(([key])=>[key,document.getElementById('dvd-panel-'+key)]));
 const wrestlingShelf=document.getElementById('wrestling-dvd-shelf');
 const legacyCase=shelf?.querySelector('.dark-side-dvd');

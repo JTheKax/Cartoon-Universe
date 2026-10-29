@@ -5,6 +5,8 @@ import {productionSiteOrigin} from './production-maintenance-gateway.mjs';
 const PROJECT='https://gjfyemvcrgrthbrlqqnz.supabase.co';
 const COOKIE='__Host-cu_owner_verify';
 const TTL=300000;
+// Keep owner access short-lived, but renew it on verified activity.
+// Never renew without rechecking the Supabase owner_members record.
 const HTML='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cartoon Universe Owner Verification</title><link rel="stylesheet" href="/__maintenance/owner-verification.css"></head><body><main><p class="eyebrow">CARTOON UNIVERSE · OWNER CHECK</p><h1>Verify owner sign-in</h1><p>This page checks owner access only. It cannot change your profile, coins, or maintenance settings.</p><form id="verify-form"><label for="identifier">Username or email</label><input id="identifier" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="254" required><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" maxlength="1024" required><button id="verify" type="submit">Verify owner sign-in</button></form><p><a href="/__maintenance/password-recovery">Reset a forgotten password</a></p><p id="status" role="status" aria-live="polite">Use your existing owner account.</p><button id="clear" type="button" hidden>Clear verification session</button><p id="arcade-entry" hidden><a href="/__maintenance/arcade/">Enter owner arcade</a></p><p class="note">Your password goes directly to Supabase. No password or refresh token is stored by this verification server.</p></main><script type="module" src="/__maintenance/owner-verification.js"></script></body></html>';
 const RECOVERY_HTML='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cartoon Universe Password Recovery</title><link rel="stylesheet" href="/__maintenance/owner-verification.css"></head><body><main><h1>Reset your Cartoon Universe password</h1><p>This page works independently of arcade maintenance. Open the password recovery email on this device; the link must point to this page.</p><form id="recovery-request-form"><label for="recovery-email">Account email</label><input id="recovery-email" type="email" autocomplete="email" maxlength="254" required><button type="submit">Email password reset link</button></form><form id="recovery-form" hidden><label for="password-new">New password</label><input id="password-new" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required><label for="password-confirm">Confirm new password</label><input id="password-confirm" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required><button type="submit">Update password</button></form><p id="recovery-status" role="status" aria-live="polite">Checking recovery link…</p><p><a href="/__maintenance/owner-signin">Return to Owner Login</a></p></main><script type="module" src="/__maintenance/password-recovery.js"></script></body></html>';
 const CSS=':root{color-scheme:dark;font-family:system-ui,sans-serif;background:#140c28;color:#efeaff}body{margin:0;padding:36px 18px}main{max-width:520px;margin:6vh auto;padding:28px;background:#24163d;border:1px solid #74549f;border-radius:18px}h1{color:#81f2ee;line-height:1.15}.eyebrow,.note{font-size:.85rem;color:#cbb9e7}p{line-height:1.6}label{display:block;margin:18px 0 7px;font-weight:600}input,button{box-sizing:border-box;width:100%;font:inherit;border-radius:9px;padding:12px;border:1px solid #8a6dad}input{background:#160e29;color:#fff}button{margin-top:20px;background:#7ce6dc;color:#15122b;font-weight:750;cursor:pointer}button:disabled{opacity:.6;cursor:wait}a{color:#ffda93}:focus-visible{outline:3px solid #ffda93;outline-offset:3px}#status{min-height:3em}';
@@ -34,6 +36,7 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
   const session=sessions.get(id);
   const valid=!!session&&session.expires>now()&&await owner(session.token);
   if(!valid)sessions.delete(id);
+  else session.expires=now()+TTL;
   return valid;
  };
  const handle=async(req,send)=>{
@@ -68,7 +71,8 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
    const session=sessions.get(id);
    const valid=!!session&&session.expires>now()&&await owner(session.token);
    if(!valid)sessions.delete(id);
-   return json(200,{ownerVerified:valid,readOnly:true});
+   else session.expires=now()+TTL;
+   return json(200,{ownerVerified:valid,readOnly:true},{...(valid?{'Set-Cookie':cookie(id,TTL/1000)}:{})});
   }
   if(path==='/__maintenance/password-recovery')return done(200,RECOVERY_HTML,'text/html; charset=utf-8',{'Content-Security-Policy':csp.replace("script-src 'self'","script-src 'self' https://esm.sh")});
   if(path==='/__maintenance/password-recovery.js')return done(200,readFileSync(new URL('./password-recovery-client.js',import.meta.url)),'text/javascript; charset=utf-8');

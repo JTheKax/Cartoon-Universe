@@ -39,14 +39,14 @@ test('nonowners and unverified claims cannot establish verification cookies',asy
 });
 test('verified owner status uses a separate secure cookie and never unlocks the arcade',async t=>{
  const {base,state,verify}=await fixture(t);const response=await verify('owner-token');assert.equal(response.status,200);
- const cookie=response.headers.get('set-cookie');assert.match(cookie,/^__Host-cu_owner_verify=[0-9a-f]{64}; Path=\/; HttpOnly; SameSite=Lax; Max-Age=300; Secure$/);
+ const cookie=response.headers.get('set-cookie');assert.match(cookie,/^__Host-cu_owner_verify=[0-9a-f]{64}; Path=\/; HttpOnly; SameSite=Lax; Max-Age=1800; Secure$/);
  const headers={Cookie:cookie.split(';')[0]};assert.deepEqual(await (await fetch(base+'/__maintenance/owner-status',{headers})).json(),{ownerVerified:true,readOnly:true});
  assert.equal((await fetch(base+'/owner.html',{headers})).status,503);
  assert.ok(state.calls.every(call=>call.options.method==='GET'));
  state.member=false;assert.equal((await (await fetch(base+'/__maintenance/owner-status',{headers})).json()).ownerVerified,false);
 });
 test('verification expires and clearing signs out only the verification session',async t=>{
- const {base,state,verify}=await fixture(t);let response=await verify('owner-token');let cookie=response.headers.get('set-cookie').split(';')[0];state.time+=300001;
+ const {base,state,verify}=await fixture(t);let response=await verify('owner-token');let cookie=response.headers.get('set-cookie').split(';')[0];state.time+=1800001;
  assert.equal((await (await fetch(base+'/__maintenance/owner-status',{headers:{Cookie:cookie}})).json()).ownerVerified,false);
  response=await verify('owner-token');cookie=response.headers.get('set-cookie').split(';')[0];
  const clear=await fetch(base+'/__maintenance/verify-session',{method:'DELETE',headers:{Origin:origin,Cookie:cookie}});assert.equal(clear.status,200);assert.match(clear.headers.get('set-cookie'),/Max-Age=0; Secure/);
@@ -120,7 +120,7 @@ test('owner arcade session expires and cannot be reused after logout',async t=>{
  const {base,state,verify}=await fixture(t);
  const response=await verify('owner-token');
  const headers={Cookie:response.headers.get('set-cookie').split(';')[0]};
- state.time+=300001;
+ state.time+=1800001;
  assert.equal((await fetch(base+'/__maintenance/arcade/',{headers})).status,503);
  state.time=1000;
  const again=await verify('owner-token');

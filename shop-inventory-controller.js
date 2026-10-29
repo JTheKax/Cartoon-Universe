@@ -1,7 +1,6 @@
 /* Preview-only catalog renderer. No mock inventory, writes, or transactions. */
 (() => {
  let rows = [];
- const notice=document.createElement('p');notice.setAttribute('role','status');notice.textContent='Loading sticker catalog…';count?.after(notice);
  const search = document.getElementById('inventory-search');
  const rarity = document.getElementById('inventory-rarity');
  const set = document.getElementById('inventory-set');
@@ -9,6 +8,7 @@
  const ownership = document.getElementById('inventory-ownership');
  const body = document.getElementById('inventory-table-body');
  const count = document.getElementById('inventory-count');
+ const notice=document.createElement('p');notice.setAttribute('role','status');notice.textContent='Loading sticker catalog…';count.after(notice);
  const textCell = (row, value) => {const cell=document.createElement('td');cell.style.padding='14px';cell.textContent=String(value ?? '—');row.append(cell)};
  const render = () => {
   const q=search.value.trim().toLowerCase();

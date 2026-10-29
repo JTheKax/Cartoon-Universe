@@ -1,7 +1,11 @@
-// Generic DVD drafts have been retired. Remove saved drafts on the owner-dashboard origin.
-// The Dark Side of the Ring episode library uses a different storage key and is preserved.
-try { localStorage.removeItem('cartoon-universe-theater-youtube-drafts-v1'); } catch {}
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
 const form=document.getElementById('owner-youtube-form');
-if(form)form.hidden=true;
-const list=document.getElementById('owner-youtube-drafts');if(list)list.replaceChildren();
-const status=document.getElementById('owner-youtube-status');if(status)status.textContent='Generic DVD drafts have been removed.';
+const status=document.getElementById('owner-youtube-status');
+const list=document.getElementById('owner-youtube-drafts');
+const db=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+function videoId(value){try{const u=new URL(value);if(u.hostname==='youtu.be')return /^[\w-]{11}$/.test(u.pathname.slice(1))?u.pathname.slice(1):null;if(['youtube.com','www.youtube.com','m.youtube.com'].includes(u.hostname)){const id=u.pathname.startsWith('/shorts/')?u.pathname.split('/')[2]:u.searchParams.get('v');return /^[\w-]{11}$/.test(id||'')?id:null;}}catch{}return null;}
+async function refresh(){const {data,error}=await db.from('theater_dvd_library').select('id,title,youtube_id').order('created_at',{ascending:false});if(error){status.textContent='Shared library unavailable until database setup is complete.';return;}list.replaceChildren();for(const item of data||[]){const row=document.createElement('p');row.textContent=item.title+' · ';const remove=document.createElement('button');remove.type='button';remove.textContent='Remove';remove.addEventListener('click',async()=>{if(!confirm('Remove '+item.title+' from the public DVD shelf?'))return;const {error}=await db.from('theater_dvd_library').delete().eq('id',item.id);status.textContent=error?'Could not remove DVD.':'DVD removed.';await refresh();});row.append(remove);list.append(row);}}
+async function init(){if(!form)return;form.hidden=true;const {data:{user}}=await db.auth.getUser();if(!user){status.textContent='Sign in to manage the DVD shelf.';return;}const {data:owner}=await db.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();if(!owner){status.textContent='Owner access required.';return;}form.hidden=false;await refresh();}
+form?.addEventListener('submit',async event=>{event.preventDefault();const title=document.getElementById('owner-youtube-title').value.trim();const id=videoId(document.getElementById('owner-youtube-url').value.trim());if(!title||!id){status.textContent='Enter a title and valid YouTube video URL.';return;}const {error}=await db.from('theater_dvd_library').insert({title,youtube_id:id});if(error){status.textContent='Could not publish DVD: '+error.message;return;}status.textContent='DVD published to public shelf.';form.reset();await refresh();});
+init().catch(()=>{status.textContent='Unable to load DVD manager.';});

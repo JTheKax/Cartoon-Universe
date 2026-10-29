@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {SECTION_KEYS} from '../server/section-maintenance-policy.mjs';
-import {normalizeSectionStatuses} from '../server/section-maintenance-store.mjs';
+import {normalizeSectionStatuses,isCompleteSectionSnapshot} from '../server/section-maintenance-store.mjs';
 
 test('missing or invalid rows keep every section in maintenance',()=>{
  for(const rows of [null,undefined,{},'invalid',[]]){
@@ -32,4 +32,16 @@ test('duplicate rows never open a section regardless of order',()=>{
 });
 test('normalized snapshot cannot be modified',()=>{
  assert.equal(Object.isFrozen(normalizeSectionStatuses([])),true);
+});
+
+test('HTTP snapshot completeness requires every known section exactly once with boolean state',()=>{
+ const complete=SECTION_KEYS.map(section_key=>({section_key,maintenance_enabled:false}));
+ assert.equal(isCompleteSectionSnapshot(complete),true);
+ for(const rows of [
+  null,{},[],complete.slice(1),
+  [...complete,{section_key:'unknown',maintenance_enabled:false}],
+  [...complete.slice(1),complete[1]],
+  complete.map((row,i)=>i===0?{...row,maintenance_enabled:'false'}:row),
+  complete.map((row,i)=>i===0?{...row,section_key:'unknown'}:row)
+ ])assert.equal(isCompleteSectionSnapshot(rows),false);
 });

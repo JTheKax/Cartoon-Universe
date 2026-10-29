@@ -13,7 +13,7 @@ index.html login.html register.html account.html coin-wallet.html owner.html
 styles.css account.css owner.css clean-arcade.css script.js auth.js config.js
 supabase-config.js theme.js logo-preferences.js admin-nav.js home-profile.js
 coin-wallet.js owner.js owner-coin-adjustments.js owner-theater.js maintenance-preview.js maintenance-controls.js maintenance-notice.js
-nav-account-controls.js shop-preview.js shop-collect-controller.js
+nav-account-controls.js retro-game-library.js shop-preview.js shop-collect-controller.js
 shop-inventory-controller.js shop-local-movie.js account-redirect.js sticker-catalog.json
 assets/appearance-catalog.json static/cartoon-carnival.png static/haunted-arcade.gif
 static/theater.html static/theater.js static/theater-dvd-library.js static/dark-side-ring-blue-cover.svg static/yu-gi-oh-gx-cover.jpg
@@ -52,7 +52,7 @@ export function createPublicGateway({config,fetchImpl=fetch,now=Date.now,
   origin:config.origin,supabaseUrl:config.supabaseUrl,
   publishableKey:config.key,fetchImpl,now
  });
- const csp=`default-src 'self'; script-src 'self' https://esm.sh; connect-src 'self' ${PROJECT} wss://gjfyemvcrgrthbrlqqnz.supabase.co; img-src 'self' data: ${PROJECT}; media-src 'self' blob:; frame-src https://www.youtube-nocookie.com; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`;
+ const csp=`default-src 'self'; script-src 'self' https://esm.sh https://cdn.emulatorjs.org 'unsafe-eval'; connect-src 'self' ${PROJECT} https://cdn.emulatorjs.org wss://gjfyemvcrgrthbrlqqnz.supabase.co; img-src 'self' data: blob: ${PROJECT} https://cdn.emulatorjs.org; media-src 'self' blob: ${PROJECT} https://cdn.emulatorjs.org; frame-src https://www.youtube-nocookie.com; style-src 'self' 'unsafe-inline' https://cdn.emulatorjs.org; worker-src 'self' blob: https://cdn.emulatorjs.org; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`;
  async function maintenance(){
   try{
    const response=await fetchImpl(PROJECT+'/rest/v1/site_maintenance?select=enabled,message&id=eq.true',{

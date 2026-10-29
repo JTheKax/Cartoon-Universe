@@ -108,8 +108,8 @@ try{
  check(current.data.maintenance_enabled===chain.data.at(-1).maintenance_enabled,
   'Current section state differs from the last audited state');
  // Force a real audit INSERT failure to verify that the preceding UPDATE rolls back.
- psql(`create function public.test_section_audit_fail() returns trigger language plpgsql as $
- begin raise exception 'isolated audit failure'; end $;
+ psql(`create function public.test_section_audit_fail() returns trigger language plpgsql as $audit_fail$
+ begin raise exception 'isolated audit failure'; end $audit_fail$;
  create trigger test_section_audit_fail before insert on public.section_maintenance_audit
  for each row execute function public.test_section_audit_fail();`);
  const rollback=await ownerClient.rpc('set_section_maintenance',{

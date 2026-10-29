@@ -34,7 +34,7 @@ try{
  cli(['migration','new','local_maintenance_integration']);
  const migration=(await readdir(join(directory,'supabase/migrations'))).find(name=>name.endsWith('_local_maintenance_integration.sql'));
  check(migration,'CLI did not generate the local migration');
- const sources=['supabase/schema.sql','sql/tests/local_supabase_maintenance_fixture.sql','supabase/maintenance-daily-reward-guard.sql','supabase/maintenance-controls-review.sql'];
+ const sources=['supabase/schema.sql','sql/tests/local_supabase_maintenance_fixture.sql','supabase/maintenance-daily-reward-guard.sql','supabase/maintenance-controls-review.sql','supabase/section-maintenance-review.sql'];
  const sql=(await Promise.all(sources.map(path=>readFile(join(root,path),'utf8')))).map(text=>text.replace(/^(?:begin|commit);\s*$/gm,'')).join('\n');
  await writeFile(join(directory,'supabase/migrations',migration),sql);
  execFileSync('docker',['network','create','-o','com.docker.network.bridge.host_binding_ipv4=127.0.0.1',network],{stdio:'pipe'});networkCreated=true;
@@ -73,6 +73,57 @@ try{
   check(!error,'Local Auth password sign-in failed');
  }
  console.log('Real local Supabase sign-in succeeded for disposable owner and player.');
+
+ // Section maintenance is tested against real disposable Auth, PostgREST, RLS and SQL.
+ const section='movie-theater';
+ const initialSections=await admin.from('section_maintenance').select('section_key,maintenance_enabled');
+ check(!initialSections.error&&initialSections.data.length===10&&initialSections.data.every(row=>row.maintenance_enabled===true),
+  'Review migration did not default all ten sections to maintenance');
+ const rejected=await playerClient.rpc('set_section_maintenance',{p_section:section,p_enabled:false});
+ check(!!rejected.error,'Nonowner could call the section maintenance RPC');
+ const direct=await playerClient.from('section_maintenance').update({maintenance_enabled:false}).eq('section_key',section).select('section_key');
+ check(!!direct.error||direct.data?.length===0,'Nonowner wrote section maintenance directly');
+ const grant=await ownerClient.rpc('set_section_maintenance',{p_section:section,p_enabled:false});
+ check(!grant.error&&grant.data?.saved===true&&grant.data?.audited===true,
+  'Real owner section RPC did not acknowledge an atomic audited write');
+ const afterGrant=await admin.from('section_maintenance').select('maintenance_enabled').eq('section_key',section).single();
+ const firstAudit=await admin.from('section_maintenance_audit').select('id,previous_enabled,maintenance_enabled,owner_id').eq('section_key',section).order('id');
+ check(!afterGrant.error&&afterGrant.data.maintenance_enabled===false
+  &&!firstAudit.error&&firstAudit.data.length===1
+  &&firstAudit.data[0].previous_enabled===true&&firstAudit.data[0].maintenance_enabled===false
+  &&firstAudit.data[0].owner_id===owner.id,
+  'Real owner section write or audit record was incorrect');
+ const simultaneous=await Promise.all([
+  ownerClient.rpc('set_section_maintenance',{p_section:section,p_enabled:true}),
+  ownerClient.rpc('set_section_maintenance',{p_section:section,p_enabled:false})
+ ]);
+ check(simultaneous.every(result=>!result.error&&result.data?.saved===true&&result.data?.audited===true),
+  'Concurrent section maintenance RPC failed');
+ const chain=await admin.from('section_maintenance_audit').select('id,previous_enabled,maintenance_enabled,owner_id').eq('section_key',section).order('id');
+ const current=await admin.from('section_maintenance').select('maintenance_enabled').eq('section_key',section).single();
+ check(!chain.error&&chain.data.length===3&&!current.error,
+  'Concurrent section writes lost an audit record');
+ for(let i=1;i<chain.data.length;i++)check(chain.data[i].previous_enabled===chain.data[i-1].maintenance_enabled,
+  'Concurrent section audit history is not serializable');
+ check(current.data.maintenance_enabled===chain.data.at(-1).maintenance_enabled,
+  'Current section state differs from the last audited state');
+ // Force a real audit INSERT failure to verify that the preceding UPDATE rolls back.
+ psql(`create function public.test_section_audit_fail() returns trigger language plpgsql as $
+ begin raise exception 'isolated audit failure'; end $;
+ create trigger test_section_audit_fail before insert on public.section_maintenance_audit
+ for each row execute function public.test_section_audit_fail();`);
+ const rollback=await ownerClient.rpc('set_section_maintenance',{
+  p_section:section,p_enabled:!current.data.maintenance_enabled
+ });
+ check(!!rollback.error,'Audit failure did not abort the section RPC');
+ const afterRollback=await admin.from('section_maintenance').select('maintenance_enabled').eq('section_key',section).single();
+ const auditAfterRollback=await admin.from('section_maintenance_audit').select('id').eq('section_key',section);
+ check(!afterRollback.error&&afterRollback.data.maintenance_enabled===current.data.maintenance_enabled
+  &&!auditAfterRollback.error&&auditAfterRollback.data.length===3,
+  'Audit failure did not atomically roll back the section status');
+ psql('drop trigger test_section_audit_fail on public.section_maintenance_audit; drop function public.test_section_audit_fail();');
+ console.log('Real local section maintenance: nonowner denial, owner audit, concurrent writes and rollback passed.');
+
  psql('update public.site_maintenance set enabled=true where id=true;');
  const {data:before,error:readError}=await admin.from('coin_wallets').select('balance').eq('user_id',player.id).single();
  check(!readError&&before.balance===100,'Could not read disposable wallet');

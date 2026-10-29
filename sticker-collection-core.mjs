@@ -29,3 +29,24 @@ export function filterStickers(catalog,{rarity='all',album='all',owned='all'}={}
   (album==='all'||s.set.slug===album)&&
   (owned==='all'||(owned==='yes'?s.quantity>0:s.quantity===0)));
 }
+
+/**
+ * Read every page or fail closed. The fetcher returns Supabase-style {data,error}.
+ * A bounded maximum prevents accidental unbounded client downloads; callers must
+ * increase it deliberately when catalogs grow rather than show incomplete totals.
+ */
+export async function collectPagedRows(fetchPage,{pageSize=500,maxPages=40}={}){
+ if(typeof fetchPage!=='function'||!Number.isSafeInteger(pageSize)||pageSize<1||pageSize>1000||
+    !Number.isSafeInteger(maxPages)||maxPages<1||maxPages>200)throw new TypeError('Invalid pagination settings');
+ const rows=[];
+ for(let page=0;page<maxPages;page++){
+  const offset=page*pageSize;
+  const result=await fetchPage(offset,offset+pageSize-1);
+  if(result?.error)throw result.error;
+  if(!Array.isArray(result?.data)||result.data.length>pageSize)
+   throw new Error('Invalid paginated response');
+  rows.push(...result.data);
+  if(result.data.length<pageSize)return rows;
+ }
+ throw new Error('Sticker collection exceeds the safe page limit; increase the reviewed limit before displaying totals.');
+}

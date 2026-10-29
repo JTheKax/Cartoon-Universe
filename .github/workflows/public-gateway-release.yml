@@ -1,0 +1,54 @@
+name: Public gateway release candidate (isolated)
+on:
+  pull_request:
+    branches: [public-maintenance-cutover]
+    paths:
+      - 'server/**'
+      - 'tests/public-launch-gateway.test.mjs'
+      - 'docs/PUBLIC_GATEWAY_CUTOVER_20261028.md'
+      - '.github/workflows/public-gateway-release.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  gateway-security:
+    name: Public and owner gateway (mocked)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate separate entrypoint
+        run: node --check server/public-launch-gateway.mjs
+      - name: Test public, owner, maintenance, auth and path protection
+        run: node --test tests/public-launch-gateway.test.mjs tests/owner-verification.test.mjs tests/production-gateway.test.mjs
+      - name: Assert public redirect directory contains no website assets
+        run: |
+          test -f deploy/public-gateway-cutover/cutover.txt
+          test "$(find deploy/public-gateway-cutover -type f | wc -l)" -eq 1
+          test ! -f deploy/public-gateway-cutover/index.html
+          test ! -f deploy/public-gateway-cutover/owner.html
+      - name: Test website and Coin contracts
+        run: |
+          node scripts/check-site.mjs
+          node --test tests/cartoon-coins.test.mjs tests/release-csp-contract.test.mjs tests/maintenance-cutover.test.mjs
+  simulated-browser:
+    name: Browser regression (simulated accounts)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser test dependencies
+        working-directory: tests/browser
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium and system dependencies
+        working-directory: tests/browser
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Run simulated browser tests
+        working-directory: tests/browser
+        run: npm test

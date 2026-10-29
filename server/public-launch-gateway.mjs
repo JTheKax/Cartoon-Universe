@@ -12,11 +12,11 @@ const ASSETS=new Set(`
 index.html login.html register.html account.html coin-wallet.html owner.html
 styles.css account.css owner.css clean-arcade.css script.js auth.js config.js
 supabase-config.js theme.js logo-preferences.js admin-nav.js home-profile.js
-coin-wallet.js owner.js owner-theater.js maintenance-preview.js maintenance-controls.js maintenance-notice.js
+coin-wallet.js owner.js owner-coin-adjustments.js owner-theater.js maintenance-preview.js maintenance-controls.js maintenance-notice.js
 nav-account-controls.js shop-preview.js shop-collect-controller.js
 shop-inventory-controller.js shop-local-movie.js account-redirect.js sticker-catalog.json
 assets/appearance-catalog.json static/cartoon-carnival.png static/haunted-arcade.gif
-static/theater.html static/theater.js static/dark-side-ring-blue-cover.svg
+static/theater.html static/theater.js static/theater-dvd-library.js static/dark-side-ring-blue-cover.svg
 shop-auctions.html shop-cards-battle.html shop-cards-deck-build.html shop-cards.html
 shop-collect-encyclopedia.html shop-collect-my-collection.html
 shop-collect-my-scene.html shop-collect-wishlist.html shop-collect.html
@@ -28,7 +28,7 @@ shop-my-shop.html shop-packs.html shop-recycler.html shop-shop.html
 shop-watch-anime.html shop-watch-cartoons.html shop-watch-misc.html
 shop-watch-movies.html shop-watch.html
 `.trim().split(/\s+/));
-const OWNER_ONLY=new Set(['owner.html','owner.js','owner-theater.js','owner.css','maintenance-controls.js','maintenance-preview.js']);
+const OWNER_ONLY=new Set(['owner.html','owner.js','owner-coin-adjustments.js','owner-theater.js','owner.css','maintenance-controls.js','maintenance-preview.js']);
 const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8',
  '.css':'text/css; charset=utf-8','.png':'image/png','.gif':'image/gif',
  '.svg':'image/svg+xml','.json':'application/json; charset=utf-8'};

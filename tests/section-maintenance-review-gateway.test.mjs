@@ -121,7 +121,7 @@ test('HTTP route matrix: every registered page and mutation is guarded independe
   }
  }finally{await f.close();}
 });
-test('HTTP route matrix: missing or duplicate section records never open a player route',async()=>{
+test('HTTP route matrix: corrupt section snapshots fail closed even for owners',async()=>{
  const cases=[
   rows().filter(row=>row.section_key!=='movie-theater'),
   [...rows(),{section_key:'movie-theater',maintenance_enabled:false}],
@@ -132,7 +132,9 @@ test('HTTP route matrix: missing or duplicate section records never open a playe
   try{
    assert.equal((await f.request('/shop-watch-movies.html')).status,503);
    assert.equal((await f.request('/api/theater/schedule',{method:'POST'})).status,503);
-   assert.equal((await f.request('/shop-community.html')).status,200);
+   assert.equal((await f.request('/shop-community.html')).status,503);
+   assert.equal((await f.request('/shop-community.html',{headers:{'x-test-owner':'owner-session'}})).status,503);
+   assert.equal((await f.request('/shop-watch-movies.html',{headers:{'x-test-owner':'owner-session'}})).status,503);
   }finally{await f.close();}
  }
 });

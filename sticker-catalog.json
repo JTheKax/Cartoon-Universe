@@ -33,5 +33,22 @@
       "name": "Misc."
     }
   ],
-  "stickers": []
+  "stickers": [
+    {
+      "id": "golden-tiger-claws",
+      "name": "Golden Tiger Claws",
+      "series": "Xiaolin Showdown",
+      "set": "Xiaolin Showdown",
+      "rarity": "Uncommon",
+      "status": "Preview — not for sale"
+    },
+    {
+      "id": "third-arm-sash",
+      "name": "Third Arm Sash",
+      "series": "Xiaolin Showdown",
+      "set": "Xiaolin Showdown",
+      "rarity": "Uncommon",
+      "status": "Preview — not for sale"
+    }
+  ]
 }

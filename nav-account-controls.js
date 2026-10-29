@@ -34,6 +34,26 @@ async function refresh(){
   balanceEl.textContent=!wallet.error&&wallet.data?.balance!=null?Number(wallet.data.balance).toLocaleString():'—';
  }catch{if(id===sequence){ownerBadge.hidden=true;ownerTab.hidden=true;nameEl.textContent='Account unavailable';balanceEl.textContent='—';}}
 }
+// Re-establish the separate gateway owner session from the current signed-in
+// Supabase session when an authenticated owner chooses the Owner tab.
+// The gateway independently validates the bearer token and owner membership.
+ownerTab?.addEventListener('click',async event=>{
+ event.preventDefault();
+ if(ownerTab.hidden)return;
+ ownerTab.setAttribute('aria-busy','true');
+ try{
+  const {data:{session},error}=await client.auth.getSession();
+  if(error||!session?.access_token)throw new Error('Not signed in');
+  const response=await fetch('/__maintenance/verify-session',{
+   method:'POST',credentials:'same-origin',cache:'no-store',redirect:'error',
+   headers:{'Authorization':'Bearer '+session.access_token}
+  });
+  if(!response.ok)throw new Error('Owner verification required');
+  window.location.assign(ownerTab.href);
+ }catch{
+  window.location.assign('/__maintenance/owner-signin');
+ }finally{ownerTab.removeAttribute('aria-busy');}
+});
 client.auth.onAuthStateChange(()=>setTimeout(refresh,0));
 window.addEventListener('pageshow',refresh);
 refresh();

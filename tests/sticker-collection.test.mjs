@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {RARITIES,createStickerView,filterStickers,safeStickerArt} from '../sticker-collection-core.mjs';
+import {RARITIES,createStickerView,filterStickers,safeStickerArt,collectPagedRows} from '../sticker-collection-core.mjs';
 const file=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const sets=[{id:'a',slug:'arcade-originals',title:'Arcade Originals'},{id:'b',slug:'space',title:'Space'}];
 const stickers=[
@@ -41,7 +41,7 @@ test('sticker art is restricted to local image assets',()=>{
 test('player page only reads authenticated inventory and never mutates it',()=>{
  const client=file('sticker-collection.js');
  assert.match(client,/auth\.getUser\(\)/);
- assert.match(client,/from\('player_stickers'\)\.select\('sticker_id,quantity'\)\.eq\('user_id',user\.id\)/);
+ assert.match(client,/from\('player_stickers'\)\.select\('sticker_id,quantity'\)\.eq\('user_id',user\.id\)\.order\('sticker_id'\)\.range\(start,end\)/);
  assert.doesNotMatch(client,/\.rpc\(|\.insert\(|\.update\(|\.upsert\(|\.delete\(/);
  assert.match(client,/\.textContent=/);
 });
@@ -66,4 +66,29 @@ test('SQL proposal keeps inventory private and grants only audited owner awards'
  assert.match(sql,/grant execute on function public\.owner_award_sticker\(uuid,uuid,integer,text\) to authenticated/);
  assert.doesNotMatch(sql,/grant\s+(?:insert|update|delete|all)\s+on\s+public\.player_stickers\s+to\s+authenticated/i);
  assert.doesNotMatch(sql,/grant\s+.+\s+to\s+anon/i);
+});
+
+test('pagination reads every ordered page without silently truncating inventory',async()=>{
+ const all=Array.from({length:1203},(_,i)=>({id:i}));
+ const calls=[];
+ const rows=await collectPagedRows(async(start,end)=>{
+  calls.push([start,end]);
+  return {data:all.slice(start,end+1),error:null};
+ },{pageSize:500,maxPages:5});
+ assert.equal(rows.length,1203);
+ assert.deepEqual(rows,all);
+ assert.deepEqual(calls,[[0,499],[500,999],[1000,1499]]);
+});
+test('pagination fails closed on unsafe limits, invalid pages and server errors',async()=>{
+ await assert.rejects(collectPagedRows(async()=>({data:[1,2],error:null}),{pageSize:2,maxPages:2}),/safe page limit/);
+ await assert.rejects(collectPagedRows(async()=>({data:null,error:null})),/Invalid paginated response/);
+ await assert.rejects(collectPagedRows(async()=>({data:null,error:new Error('RLS denied')})),/RLS denied/);
+ await assert.rejects(collectPagedRows(async()=>({data:[],error:null}),{pageSize:1001}),/Invalid pagination settings/);
+});
+test('collection queries use deterministic ordered ranges and never show partial totals',()=>{
+ const client=file('sticker-collection.js');
+ assert.match(client,/collectPagedRows/);
+ assert.match(client,/\.order\('id'\)\.range\(start,end\)/);
+ assert.match(client,/\.order\('sticker_id'\)\.range\(start,end\)/);
+ assert.doesNotMatch(client,/\.limit\(1000\)/);
 });

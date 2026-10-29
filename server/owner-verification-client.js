@@ -12,6 +12,9 @@ async function getClient(){
 const form=document.getElementById('verify-form'),status=document.getElementById('status'),clear=document.getElementById('clear'),verify=document.getElementById('verify');
 const password=document.getElementById('password');
 let initializing=true,inFlight=false;
+const returnTo=(()=>{const value=new URLSearchParams(location.search).get('next');return value&&value.startsWith('/__maintenance/arcade/')&&!value.startsWith('//')&&!value.includes('\\')?value:null;})();
+function resumeOwnerPage(){if(returnTo)location.replace(returnTo);}
+
 function busy(value){verify.disabled=value||initializing;clear.disabled=value||initializing;}
 function show(verified){if(verified)password.value='';form.hidden=verified;clear.hidden=!verified;document.getElementById('arcade-entry').hidden=!verified;status.textContent=verified?'Owner sign-in verified. Open the arcade and Owner Dashboard.':'Use your existing owner account.';}
 async function refresh(){
@@ -45,7 +48,7 @@ form.addEventListener('submit',async event=>{
   }
   const verified=await fetch('/__maintenance/verify-session',{method:'POST',headers:{Authorization:'Bearer '+session.access_token},credentials:'same-origin',redirect:'error',cache:'no-store'});
   if(!verified.ok)throw new Error('Owner access could not be verified.');
-  signedInThisAttempt=false;clear.hidden=false;await refresh();
+  signedInThisAttempt=false;clear.hidden=false;await refresh();resumeOwnerPage();
  }catch(error){if(signedInThisAttempt&&client)try{await client.auth.signOut({scope:'local'});}catch{}status.textContent=error.message||'Verification unavailable. Try again.';}
  finally{password.value='';inFlight=false;busy(false);}
 });
@@ -69,4 +72,4 @@ clear.addEventListener('click',async()=>{
 });
 async function restoreExistingOwnerSession(){try{const active=await getClient();const {data:{session}}=await active.auth.getSession();if(!session?.access_token)return false;const response=await fetch('/__maintenance/verify-session',{method:'POST',headers:{Authorization:'Bearer '+session.access_token},credentials:'same-origin',redirect:'error',cache:'no-store'});if(!response.ok)return false;await refresh();return true;}catch{return false;}}
 busy(true);
-refresh().then(async()=>{if(!form.hidden){const restored=await restoreExistingOwnerSession();if(restored)status.textContent='Owner access restored from your existing signed-in account.';}}).catch(()=>{status.textContent='Verification status unavailable. Try again shortly.';}).finally(()=>{initializing=false;busy(false);});
+refresh().then(async()=>{if(form.hidden){resumeOwnerPage();}else{const restored=await restoreExistingOwnerSession();if(restored){status.textContent='Owner access restored from your existing signed-in account.';resumeOwnerPage();}}}).catch(()=>{status.textContent='Verification status unavailable. Try again shortly.';}).finally(()=>{initializing=false;busy(false);});

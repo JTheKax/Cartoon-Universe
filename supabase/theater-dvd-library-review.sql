@@ -2,6 +2,7 @@ create table if not exists public.theater_dvd_library (
  id uuid primary key default gen_random_uuid(),
  title text not null,
  youtube_id text not null unique,
+ category text not null default 'movies' check (category in ('cartoons-animes','movies','wrestling')),
  created_at timestamptz not null default now()
 );
 alter table public.theater_dvd_library enable row level security;

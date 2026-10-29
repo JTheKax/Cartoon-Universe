@@ -1,6 +1,6 @@
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
-import {RARITIES,createStickerView,filterStickers,safeStickerArt} from './sticker-collection-core.mjs';
+import {RARITIES,createStickerView,filterStickers,safeStickerArt,collectPagedRows} from './sticker-collection-core.mjs';
 
 const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const status=document.getElementById('sticker-status');
@@ -95,21 +95,17 @@ async function load(){
    .then(({data,error})=>{if(current===revision&&!error&&data)ownerLink.hidden=false;})
    .catch(()=>{});
   const [sets,stickers,inventory]=await Promise.all([
-   client.from('sticker_sets').select('id,slug,title').eq('published',true).order('title').limit(1000),
-   client.from('stickers').select('id,set_id,name,rarity,image_path').eq('published',true).limit(1000),
-   client.from('player_stickers').select('sticker_id,quantity').eq('user_id',user.id).limit(1000)
+   collectPagedRows((start,end)=>client.from('sticker_sets').select('id,slug,title').eq('published',true).order('id').range(start,end)),
+   collectPagedRows((start,end)=>client.from('stickers').select('id,set_id,name,rarity,image_path').eq('published',true).order('id').range(start,end)),
+   collectPagedRows((start,end)=>client.from('player_stickers').select('sticker_id,quantity').eq('user_id',user.id).order('sticker_id').range(start,end))
   ]);
   if(current!==revision)return;
-  if(sets.error||stickers.error||inventory.error){
-   setMessage('Sticker collecting is not enabled yet. The database review must be completed before real inventory appears.','error');return;
-  }
-  model=createStickerView(sets.data||[],stickers.data||[],inventory.data||[]);
+  model=createStickerView(sets,stickers,inventory);
   render();app.hidden=false;
   setMessage('Showing your account’s read-only sticker collection. No changes can be made here.');
-  if((sets.data||[]).length===1000||(stickers.data||[]).length===1000||(inventory.data||[]).length===1000)
-   setMessage('Showing up to 1,000 records per section. Pagination will be added before launch.','error');
+
  }catch{
-  if(current===revision)setMessage('Unable to load stickers. Check your connection and try again.','error');
+  if(current===revision)setMessage('Unable to load the complete sticker collection. The database may be unavailable or the safe pagination limit was reached. No partial totals are shown.','error');
  }
 }
 for(const control of [albumFilter,rarityFilter,ownedFilter])control?.addEventListener('change',renderStickers);

@@ -1,0 +1,10 @@
+/* Electric-blue perspective grid: isolated appearance preview. */
+:root{--bg:#030b16;--panel:#071a2c;--cyan:#28cfff}
+html{background:#030b16}
+body{background-color:#030b16!important;background-image:radial-gradient(ellipse at 50% 75%,rgba(0,110,205,.16),transparent 60%),linear-gradient(180deg,#020712 0%,#051326 100%)!important;background-attachment:fixed!important;min-height:100vh;position:relative}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.42;background:linear-gradient(transparent 0 48%,rgba(21,171,255,.15) 49%,rgba(0,185,255,.4) 50%,transparent 51%),linear-gradient(90deg,transparent 0 48%,rgba(21,171,255,.15) 49%,rgba(0,185,255,.4) 50%,transparent 51%);background-size:76px 76px;transform:perspective(400px) rotateX(56deg) scale(2.5);transform-origin:center bottom;mask-image:linear-gradient(to bottom,transparent 8%,black 85%);-webkit-mask-image:linear-gradient(to bottom,transparent 8%,black 85%)}
+body>*{position:relative;z-index:1}
+body .header{background:rgba(2,12,27,.96)}
+body .section,body .hero,body .dashboard-home{background-color:transparent}
+body .card,body .dashboard-feature,body .dashboard-tile{backdrop-filter:blur(8px)}
+@media(prefers-reduced-motion:reduce){body::before{transform:none;opacity:.16;background-size:76px 76px}}

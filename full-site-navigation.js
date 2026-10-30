@@ -42,7 +42,27 @@
       }
       details.append(panel); fragment.append(details);
     }
-    if (owner) fragment.append(owner);
+    if (owner) {
+      const admin = document.createElement("details");
+      admin.className = "compact-admin";
+      admin.id = "nav-owner-group";
+      admin.hidden = true;
+      const label = document.createElement("summary");
+      label.textContent = "ADMIN ⌄";
+      const panel = document.createElement("div");
+      panel.className = "compact-options";
+      for (const [name, href] of [["Dashboard","owner.html"],["Advertisements","coming-soon.html?feature=advertisements"],["Logos","owner.html"],["Themes","owner.html"],["Maintenance","owner.html"],["Coin Management","owner.html"],["Theater Management","owner.html"]]) {
+        const link = document.createElement("a");
+        link.href = href;
+        link.textContent = name;
+        panel.append(link);
+      }
+      admin.append(label,panel);
+      owner.hidden = true;
+      owner.addEventListener("owner-navigation-state", () => { admin.hidden = owner.hidden; });
+      new MutationObserver(() => { admin.hidden = owner.hidden; }).observe(owner,{attributes:true,attributeFilter:["hidden"]});
+      fragment.append(admin,owner);
+    }
     nav.replaceChildren(fragment);
   }
   // Run before defer/module account and owner scripts when possible.

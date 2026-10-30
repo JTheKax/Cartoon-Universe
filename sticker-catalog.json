@@ -2,35 +2,51 @@
   "series": [
     {
       "id": "disney",
-      "name": "Disney"
+      "name": "Disney",
+      "logo": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Disney_wordmark.svg",
+      "logoStatus": "external reference — verify rights and availability"
     },
     {
       "id": "dragon-ball-z",
-      "name": "Dragon Ball Z"
+      "name": "Dragon Ball Z",
+      "logo": null,
+      "logoStatus": "custom series title treatment"
     },
     {
       "id": "family-guy",
-      "name": "Family Guy"
+      "name": "Family Guy",
+      "logo": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Family_Guy_Logo.svg",
+      "logoStatus": "external reference — verify rights and availability"
     },
     {
       "id": "futurama",
-      "name": "Futurama"
+      "name": "Futurama",
+      "logo": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Futurama_1999_logo.svg",
+      "logoStatus": "external reference — verify rights and availability"
     },
     {
       "id": "spongebob-squarepants",
-      "name": "SpongeBob SquarePants"
+      "name": "SpongeBob SquarePants",
+      "logo": "https://commons.wikimedia.org/wiki/Special:Redirect/file/SpongeBob_SquarePants_logo.png",
+      "logoStatus": "external reference — verify rights and availability"
     },
     {
       "id": "the-simpsons",
-      "name": "The Simpsons"
+      "name": "The Simpsons",
+      "logo": "https://commons.wikimedia.org/wiki/Special:Redirect/file/The_Simpsons_Logo.svg",
+      "logoStatus": "external reference — verify rights and availability"
     },
     {
       "id": "xiaolin-showdown",
-      "name": "Xiaolin Showdown"
+      "name": "Xiaolin Showdown",
+      "logo": "https://ih1.redbubble.net/image.884057104.5191/st%2Csmall%2C507x507-pad%2C600x600%2Cf8f8f8.jpg",
+      "logoStatus": "external reference — verify rights and availability"
     },
     {
       "id": "misc",
-      "name": "Misc."
+      "name": "Misc.",
+      "logo": null,
+      "logoStatus": "custom series title treatment"
     }
   ],
   "stickers": [

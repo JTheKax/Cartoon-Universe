@@ -89,8 +89,8 @@ begin
  if (select maintenance_enabled from public.section_maintenance where section_key='radio') is distinct from false then
   raise exception 'Owner update did not persist';
  end if;
- if not exists (select 1 from jsonb_array_elements(public.get_maintenance_snapshot()->'sectionRows') row
-   where row->>'section_key'='radio' and row->>'maintenance_enabled'='false') then
+ if not exists (select 1 from jsonb_array_elements(public.get_maintenance_snapshot()->'sectionRows') as entry
+   where entry->>'section_key'='radio' and entry->>'maintenance_enabled'='false') then
   raise exception 'Snapshot did not reflect the audited owner change';
  end if;
  if (select count(*) from public.section_maintenance_audit where section_key='radio'

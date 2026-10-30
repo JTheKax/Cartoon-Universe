@@ -43,6 +43,12 @@
           "name": "Samurai Jack",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "xiaolin-showdown",
+          "name": "Xiaolin Showdown",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

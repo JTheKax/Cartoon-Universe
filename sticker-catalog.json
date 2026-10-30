@@ -109,6 +109,12 @@
           "name": "South Park",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "adventure-time",
+          "name": "Adventure Time",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

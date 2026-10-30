@@ -21,7 +21,7 @@
     const img=document.createElement('img');img.src=group.logo;img.alt=group.name+' series logo';img.loading='lazy';img.referrerPolicy='no-referrer';
     img.addEventListener('error',()=>{img.remove();if(!art.textContent.trim())art.textContent=group.name;});
     art.replaceChildren(img);
-   }else if(!art.textContent.trim()){art.textContent=group.name;}
+   }else{art.replaceChildren(document.createTextNode(group.name));}
   }
  }
  function render(){

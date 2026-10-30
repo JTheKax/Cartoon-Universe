@@ -37,6 +37,12 @@
           "name": "The Powerpuff Girls",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "samurai-jack",
+          "name": "Samurai Jack",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

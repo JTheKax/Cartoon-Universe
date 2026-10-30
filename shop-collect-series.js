@@ -26,13 +26,17 @@
   'dexters-laboratory':'Dexter-logo.png',
   'courage-the-cowardly-dog':'Courage The Cowardly Dog logo.png'
  };
+ const fandomLogos={
+  'camp-lazlo':'https://fusionfall.fandom.com/wiki/Special:Redirect/file/Camp_Lazlo.png',
+  'class-of-3000':'https://fusionfall.fandom.com/wiki/Special:Redirect/file/Class_of_3000.png'
+ };
  const logoImage=(sub,logo)=>{
   const img=document.createElement('img');img.className='official-series-logo';img.alt=sub.name+' television series logo';img.loading='lazy';img.referrerPolicy='no-referrer';
   img.onerror=()=>{img.remove();logo.classList.remove('has-official-logo')};
   img.src='https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(verifiedLogos[sub.id]);
   logo.classList.add('has-official-logo');logo.prepend(img)
  };
- const makeLogo=(sub)=>{const [symbol,accent,bg]=logoThemes[sub.id]||['✦','#a8e9ff','#34486b'];const logo=document.createElement('div');logo.className='subseries-logo';logo.style.setProperty('--logo-accent',accent);logo.style.setProperty('--logo-bg',bg);logo.setAttribute('role','img');logo.setAttribute('aria-label',sub.name+' custom Ctoon collection logo');const mark=document.createElement('span');mark.className='subseries-logo-symbol';mark.setAttribute('aria-hidden','true');mark.textContent=symbol;const name=document.createElement('strong');name.className='subseries-logo-name';name.textContent=sub.name;logo.append(mark,name);if(verifiedLogos[sub.id]){logoImage(sub,logo)}else{
+ const makeLogo=(sub)=>{const [symbol,accent,bg]=logoThemes[sub.id]||['✦','#a8e9ff','#34486b'];const logo=document.createElement('div');logo.className='subseries-logo';logo.style.setProperty('--logo-accent',accent);logo.style.setProperty('--logo-bg',bg);logo.setAttribute('role','img');logo.setAttribute('aria-label',sub.name+' custom Ctoon collection logo');const mark=document.createElement('span');mark.className='subseries-logo-symbol';mark.setAttribute('aria-hidden','true');mark.textContent=symbol;const name=document.createElement('strong');name.className='subseries-logo-name';name.textContent=sub.name;logo.append(mark,name);if(fandomLogos[sub.id]){const img=document.createElement('img');img.className='official-series-logo';img.alt=sub.name+' original show logo';img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{img.remove();logo.classList.remove('has-official-logo')};img.src=fandomLogos[sub.id];logo.classList.add('has-official-logo');logo.prepend(img)}else if(verifiedLogos[sub.id]){logoImage(sub,logo)}else{
    const search='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent('intitle:'+sub.name+' logo')+'&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url&iiurlwidth=520&format=json&origin=*';
    fetch(search).then(r=>r.json()).then(data=>{
     const pages=Object.values(data.query?.pages||{});

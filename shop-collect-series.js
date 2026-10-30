@@ -37,32 +37,40 @@
   'courage-the-cowardly-dog':'Courage The Cowardly Dog logo.png'
  };
  const addLogoImage=(logo,sub,url)=>{
-  if(!url||logo.querySelector('img'))return;
-  const img=document.createElement('img');img.className='official-series-logo';img.alt=sub.name+' television series logo';img.loading='lazy';img.referrerPolicy='no-referrer';
-  img.onload=()=>{logo.classList.add('has-official-logo');logo.setAttribute('aria-label',sub.name+' television series logo')};
-  img.onerror=()=>{img.remove();logo.classList.remove('has-official-logo')};
-  img.src=url;logo.prepend(img)
+  if(!url||logo.dataset.logoLoaded==='true')return Promise.resolve(false);
+  return new Promise(resolve=>{
+   const img=new Image();img.className='official-series-logo';img.alt=sub.name+' television series logo';img.loading='eager';img.referrerPolicy='no-referrer';
+   img.onload=()=>{
+    if(logo.dataset.logoLoaded==='true'){resolve(false);return}
+    logo.dataset.logoLoaded='true';logo.classList.add('has-official-logo');logo.setAttribute('aria-label',sub.name+' television series logo');logo.prepend(img);resolve(true)
+   };
+   img.onerror=()=>resolve(false);
+   img.src=url;
+  })
  };
  const findCommonsLogo=async(sub,logo)=>{
   const names=logoAliases[sub.id]||[sub.name];
   const normalize=x=>x.toLowerCase().replace(/[^a-z0-9]/g,'');
+  const seen=new Set();
   for(const name of names){
-   for(const query of ['intitle:"'+name+'" logo','"'+name+'" logo']){
+   const queries=['intitle:"'+name+'" logo','"'+name+'" logo',name+' title logo'];
+   for(const query of queries){
     try{
-     const url='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(query)+'&gsrnamespace=6&gsrlimit=30&prop=imageinfo&iiprop=url&iiurlwidth=520&format=json&origin=*';
+     const url='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(query)+'&gsrnamespace=6&gsrlimit=40&prop=imageinfo&iiprop=url&iiurlwidth=520&format=json&origin=*';
      const response=await fetch(url);if(!response.ok)continue;
      const data=await response.json();
      const target=normalize(name);
      const candidates=Object.values(data.query?.pages||{}).filter(p=>{
-      const filename=p.title.replace(/^File:/i,'').replace(/\.(svg|png|jpg|jpeg|webp)$/i,'');
+      const filename=p.title.replace(/^File:/i,'').replace(/\\.(svg|png|jpg|jpeg|webp)$/i,'');
       const normalized=normalize(filename);
-      return normalized.includes(target)&&normalized.includes('logo')&&p.imageinfo?.[0]?.thumburl;
-     });
-     if(candidates.length){
-      candidates.sort((a,b)=>a.title.length-b.title.length);
-      addLogoImage(logo,sub,candidates[0].imageinfo[0].thumburl);return
+      return normalized.includes(target)&&(/logo|titlecard|wordmark/i.test(normalized))&&p.imageinfo?.[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url);
+     }).sort((a,b)=>a.title.length-b.title.length);
+     for(const candidate of candidates){
+      const imageUrl=candidate.imageinfo[0].thumburl||candidate.imageinfo[0].url;
+      if(seen.has(imageUrl))continue;seen.add(imageUrl);
+      if(await addLogoImage(logo,sub,imageUrl))return
      }
-    }catch(e){/* retain readable title fallback */}
+    }catch(e){/* leave styled show title visible */}
    }
   }
  };
@@ -74,8 +82,8 @@
   const mark=document.createElement('span');mark.className='subseries-logo-symbol';mark.setAttribute('aria-hidden','true');mark.textContent=symbol;
   const name=document.createElement('strong');name.className='subseries-logo-name';name.textContent=sub.name;
   logo.append(mark,name);
-  if(typeof sub.logoUrl==='string' && /^https:\/\//.test(sub.logoUrl))addLogoImage(logo,sub,sub.logoUrl);
-  else if(directFiles[sub.id])addLogoImage(logo,sub,'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(directFiles[sub.id]));
+  if(typeof sub.logoUrl==='string' && /^https:\/\//.test(sub.logoUrl))void addLogoImage(logo,sub,sub.logoUrl).then(ok=>{if(!ok)void findCommonsLogo(sub,logo)});
+  else if(directFiles[sub.id])void addLogoImage(logo,sub,'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(directFiles[sub.id])).then(ok=>{if(!ok)void findCommonsLogo(sub,logo)});
   else void findCommonsLogo(sub,logo);
   return logo
  };

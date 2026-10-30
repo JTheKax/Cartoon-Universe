@@ -1,0 +1,28 @@
+name: Review five-category Ctoon catalog
+on:
+  pull_request:
+    branches:
+      - review/full-site-integration-20261030
+    paths:
+      - 'deploy/public-gateway-cutover/sets-overview.*'
+      - 'deploy/public-gateway-cutover/my-collection.*'
+      - 'tests/public-ctoon-categories.test.mjs'
+      - '.github/workflows/review-ctoon-catalog.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check public catalog script syntax
+        run: |
+          node --check deploy/public-gateway-cutover/sets-overview.js
+          node --check deploy/public-gateway-cutover/my-collection.js
+      - name: Test category parity, clickable links and preview safety
+        run: node --test tests/public-ctoon-categories.test.mjs

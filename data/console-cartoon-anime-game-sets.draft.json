@@ -27,12 +27,30 @@
   "notes": "Draft preview catalog, not a complete release database. Entries are examples of console or handheld releases; artwork, ownership, and canonical Sets Overview integration remain pending.",
   "sets": [
     {
+      "series": "Ace Attorney",
+      "category": "original",
+      "games": [
+        "Phoenix Wright: Ace Attorney",
+        "Apollo Justice: Ace Attorney",
+        "The Great Ace Attorney Chronicles"
+      ]
+    },
+    {
       "series": "Animal Crossing",
       "category": "original",
       "games": [
         "Animal Crossing",
         "Animal Crossing: New Leaf",
         "Animal Crossing: New Horizons"
+      ]
+    },
+    {
+      "series": "Assassin's Creed",
+      "category": "original",
+      "games": [
+        "Assassin's Creed II",
+        "Assassin's Creed IV: Black Flag",
+        "Assassin's Creed Origins"
       ]
     },
     {
@@ -63,6 +81,15 @@
       ]
     },
     {
+      "series": "Borderlands",
+      "category": "original",
+      "games": [
+        "Borderlands",
+        "Borderlands 2",
+        "Borderlands 3"
+      ]
+    },
+    {
       "series": "Castlevania",
       "category": "original",
       "games": [
@@ -78,6 +105,24 @@
         "Crash Bandicoot",
         "Crash Bandicoot 2: Cortex Strikes Back",
         "Crash Bandicoot 3: Warped"
+      ]
+    },
+    {
+      "series": "Dark Souls",
+      "category": "original",
+      "games": [
+        "Dark Souls",
+        "Dark Souls II",
+        "Dark Souls III"
+      ]
+    },
+    {
+      "series": "Dead Space",
+      "category": "original",
+      "games": [
+        "Dead Space",
+        "Dead Space 2",
+        "Dead Space 3"
       ]
     },
     {
@@ -99,11 +144,29 @@
       ]
     },
     {
+      "series": "Dragon Quest",
+      "category": "original",
+      "games": [
+        "Dragon Quest III",
+        "Dragon Quest VIII: Journey of the Cursed King",
+        "Dragon Quest XI: Echoes of an Elusive Age"
+      ]
+    },
+    {
       "series": "EarthBound / Mother",
       "category": "original",
       "games": [
         "EarthBound",
         "Mother 3"
+      ]
+    },
+    {
+      "series": "F-Zero",
+      "category": "original",
+      "games": [
+        "F-Zero",
+        "F-Zero X",
+        "F-Zero GX"
       ]
     },
     {
@@ -125,6 +188,15 @@
       ]
     },
     {
+      "series": "Gears of War",
+      "category": "original",
+      "games": [
+        "Gears of War",
+        "Gears of War 2",
+        "Gears 5"
+      ]
+    },
+    {
       "series": "God of War",
       "category": "original",
       "games": [
@@ -143,6 +215,15 @@
       ]
     },
     {
+      "series": "Gran Turismo",
+      "category": "original",
+      "games": [
+        "Gran Turismo",
+        "Gran Turismo 4",
+        "Gran Turismo 7"
+      ]
+    },
+    {
       "series": "Halo",
       "category": "original",
       "games": [
@@ -152,12 +233,30 @@
       ]
     },
     {
+      "series": "Harvest Moon",
+      "category": "original",
+      "games": [
+        "Harvest Moon: Back to Nature",
+        "Harvest Moon: Friends of Mineral Town",
+        "Harvest Moon: A Wonderful Life"
+      ]
+    },
+    {
       "series": "Jak and Daxter",
       "category": "original",
       "games": [
         "Jak and Daxter: The Precursor Legacy",
         "Jak II",
         "Jak 3"
+      ]
+    },
+    {
+      "series": "Kid Icarus",
+      "category": "original",
+      "games": [
+        "Kid Icarus",
+        "Kid Icarus: Of Myths and Monsters",
+        "Kid Icarus: Uprising"
       ]
     },
     {
@@ -176,6 +275,15 @@
         "Kirby's Dream Land",
         "Kirby Super Star",
         "Kirby and the Forgotten Land"
+      ]
+    },
+    {
+      "series": "Klonoa",
+      "category": "original",
+      "games": [
+        "Klonoa: Door to Phantomile",
+        "Klonoa 2: Lunatea's Veil",
+        "Klonoa: Empire of Dreams"
       ]
     },
     {
@@ -206,12 +314,29 @@
       ]
     },
     {
+      "series": "Monster Hunter",
+      "category": "original",
+      "games": [
+        "Monster Hunter",
+        "Monster Hunter Freedom Unite",
+        "Monster Hunter Rise"
+      ]
+    },
+    {
       "series": "Mortal Kombat",
       "category": "original",
       "games": [
         "Mortal Kombat II",
         "Mortal Kombat 9",
         "Mortal Kombat 11"
+      ]
+    },
+    {
+      "series": "Ni no Kuni",
+      "category": "original",
+      "games": [
+        "Ni no Kuni: Wrath of the White Witch",
+        "Ni no Kuni II: Revenant Kingdom"
       ]
     },
     {
@@ -233,6 +358,24 @@
       ]
     },
     {
+      "series": "Pikmin",
+      "category": "original",
+      "games": [
+        "Pikmin",
+        "Pikmin 2",
+        "Pikmin 4"
+      ]
+    },
+    {
+      "series": "Prince of Persia",
+      "category": "original",
+      "games": [
+        "Prince of Persia: The Sands of Time",
+        "Prince of Persia: Warrior Within",
+        "Prince of Persia: The Lost Crown"
+      ]
+    },
+    {
       "series": "Ratchet & Clank",
       "category": "original",
       "games": [
@@ -242,12 +385,30 @@
       ]
     },
     {
+      "series": "Rayman",
+      "category": "original",
+      "games": [
+        "Rayman",
+        "Rayman 2: The Great Escape",
+        "Rayman Legends"
+      ]
+    },
+    {
       "series": "Resident Evil",
       "category": "original",
       "games": [
         "Resident Evil",
         "Resident Evil 2",
         "Resident Evil 4"
+      ]
+    },
+    {
+      "series": "Shin Megami Tensei",
+      "category": "original",
+      "games": [
+        "Shin Megami Tensei III: Nocturne",
+        "Shin Megami Tensei IV",
+        "Shin Megami Tensei V"
       ]
     },
     {
@@ -266,6 +427,15 @@
         "Sonic the Hedgehog",
         "Sonic Adventure 2",
         "Sonic Generations"
+      ]
+    },
+    {
+      "series": "Soulcalibur",
+      "category": "original",
+      "games": [
+        "Soulcalibur",
+        "Soulcalibur II",
+        "Soulcalibur VI"
       ]
     },
     {
@@ -311,6 +481,51 @@
         "Tekken 3",
         "Tekken 5",
         "Tekken 8"
+      ]
+    },
+    {
+      "series": "Tomb Raider",
+      "category": "original",
+      "games": [
+        "Tomb Raider",
+        "Tomb Raider: Legend",
+        "Rise of the Tomb Raider"
+      ]
+    },
+    {
+      "series": "Tony Hawk's Pro Skater",
+      "category": "original",
+      "games": [
+        "Tony Hawk's Pro Skater",
+        "Tony Hawk's Pro Skater 2",
+        "Tony Hawk's Underground"
+      ]
+    },
+    {
+      "series": "WarioWare",
+      "category": "original",
+      "games": [
+        "WarioWare, Inc.: Mega Microgame$!",
+        "WarioWare: Touched!",
+        "WarioWare: Get It Together!"
+      ]
+    },
+    {
+      "series": "Xenoblade Chronicles",
+      "category": "original",
+      "games": [
+        "Xenoblade Chronicles",
+        "Xenoblade Chronicles 2",
+        "Xenoblade Chronicles 3"
+      ]
+    },
+    {
+      "series": "Yakuza / Like a Dragon",
+      "category": "original",
+      "games": [
+        "Yakuza 0",
+        "Yakuza: Like a Dragon",
+        "Like a Dragon: Infinite Wealth"
       ]
     },
     {

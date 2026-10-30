@@ -127,6 +127,12 @@
           "name": "¡Mucha Lucha!",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "ben-10",
+          "name": "Ben 10",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

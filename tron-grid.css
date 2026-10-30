@@ -1,0 +1,69 @@
+/* Electric-blue perspective grid: isolated appearance preview. */
+:root{--bg:#030b16;--panel:#071a2c;--cyan:#28cfff}
+html{background:#030b16}
+body{background-color:#030b16!important;background-image:radial-gradient(ellipse at 50% 75%,rgba(0,110,205,.16),transparent 60%),linear-gradient(180deg,#020712 0%,#051326 100%)!important;background-attachment:fixed!important;min-height:100vh;position:relative}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.42;background:linear-gradient(transparent 0 48%,rgba(21,171,255,.15) 49%,rgba(0,185,255,.4) 50%,transparent 51%),linear-gradient(90deg,transparent 0 48%,rgba(21,171,255,.15) 49%,rgba(0,185,255,.4) 50%,transparent 51%);background-size:76px 76px;transform:perspective(400px) rotateX(56deg) scale(2.5);transform-origin:center bottom;mask-image:linear-gradient(to bottom,transparent 8%,black 85%);-webkit-mask-image:linear-gradient(to bottom,transparent 8%,black 85%)}
+body>*{position:relative;z-index:1}
+body .header{background:rgba(2,12,27,.96)}
+body .section,body .hero,body .dashboard-home{background-color:transparent}
+body .card,body .dashboard-feature,body .dashboard-tile{backdrop-filter:blur(8px)}
+@media(prefers-reduced-motion:reduce){body::before{transform:none;opacity:.16;background-size:76px 76px}}
+
+/* Matching TRON navigation tabs and dropdowns */
+.header nav a,.header nav .nav-trigger,.header .nav-group>a,
+nav a,nav .nav-trigger{
+  display:inline-flex;align-items:center;justify-content:center;gap:.35rem;
+  color:#d8f5ff;background:linear-gradient(180deg,rgba(9,44,73,.94),rgba(2,15,31,.96));
+  border:1px solid #168bd0;border-radius:7px;padding:10px 15px;
+  box-shadow:inset 0 1px 0 #61dcff33,0 0 10px #008fff33;
+  text-shadow:0 0 7px #00baff55;transition:background-color .2s,border-color .2s,box-shadow .2s,color .2s;
+  font-weight:800;cursor:pointer;
+}
+.header nav a:hover,.header nav .nav-trigger:hover,
+.header nav a:focus-visible,.header nav .nav-trigger:focus-visible,
+nav a:hover,nav .nav-trigger:hover,nav a:focus-visible,nav .nav-trigger:focus-visible{
+  color:#fff;border-color:#69e7ff;background:#07365b;
+  box-shadow:0 0 16px #00aeff88,inset 0 0 12px #00aeff33;outline-offset:3px;
+}
+.header nav a[aria-current="page"],.header nav .nav-trigger[aria-expanded="true"],
+nav a[aria-current="page"],nav .nav-trigger[aria-expanded="true"]{
+  color:#fff;border-color:#83efff;background:#095184;box-shadow:0 0 18px #00aeffaa;
+}
+.header nav .nav-dropdown,.nav-dropdown{
+  background:#041626f5;border:1px solid #168bd0;border-radius:9px;
+  box-shadow:0 12px 30px #000a,0 0 14px #008fff44;padding:8px;
+}
+.header nav .nav-dropdown a,.nav-dropdown a{display:flex;width:100%;margin:3px 0;box-shadow:none}
+@media(max-width:700px){.header nav a,.header nav .nav-trigger,nav a,nav .nav-trigger{min-height:44px;padding:10px 12px}}
+@media(prefers-reduced-motion:reduce){.header nav a,.header nav .nav-trigger,nav a,nav .nav-trigger{transition:none}}
+
+/* Subtle animated circuitry for TRON navigation. */
+@keyframes tron-tab-pulse{
+  0%,100%{box-shadow:inset 0 1px 0 #61dcff33,0 0 6px #008fff44;border-color:#168bd0}
+  50%{box-shadow:inset 0 1px 0 #61dcff55,0 0 15px #00aeff88;border-color:#40cfff}
+}
+@keyframes tron-tab-scan{
+  from{transform:translateX(-110%)}
+  to{transform:translateX(110%)}
+}
+.header nav a,.header nav .nav-trigger,nav a,nav .nav-trigger{
+  position:relative;overflow:hidden;animation:tron-tab-pulse 3.5s ease-in-out infinite;
+}
+.header nav a::after,.header nav .nav-trigger::after,nav a::after,nav .nav-trigger::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 35%,#76eaff22 50%,transparent 65%);
+  transform:translateX(-110%);transition:transform .5s ease;
+}
+.header nav a:hover::after,.header nav .nav-trigger:hover::after,
+.header nav a:focus-visible::after,.header nav .nav-trigger:focus-visible::after,
+nav a:hover::after,nav .nav-trigger:hover::after,
+nav a:focus-visible::after,nav .nav-trigger:focus-visible::after{
+  transform:translateX(110%);
+}
+.header nav a:hover,.header nav .nav-trigger:hover,nav a:hover,nav .nav-trigger:hover{
+  animation-duration:1.5s;
+}
+@media(prefers-reduced-motion:reduce){
+  .header nav a,.header nav .nav-trigger,nav a,nav .nav-trigger{animation:none}
+  .header nav a::after,.header nav .nav-trigger::after,nav a::after,nav .nav-trigger::after{display:none}
+}

@@ -149,7 +149,8 @@
           "id": "jackie-chan-adventures",
           "name": "Jackie Chan Adventures",
           "status": "Coming Soon",
-          "ctoonCount": 0
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/jackie-chan-adventures.jpg"
         },
         {
           "id": "teen-titans",

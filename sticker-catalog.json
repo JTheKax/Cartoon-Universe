@@ -251,6 +251,12 @@
           "name": "Lupin the Third",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "fullmetal-alchemist",
+          "name": "Fullmetal Alchemist",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

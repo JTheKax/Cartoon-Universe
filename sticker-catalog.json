@@ -85,7 +85,8 @@
           "id": "class-of-3000",
           "name": "Class of 3000",
           "status": "Coming Soon",
-          "ctoonCount": 0
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/class-of-3000.jpg"
         },
         {
           "id": "courage-the-cowardly-dog",
@@ -127,7 +128,8 @@
           "id": "mucha-lucha",
           "name": "¡Mucha Lucha!",
           "status": "Coming Soon",
-          "ctoonCount": 0
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/mucha-lucha.png"
         },
         {
           "id": "ben-10",

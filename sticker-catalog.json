@@ -98,7 +98,8 @@
           "id": "codename-kids-next-door",
           "name": "Codename: Kids Next Door",
           "status": "Coming Soon",
-          "ctoonCount": 0
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/codename-kids-next-door.png"
         },
         {
           "id": "family-guy",

@@ -269,6 +269,15 @@
       ]
     },
     {
+      "series": "Kingdom Hearts",
+      "category": "original",
+      "games": [
+        "Kingdom Hearts",
+        "Kingdom Hearts II",
+        "Kingdom Hearts III"
+      ]
+    },
+    {
       "series": "Kirby",
       "category": "original",
       "games": [
@@ -466,6 +475,15 @@
       ]
     },
     {
+      "series": "Super Mario",
+      "category": "original",
+      "games": [
+        "Super Mario Bros.",
+        "Super Mario World",
+        "Super Mario Odyssey"
+      ]
+    },
+    {
       "series": "Super Smash Bros.",
       "category": "original",
       "games": [
@@ -481,6 +499,15 @@
         "Tekken 3",
         "Tekken 5",
         "Tekken 8"
+      ]
+    },
+    {
+      "series": "The Legend of Zelda",
+      "category": "original",
+      "games": [
+        "The Legend of Zelda: Ocarina of Time",
+        "The Legend of Zelda: Breath of the Wild",
+        "The Legend of Zelda: Tears of the Kingdom"
       ]
     },
     {

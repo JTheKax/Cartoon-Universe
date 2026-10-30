@@ -67,3 +67,45 @@ nav a:focus-visible::after,nav .nav-trigger:focus-visible::after{
   .header nav a,.header nav .nav-trigger,nav a,nav .nav-trigger{animation:none}
   .header nav a::after,.header nav .nav-trigger::after,nav a::after,nav .nav-trigger::after{display:none}
 }
+
+/* Public gateway's compact dropdown links need the same visible neon tab boxes. */
+.compact-arcade-nav .compact-options,
+.compact-arcade-nav .compact-options a,
+.compact-arcade-nav .compact-options button,
+.compact-arcade-nav .compact-options [role="menuitem"]{
+  box-sizing:border-box;
+}
+.compact-arcade-nav .compact-options{
+  background:rgba(3,15,33,.98)!important;
+  border:1px solid #22bfff!important;
+  box-shadow:0 12px 30px #000b,0 0 18px #008fff55!important;
+  padding:9px!important;
+  gap:8px!important;
+}
+.compact-arcade-nav .compact-options a,
+.compact-arcade-nav .compact-options button,
+.compact-arcade-nav .compact-options [role="menuitem"]{
+  display:block!important;
+  width:100%;
+  color:#e0f7ff!important;
+  background:linear-gradient(180deg,#103e65,#071c36)!important;
+  border:1px solid #24b9fa!important;
+  border-radius:8px!important;
+  padding:11px 14px!important;
+  text-align:left;
+  text-decoration:none;
+  box-shadow:inset 0 1px 0 #8ae8ff44,0 0 10px #0099ff33;
+  transition:background .2s,box-shadow .2s,transform .2s;
+}
+.compact-arcade-nav .compact-options a:hover,
+.compact-arcade-nav .compact-options a:focus-visible,
+.compact-arcade-nav .compact-options button:hover,
+.compact-arcade-nav .compact-options button:focus-visible{
+  background:linear-gradient(180deg,#176da3,#0b315a)!important;
+  box-shadow:0 0 15px #27caff88;
+  transform:translateY(-1px);
+}
+@media(prefers-reduced-motion:reduce){
+  .compact-arcade-nav .compact-options a,
+  .compact-arcade-nav .compact-options button{transition:none;transform:none!important}
+}

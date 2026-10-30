@@ -203,6 +203,12 @@
           "name": "Digimon",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "pokemon",
+          "name": "Pokémon",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

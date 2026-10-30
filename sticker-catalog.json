@@ -97,6 +97,12 @@
           "name": "Codename: Kids Next Door",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "family-guy",
+          "name": "Family Guy",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

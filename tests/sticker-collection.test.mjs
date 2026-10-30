@@ -108,21 +108,21 @@ test('album shelf sorts alphabetically with Misc last',()=>{
 test('sticker HTML has valid theme script tags and a searchable Need filter',()=>{
  for(const path of ['sticker-collection.html','sticker-albums.html']){
   const html=file(path);
-  assert.match(html,/<script src="theme\\.js" defer><\\/script><title>/);
-  assert.doesNotMatch(html,/<script src="theme\\.js" defer><title>/);
+  assert.ok(html.includes('<script src="theme.js" defer></script><title>'));
+  assert.ok(!html.includes('<script src="theme.js" defer><title>'));
  }
  const html=file('sticker-collection.html');
- assert.match(html,/id="sticker-search-filter"/);
- assert.match(html,/<option value="no">Need<\\/option>/);
+ assert.ok(html.includes('id="sticker-search-filter"'));
+ assert.ok(html.includes('<option value="no">Need</option>'));
  const js=file('sticker-collection.js');
- assert.match(js,/searchFilter\\?\\.addEventListener\\('input',renderStickers\\)/);
- assert.match(js,/model=null;grid\\.replaceChildren\\(\\);summary\\.replaceChildren\\(\\)/);
+ assert.ok(js.includes("searchFilter?.addEventListener('input',renderStickers)"));
+ assert.ok(js.includes('model=null;grid.replaceChildren();summary.replaceChildren()'));
 });
 test('owner draft is cleared when owner authorization is lost or changes',()=>{
  const js=file('owner-sticker-creator.js');
- assert.match(js,/function clearDraft\\(\\)/);
- assert.match(js,/revokePreview\\(\\)/);
- assert.match(js,/verifiedOwnerId!==user\\.id/);
- assert.match(js,/if\\(error\\|\\|!owner\\)\\{verifiedOwnerId=null;clearDraft\\(\\)/);
- assert.match(js,/if\\(authError\\|\\|!user\\|\\|user\\.is_anonymous\\)\\{verifiedOwnerId=null;clearDraft\\(\\)/);
+ assert.ok(js.includes('function clearDraft()'));
+ assert.ok(js.includes('revokePreview()'));
+ assert.ok(js.includes('verifiedOwnerId!==user.id'));
+ assert.ok(js.includes('if(error||!owner){verifiedOwnerId=null;clearDraft()'));
+ assert.ok(js.includes('if(authError||!user||user.is_anonymous){verifiedOwnerId=null;clearDraft()'));
 });

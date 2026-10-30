@@ -61,6 +61,12 @@
           "name": "SpongeBob SquarePants",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "the-fairly-oddparents",
+          "name": "The Fairly OddParents",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

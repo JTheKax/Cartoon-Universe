@@ -1,13 +1,7 @@
 // Verified official-series wordmarks from Wikimedia Commons; other series keep local artwork/text fallbacks.
 const verifiedSeriesLogos={'Adventure Time':'https://commons.wikimedia.org/wiki/Special:FilePath/Adventure_Time_logo2.png','Dragon Ball Z':'https://commons.wikimedia.org/wiki/Special:FilePath/Dragon_Ball_Z_logo.svg','Naruto':'https://commons.wikimedia.org/wiki/Special:FilePath/Naruto_logo.svg','The Simpsons':'https://commons.wikimedia.org/wiki/Special:FilePath/The_Simpsons_Logo.svg','American Dad':'https://commons.wikimedia.org/wiki/Special:FilePath/American_dad_logo.svg','Yu Yu Hakusho':'https://commons.wikimedia.org/wiki/Special:FilePath/Y%C5%AB_Y%C5%AB_Hakusho_logo.svg','Futurama':'https://commons.wikimedia.org/wiki/Special:FilePath/Futurama_1999_logo.svg','SpongeBob SquarePants':'https://commons.wikimedia.org/wiki/Special:FilePath/SpongeBob_SquarePants_logo.png'};
 // Cartoon Universe 3.0 public Ctoon series catalog. Text fallbacks are intentional.
-const catalog={
-'Cartoons':['Adventure Time','American Dad','Ben 10','Camp Lazlo','Class of 3000',"Codename: Kids Next Door",'Family Guy','Futurama','Jackie Chan Adventures','Mucha Lucha','South Park','SpongeBob SquarePants','Teen Titans','The Simpsons','Tom & Jerry','Xiaolin Showdown'],
-'Anime':['Attack on Titan','Case Closed','Digimon','Dragon Ball Z','Duel Masters','Fullmetal Alchemist','Hamtaro','Inuyasha','Lupin the Third','Naruto','One Piece','Pokémon','The Seven Deadly Sins','Yu-Gi-Oh!','Yu-Gi-Oh! GX','Yu Yu Hakusho','Zatch Bell'],
-'Disney':['Big Hero 6',"The Emperor's New Groove",'Hercules','Kim Possible','Phineas and Ferb','Pirates of the Caribbean','The Nightmare Before Christmas'],
-'Video Games':['Kingdom Hearts','Super Mario','The Legend of Zelda'],
-'Misc.':['Misc.']
-};
+const catalog={"Cartoons":["Adventure Time","American Dad","Ben 10","Camp Lazlo","Class of 3000","Codename: Kids Next Door","Courage the Cowardly Dog","Danny Phantom","Dexter's Laboratory","Ed, Edd n Eddy","Fairly OddParents","Family Guy","Foster's Home for Imaginary Friends","Futurama","Jackie Chan Adventures","Jimmy Neutron","Johnny Bravo","Kim Possible","Mucha Lucha","Phineas and Ferb","Powerpuff Girls","Samurai Jack","South Park","SpongeBob SquarePants","Teen Titans","The Simpsons","Tom & Jerry","Xiaolin Showdown"],"Anime":["Attack on Titan","Case Closed","Digimon","Dragon Ball Z","Duel Masters","Fullmetal Alchemist","Hamtaro","Inuyasha","Lupin the Third","Naruto","One Piece","Pokémon","The Seven Deadly Sins","Yu-Gi-Oh!","Yu-Gi-Oh! GX","Yu Yu Hakusho","Zatch Bell"],"Movies":["Big Hero 6","The Emperor's New Groove","Hercules","Pirates of the Caribbean","The Nightmare Before Christmas"],"Video Games":["Kingdom Hearts","Super Mario","The Legend of Zelda"],"Misc":["Misc"]};
 const container=document.getElementById('sets-grid');
 const search=document.getElementById('series-search');
 const filter=document.getElementById('series-filter');
@@ -15,7 +9,7 @@ const count=document.getElementById('series-count');
 const slug=name=>name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 function render(){
  const query=search.value.trim().toLocaleLowerCase();const selected=filter.value;container.replaceChildren();let total=0;
- for(const category of ['Anime','Cartoons','Disney','Video Games','Misc.']){
+ for(const category of ['Cartoons','Anime','Movies','Video Games','Misc']){
   if(selected!=='All'&&selected!==category)continue;
   const names=catalog[category].filter(n=>n.toLocaleLowerCase().includes(query)).sort((a,b)=>a.localeCompare(b));if(!names.length)continue;
   const heading=document.createElement('h2');heading.className='group-heading';heading.textContent=category;container.append(heading);

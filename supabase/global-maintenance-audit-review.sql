@@ -15,7 +15,7 @@ create table if not exists public.global_maintenance_audit (
 alter table public.global_maintenance_audit enable row level security;
 revoke all on public.global_maintenance_audit from public, anon, authenticated;
 -- Eliminate unaudited owner browser UPDATE; all changes must use audited RPC.
-revoke update on public.site_maintenance from authenticated;
+revoke update on public.site_maintenance from public, anon, authenticated;
 
 create or replace function public.set_global_maintenance(p_enabled boolean,p_message text default null)
 returns jsonb language plpgsql security definer set search_path = ''

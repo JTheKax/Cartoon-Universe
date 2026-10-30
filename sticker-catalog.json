@@ -85,6 +85,12 @@
           "name": "Class of 3000",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "courage-the-cowardly-dog",
+          "name": "Courage the Cowardly Dog",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

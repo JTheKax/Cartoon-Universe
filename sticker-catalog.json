@@ -145,6 +145,12 @@
           "name": "Jackie Chan Adventures",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "teen-titans",
+          "name": "Teen Titans",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

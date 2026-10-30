@@ -24,7 +24,7 @@
  };
  const verifiedLogos={
   'dexters-laboratory':'Dexter-logo.png',
-  'courage-the-cowardly-dog':'Courage_the_Cowardly_Dog_logo.png'
+  'courage-the-cowardly-dog':'Courage The Cowardly Dog logo.png'
  };
  const logoImage=(sub,logo)=>{
   const img=document.createElement('img');img.className='official-series-logo';img.alt=sub.name+' television series logo';img.loading='lazy';img.referrerPolicy='no-referrer';

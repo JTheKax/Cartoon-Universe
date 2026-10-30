@@ -239,6 +239,12 @@
           "name": "Duel Masters",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "hamtaro",
+          "name": "Hamtaro",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

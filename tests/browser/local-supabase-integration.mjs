@@ -79,6 +79,13 @@ try{
  const initialSections=await admin.from('section_maintenance').select('section_key,maintenance_enabled');
  check(!initialSections.error&&initialSections.data.length===10&&initialSections.data.every(row=>row.maintenance_enabled===true),
   'Review migration did not default all ten sections to maintenance');
+ const anonymousClient=client();
+ const anonymousSnapshot=await anonymousClient.rpc('get_maintenance_snapshot');
+ check(!anonymousSnapshot.error&&anonymousSnapshot.data?.globalMaintenance===false
+  &&Array.isArray(anonymousSnapshot.data?.sectionRows)
+  &&anonymousSnapshot.data.sectionRows.length===10
+  &&anonymousSnapshot.data.sectionRows.every(row=>row.maintenance_enabled===true),
+  'Anonymous one-statement maintenance snapshot RPC failed');
  const rejected=await playerClient.rpc('set_section_maintenance',{p_section:section,p_enabled:false});
  check(!!rejected.error,'Nonowner could call the section maintenance RPC');
  const direct=await playerClient.from('section_maintenance').update({maintenance_enabled:false}).eq('section_key',section).select('section_key');
@@ -86,6 +93,9 @@ try{
  const grant=await ownerClient.rpc('set_section_maintenance',{p_section:section,p_enabled:false});
  check(!grant.error&&grant.data?.saved===true&&grant.data?.audited===true,
   'Real owner section RPC did not acknowledge an atomic audited write');
+ const updatedSnapshot=await anonymousClient.rpc('get_maintenance_snapshot');
+ check(!updatedSnapshot.error&&updatedSnapshot.data?.sectionRows?.find(row=>row.section_key===section)?.maintenance_enabled===false,
+  'Public snapshot did not reflect the atomic owner section change');
  const afterGrant=await admin.from('section_maintenance').select('maintenance_enabled').eq('section_key',section).single();
  const firstAudit=await admin.from('section_maintenance_audit').select('id,previous_enabled,maintenance_enabled,owner_id').eq('section_key',section).order('id');
  check(!afterGrant.error&&afterGrant.data.maintenance_enabled===false

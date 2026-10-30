@@ -185,6 +185,12 @@
           "name": "One Piece",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "attack-on-titan",
+          "name": "Attack on Titan",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

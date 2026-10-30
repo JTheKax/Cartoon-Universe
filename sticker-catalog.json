@@ -173,6 +173,12 @@
           "name": "Dragon Ball Z",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "naruto",
+          "name": "Naruto",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

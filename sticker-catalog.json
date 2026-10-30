@@ -166,7 +166,15 @@
       "logo": null,
       "logoStatus": "custom set title treatment",
       "status": "Coming Soon",
-      "order": 2
+      "order": 2,
+      "subseries": [
+        {
+          "id": "dragon-ball-z",
+          "name": "Dragon Ball Z",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        }
+      ]
     },
     {
       "id": "movies",

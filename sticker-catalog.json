@@ -257,6 +257,12 @@
           "name": "Fullmetal Alchemist",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "case-closed",
+          "name": "Case Closed",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

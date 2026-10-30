@@ -15,6 +15,12 @@ begin
     or has_table_privilege('authenticated','public.section_maintenance_audit','SELECT') then
   raise exception 'Direct section or audit access is too broad';
  end if;
+ if not has_function_privilege('anon','public.get_maintenance_snapshot()','EXECUTE')
+    or not has_function_privilege('authenticated','public.get_maintenance_snapshot()','EXECUTE')
+    or exists (select 1 from pg_proc where oid='public.get_maintenance_snapshot()'::regprocedure
+      and (prosecdef or provolatile<>'s')) then
+  raise exception 'Snapshot RPC must be stable, invoker and publicly readable';
+ end if;
  if has_function_privilege('anon','public.set_section_maintenance(text,boolean)','EXECUTE')
     or not has_function_privilege('authenticated','public.set_section_maintenance(text,boolean)','EXECUTE') then
   raise exception 'RPC execute grants are incorrect';
@@ -26,6 +32,10 @@ do $$
 begin
  if (select count(*) from public.section_maintenance)<>10 then
   raise exception 'Public section status must be readable';
+ end if;
+ if (public.get_maintenance_snapshot()->>'globalMaintenance')<>'false'
+    or jsonb_array_length(public.get_maintenance_snapshot()->'sectionRows')<>10 then
+  raise exception 'Anonymous consistent snapshot did not include global and ten sections';
  end if;
  begin
   perform public.set_section_maintenance('radio',false);
@@ -78,6 +88,10 @@ do $$
 begin
  if (select maintenance_enabled from public.section_maintenance where section_key='radio') is distinct from false then
   raise exception 'Owner update did not persist';
+ end if;
+ if not exists (select 1 from jsonb_array_elements(public.get_maintenance_snapshot()->'sectionRows') row
+   where row->>'section_key'='radio' and row->>'maintenance_enabled'='false') then
+  raise exception 'Snapshot did not reflect the audited owner change';
  end if;
  if (select count(*) from public.section_maintenance_audit where section_key='radio'
      and previous_enabled=true and maintenance_enabled=false

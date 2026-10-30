@@ -92,3 +92,37 @@ test('collection queries use deterministic ordered ranges and never show partial
  assert.match(client,/\.order\('sticker_id'\)\.range\(start,end\)/);
  assert.doesNotMatch(client,/\.limit\(1000\)/);
 });
+
+test('sticker binder search combines with rarity, album and ownership filters',()=>{
+ const {catalog}=createStickerView(sets,stickers,[{sticker_id:'1',quantity:2}]);
+ assert.deepEqual(filterStickers(catalog,{search:' PIXEL ',rarity:'Rare',owned:'yes'}).map(s=>s.id),['1']);
+ assert.deepEqual(filterStickers(catalog,{search:'arcade originals',owned:'no'}).map(s=>s.id),['2']);
+ assert.deepEqual(filterStickers(catalog,{search:'not-a-sticker'}),[]);
+ assert.equal(filterStickers(catalog,{search:null}).length,3);
+});
+test('album shelf sorts alphabetically with Misc last',()=>{
+ const albums=[{id:'c',slug:'misc',title:'Misc.'},{id:'d',slug:'zelda',title:'Zelda'},...sets];
+ const view=createStickerView(albums,stickers,[]);
+ assert.deepEqual(view.albums.map(s=>s.title),['Arcade Originals','Space','Zelda','Misc.']);
+});
+test('sticker HTML has valid theme script tags and a searchable Need filter',()=>{
+ for(const path of ['sticker-collection.html','sticker-albums.html']){
+  const html=file(path);
+  assert.match(html,/<script src="theme\\.js" defer><\\/script><title>/);
+  assert.doesNotMatch(html,/<script src="theme\\.js" defer><title>/);
+ }
+ const html=file('sticker-collection.html');
+ assert.match(html,/id="sticker-search-filter"/);
+ assert.match(html,/<option value="no">Need<\\/option>/);
+ const js=file('sticker-collection.js');
+ assert.match(js,/searchFilter\\?\\.addEventListener\\('input',renderStickers\\)/);
+ assert.match(js,/model=null;grid\\.replaceChildren\\(\\);summary\\.replaceChildren\\(\\)/);
+});
+test('owner draft is cleared when owner authorization is lost or changes',()=>{
+ const js=file('owner-sticker-creator.js');
+ assert.match(js,/function clearDraft\\(\\)/);
+ assert.match(js,/revokePreview\\(\\)/);
+ assert.match(js,/verifiedOwnerId!==user\\.id/);
+ assert.match(js,/if\\(error\\|\\|!owner\\)\\{verifiedOwnerId=null;clearDraft\\(\\)/);
+ assert.match(js,/if\\(authError\\|\\|!user\\|\\|user\\.is_anonymous\\)\\{verifiedOwnerId=null;clearDraft\\(\\)/);
+});

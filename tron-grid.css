@@ -109,3 +109,47 @@ nav a:focus-visible::after,nav .nav-trigger:focus-visible::after{
   .compact-arcade-nav .compact-options a,
   .compact-arcade-nav .compact-options button{transition:none;transform:none!important}
 }
+
+/* Consistent TRON tab-box treatment for ALL primary navigation controls. */
+.compact-arcade-nav nav>a,
+.compact-arcade-nav nav>details>summary,
+.compact-arcade-nav #nav-owner-tab,
+.account-quick-menu summary,
+.account-quick-menu button{
+  box-sizing:border-box;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  color:#e0f8ff!important;
+  background:linear-gradient(180deg,#10416b,#071a35)!important;
+  border:2px solid #2bc6ff!important;
+  border-radius:9px!important;
+  padding:11px 16px!important;
+  box-shadow:inset 0 1px 0 #b4f3ff55,0 0 12px #009dff66!important;
+  text-shadow:0 0 8px #36cfff88;
+  text-decoration:none;
+  transition:box-shadow .2s,background .2s,transform .2s;
+}
+.compact-arcade-nav nav>a:hover,
+.compact-arcade-nav nav>a:focus-visible,
+.compact-arcade-nav nav>details>summary:hover,
+.compact-arcade-nav nav>details>summary:focus-visible,
+.account-quick-menu summary:hover,
+.account-quick-menu summary:focus-visible,
+.account-quick-menu button:hover,
+.account-quick-menu button:focus-visible{
+  background:linear-gradient(180deg,#176ea7,#0b315c)!important;
+  box-shadow:inset 0 1px 0 #d5f9ff99,0 0 20px #2acaffaa!important;
+  transform:translateY(-1px);
+}
+.compact-arcade-nav nav>details[open]>summary{
+  background:linear-gradient(180deg,#167db4,#0c3c67)!important;
+  border-color:#a2f1ff!important;
+  box-shadow:0 0 20px #25c8ffbb!important;
+}
+.compact-arcade-nav #nav-owner-tab[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){
+  .compact-arcade-nav nav>a,.compact-arcade-nav nav>details>summary,
+  .account-quick-menu summary,.account-quick-menu button{transition:none;transform:none!important}
+}

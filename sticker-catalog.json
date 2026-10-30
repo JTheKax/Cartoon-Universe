@@ -49,6 +49,12 @@
           "name": "Xiaolin Showdown",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "camp-lazlo",
+          "name": "Camp Lazlo",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

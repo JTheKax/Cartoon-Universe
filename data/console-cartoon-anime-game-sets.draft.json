@@ -27,6 +27,42 @@
   "notes": "Draft preview catalog, not a complete release database. Entries are examples of console or handheld releases; artwork, ownership, and canonical Sets Overview integration remain pending.",
   "sets": [
     {
+      "series": "Animal Crossing",
+      "category": "original",
+      "games": [
+        "Animal Crossing",
+        "Animal Crossing: New Leaf",
+        "Animal Crossing: New Horizons"
+      ]
+    },
+    {
+      "series": "Banjo-Kazooie",
+      "category": "original",
+      "games": [
+        "Banjo-Kazooie",
+        "Banjo-Tooie",
+        "Banjo-Kazooie: Nuts & Bolts"
+      ]
+    },
+    {
+      "series": "Bayonetta",
+      "category": "original",
+      "games": [
+        "Bayonetta",
+        "Bayonetta 2",
+        "Bayonetta 3"
+      ]
+    },
+    {
+      "series": "Bomberman",
+      "category": "original",
+      "games": [
+        "Bomberman '93",
+        "Super Bomberman",
+        "Super Bomberman R"
+      ]
+    },
+    {
       "series": "Castlevania",
       "category": "original",
       "games": [
@@ -45,12 +81,29 @@
       ]
     },
     {
+      "series": "Devil May Cry",
+      "category": "original",
+      "games": [
+        "Devil May Cry",
+        "Devil May Cry 3: Dante's Awakening",
+        "Devil May Cry 5"
+      ]
+    },
+    {
       "series": "Donkey Kong",
       "category": "original",
       "games": [
         "Donkey Kong Country",
         "Donkey Kong 64",
         "Donkey Kong Country Returns"
+      ]
+    },
+    {
+      "series": "EarthBound / Mother",
+      "category": "original",
+      "games": [
+        "EarthBound",
+        "Mother 3"
       ]
     },
     {
@@ -63,12 +116,75 @@
       ]
     },
     {
+      "series": "Fire Emblem",
+      "category": "original",
+      "games": [
+        "Fire Emblem: The Blazing Blade",
+        "Fire Emblem Awakening",
+        "Fire Emblem: Three Houses"
+      ]
+    },
+    {
+      "series": "God of War",
+      "category": "original",
+      "games": [
+        "God of War",
+        "God of War II",
+        "God of War Ragnarök"
+      ]
+    },
+    {
+      "series": "Golden Sun",
+      "category": "original",
+      "games": [
+        "Golden Sun",
+        "Golden Sun: The Lost Age",
+        "Golden Sun: Dark Dawn"
+      ]
+    },
+    {
+      "series": "Halo",
+      "category": "original",
+      "games": [
+        "Halo: Combat Evolved",
+        "Halo 2",
+        "Halo 3"
+      ]
+    },
+    {
+      "series": "Jak and Daxter",
+      "category": "original",
+      "games": [
+        "Jak and Daxter: The Precursor Legacy",
+        "Jak II",
+        "Jak 3"
+      ]
+    },
+    {
+      "series": "King of Fighters",
+      "category": "original",
+      "games": [
+        "The King of Fighters '98",
+        "The King of Fighters XIII",
+        "The King of Fighters XV"
+      ]
+    },
+    {
       "series": "Kirby",
       "category": "original",
       "games": [
         "Kirby's Dream Land",
         "Kirby Super Star",
         "Kirby and the Forgotten Land"
+      ]
+    },
+    {
+      "series": "LittleBigPlanet",
+      "category": "original",
+      "games": [
+        "LittleBigPlanet",
+        "LittleBigPlanet 2",
+        "LittleBigPlanet 3"
       ]
     },
     {
@@ -90,12 +206,39 @@
       ]
     },
     {
+      "series": "Mortal Kombat",
+      "category": "original",
+      "games": [
+        "Mortal Kombat II",
+        "Mortal Kombat 9",
+        "Mortal Kombat 11"
+      ]
+    },
+    {
       "series": "Pac-Man",
       "category": "original",
       "games": [
         "Pac-Man",
         "Pac-Man World",
         "Pac-Man World 2"
+      ]
+    },
+    {
+      "series": "Persona",
+      "category": "original",
+      "games": [
+        "Persona 3",
+        "Persona 4 Golden",
+        "Persona 5 Royal"
+      ]
+    },
+    {
+      "series": "Ratchet & Clank",
+      "category": "original",
+      "games": [
+        "Ratchet & Clank",
+        "Ratchet & Clank: Going Commando",
+        "Ratchet & Clank: Rift Apart"
       ]
     },
     {
@@ -108,6 +251,15 @@
       ]
     },
     {
+      "series": "Silent Hill",
+      "category": "original",
+      "games": [
+        "Silent Hill",
+        "Silent Hill 2",
+        "Silent Hill 3"
+      ]
+    },
+    {
       "series": "Sonic the Hedgehog",
       "category": "original",
       "games": [
@@ -117,12 +269,39 @@
       ]
     },
     {
+      "series": "Spyro the Dragon",
+      "category": "original",
+      "games": [
+        "Spyro the Dragon",
+        "Spyro 2: Ripto's Rage!",
+        "Spyro: Year of the Dragon"
+      ]
+    },
+    {
+      "series": "Star Fox",
+      "category": "original",
+      "games": [
+        "Star Fox",
+        "Star Fox 64",
+        "Star Fox Adventures"
+      ]
+    },
+    {
       "series": "Street Fighter",
       "category": "original",
       "games": [
         "Street Fighter II",
         "Street Fighter Alpha 3",
         "Street Fighter 6"
+      ]
+    },
+    {
+      "series": "Super Smash Bros.",
+      "category": "original",
+      "games": [
+        "Super Smash Bros.",
+        "Super Smash Bros. Melee",
+        "Super Smash Bros. Ultimate"
       ]
     },
     {

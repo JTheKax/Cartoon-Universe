@@ -121,6 +121,12 @@
           "name": "The Simpsons",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "mucha-lucha",
+          "name": "¡Mucha Lucha!",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

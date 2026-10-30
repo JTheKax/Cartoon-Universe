@@ -215,6 +215,12 @@
           "name": "Inuyasha",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "yu-gi-oh",
+          "name": "Yu-Gi-Oh!",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

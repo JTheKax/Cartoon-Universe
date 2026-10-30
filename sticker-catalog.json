@@ -39,8 +39,8 @@
     {
       "id": "xiaolin-showdown",
       "name": "Xiaolin Showdown",
-      "logo": "https://ih1.redbubble.net/image.884057104.5191/st%2Csmall%2C507x507-pad%2C600x600%2Cf8f8f8.jpg",
-      "logoStatus": "external reference — verify rights and availability"
+      "logo": null,
+      "logoStatus": "custom title fallback — previous third-party image returned HTTP 429"
     },
     {
       "id": "misc",

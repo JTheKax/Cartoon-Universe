@@ -233,6 +233,12 @@
           "name": "Zatch Bell!",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "duel-masters",
+          "name": "Duel Masters",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

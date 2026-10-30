@@ -27,7 +27,7 @@ function render(){
    img.addEventListener('load',()=>{img.hidden=false;fallback.hidden=true});
    img.addEventListener('error',()=>{img.remove();fallback.hidden=false});
    const title=document.createElement('h2');title.textContent=name;const label=document.createElement('small');label.textContent=category;
-   card.append(img,fallback,title,label);grid.append(card);
+   const link=document.createElement('a');link.href='set-detail.html?'+new URLSearchParams({series:name,category}).toString();link.setAttribute('aria-label','Open '+name+' set');link.style.cssText='display:flex;flex-direction:column;align-items:center;text-align:center;color:inherit;text-decoration:none;width:100%;height:100%';link.append(img,fallback,title,label);card.append(link);grid.append(card);
   }
   container.append(grid);
  }

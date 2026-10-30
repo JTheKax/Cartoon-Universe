@@ -10,7 +10,7 @@ import {productionSiteOrigin} from './production-maintenance-gateway.mjs';
 const PROJECT='https://gjfyemvcrgrthbrlqqnz.supabase.co';
 const ASSETS=new Set(`
 index.html login.html register.html account.html coin-wallet.html owner.html
-styles.css account.css owner.css clean-arcade.css script.js auth.js config.js
+styles.css tron-grid.css account.css owner.css clean-arcade.css script.js auth.js config.js
 supabase-config.js theme.js logo-preferences.js admin-nav.js home-profile.js
 coin-wallet.js global-chat.js home-news.js owner.js owner-coin-adjustments.js owner-theater.js maintenance-preview.js maintenance-controls.js maintenance-notice.js
 nav-account-controls.js retro-game-library.js shop-preview.js shop-collect-controller.js

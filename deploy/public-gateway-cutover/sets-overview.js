@@ -33,3 +33,14 @@ function render(){
  if(!total){const empty=document.createElement('p');empty.className='empty';empty.textContent='No matching series found.';container.append(empty)}
 }
 search.addEventListener('input',render);filter.addEventListener('change',render);render();
+
+// Load the full existing console/handheld draft catalog instead of showing only featured games.
+fetch('data/console-cartoon-anime-game-sets.draft.json',{cache:'no-store'})
+ .then(response=>{if(!response.ok)throw Error('Catalog unavailable');return response.json()})
+ .then(data=>{
+  if(!Array.isArray(data.sets))return;
+  const games=data.sets.map(entry=>entry.series).filter(name=>typeof name==='string'&&name.trim());
+  catalog['Video Games']=[...new Set([...games,...catalog['Video Games']])];
+  render();
+ })
+ .catch(()=>{const note=document.createElement('p');note.className='notice';note.textContent='Full Video Games preview catalog is temporarily unavailable; featured sets remain visible.';container.after(note)});

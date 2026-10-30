@@ -56,7 +56,7 @@ begin
  if (select count(*) from public.sticker_inventory_events)<>2 then raise exception 'Award ledger incorrect'; end if;
 end $$;
 -- Signed-in players cannot insert into inventory or forge audit history.
-do $
+do $$
 begin
  begin
   insert into public.player_stickers(user_id,sticker_id,quantity)
@@ -68,10 +68,10 @@ begin
   values('00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-000000000002','20000000-0000-0000-0000-000000000001',99,'Forged reward');
   raise exception 'Player forged an inventory audit event';
  exception when insufficient_privilege then null; end;
-end $;
+end $$;
 -- Owner awards reject invalid quantities and leave the ledger unchanged.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000001',false);
-do $
+do $$
 begin
  begin
   perform public.owner_award_sticker('00000000-0000-0000-0000-000000000002','20000000-0000-0000-0000-000000000001',0,'Invalid quantity');
@@ -81,16 +81,16 @@ begin
   perform public.owner_award_sticker('00000000-0000-0000-0000-000000000002','20000000-0000-0000-0000-000000000001',101,'Invalid quantity');
   raise exception 'Over-limit award was accepted';
  exception when invalid_parameter_value then null; end;
-end $;
+end $$;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false);
-do $
+do $$
 begin
  if (select sum(quantity) from public.player_stickers)<>3
  or (select count(*) from public.sticker_inventory_events)<>2
  then raise exception 'Invalid owner award changed inventory or audit ledger'; end if;
-end $;
+end $$;
 reset role;
-do $
+do $$
 begin
  if (select count(*) from public.sticker_inventory_events)<>2 then raise exception 'Audit rows not committed'; end if;
-end $;
+end $$;

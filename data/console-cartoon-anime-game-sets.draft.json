@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "title": "Console and handheld adaptations of Cartoon and Anime series",
+  "status": "draft",
+  "platformPolicy": {
+    "include": [
+      "home_console",
+      "handheld_console"
+    ],
+    "exclude": [
+      "browser_only",
+      "mobile_only",
+      "pc_only"
+    ],
+    "allowMultiplatformWithConsoleRelease": true
+  },
+  "artworkPolicy": "No automatic copyrighted art import; use owner-provided or licensed artwork.",
+  "display": {
+    "collection": "Video Games",
+    "groupBy": "category",
+    "stickerStatus": [
+      "Owned",
+      "Need"
+    ],
+    "missingArtwork": "Coming Soon"
+  },
+  "notes": "Seed examples only, not an exhaustive game list. Validate release/platform and integrate with the site's canonical sets schema before publishing.",
+  "sets": [
+    {
+      "series": "Adventure Time",
+      "category": "cartoon",
+      "games": [
+        "Adventure Time: Hey Ice King! Why'd You Steal Our Garbage?!"
+      ]
+    },
+    {
+      "series": "Ben 10",
+      "category": "cartoon",
+      "games": [
+        "Ben 10: Protector of Earth"
+      ]
+    },
+    {
+      "series": "Codename: Kids Next Door",
+      "category": "cartoon",
+      "games": [
+        "Codename: Kids Next Door – Operation: V.I.D.E.O.G.A.M.E."
+      ]
+    },
+    {
+      "series": "Dexter's Laboratory",
+      "category": "cartoon",
+      "games": [
+        "Dexter's Laboratory: Deesaster Strikes!"
+      ]
+    },
+    {
+      "series": "Disney",
+      "category": "cartoon",
+      "games": [
+        "Disney Epic Mickey"
+      ]
+    },
+    {
+      "series": "Family Guy",
+      "category": "cartoon",
+      "games": [
+        "Family Guy: Back to the Multiverse"
+      ]
+    },
+    {
+      "series": "Futurama",
+      "category": "cartoon",
+      "games": [
+        "Futurama"
+      ]
+    },
+    {
+      "series": "Jackie Chan Adventures",
+      "category": "cartoon",
+      "games": [
+        "Jackie Chan Adventures"
+      ]
+    },
+    {
+      "series": "South Park",
+      "category": "cartoon",
+      "games": [
+        "South Park: The Stick of Truth"
+      ]
+    },
+    {
+      "series": "SpongeBob SquarePants",
+      "category": "cartoon",
+      "games": [
+        "SpongeBob SquarePants: Battle for Bikini Bottom"
+      ]
+    },
+    {
+      "series": "Teen Titans",
+      "category": "cartoon",
+      "games": [
+        "Teen Titans"
+      ]
+    },
+    {
+      "series": "The Simpsons",
+      "category": "cartoon",
+      "games": [
+        "The Simpsons: Hit & Run"
+      ]
+    },
+    {
+      "series": "Tom & Jerry",
+      "category": "cartoon",
+      "games": [
+        "Tom and Jerry in War of the Whiskers"
+      ]
+    },
+    {
+      "series": "Xiaolin Showdown",
+      "category": "cartoon",
+      "games": [
+        "Xiaolin Showdown"
+      ]
+    },
+    {
+      "series": "Attack on Titan",
+      "category": "anime",
+      "games": [
+        "Attack on Titan 2"
+      ]
+    },
+    {
+      "series": "Case Closed",
+      "category": "anime",
+      "games": [
+        "Detective Conan: The Mirapolis Investigation"
+      ]
+    },
+    {
+      "series": "Digimon",
+      "category": "anime",
+      "games": [
+        "Digimon World"
+      ]
+    },
+    {
+      "series": "Dragon Ball Z",
+      "category": "anime",
+      "games": [
+        "Dragon Ball Z: Budokai Tenkaichi 3"
+      ]
+    },
+    {
+      "series": "Duel Masters",
+      "category": "anime",
+      "games": [
+        "Duel Masters: Sempai Legends"
+      ]
+    },
+    {
+      "series": "Fullmetal Alchemist",
+      "category": "anime",
+      "games": [
+        "Fullmetal Alchemist and the Broken Angel"
+      ]
+    },
+    {
+      "series": "Hamtaro",
+      "category": "anime",
+      "games": [
+        "Hamtaro: Ham-Ham Heartbreak"
+      ]
+    },
+    {
+      "series": "Inuyasha",
+      "category": "anime",
+      "games": [
+        "Inuyasha: The Secret of the Cursed Mask"
+      ]
+    },
+    {
+      "series": "Lupin the Third",
+      "category": "anime",
+      "games": [
+        "Lupin the Third: Treasure of the Sorcerer King"
+      ]
+    },
+    {
+      "series": "Naruto",
+      "category": "anime",
+      "games": [
+        "Naruto: Ultimate Ninja Storm"
+      ]
+    },
+    {
+      "series": "One Piece",
+      "category": "anime",
+      "games": [
+        "One Piece: Pirate Warriors 4"
+      ]
+    },
+    {
+      "series": "Pokémon",
+      "category": "anime",
+      "games": [
+        "Pokémon Red Version"
+      ]
+    },
+    {
+      "series": "The Seven Deadly Sins",
+      "category": "anime",
+      "games": [
+        "The Seven Deadly Sins: Knights of Britannia"
+      ]
+    },
+    {
+      "series": "Yu-Gi-Oh!",
+      "category": "anime",
+      "games": [
+        "Yu-Gi-Oh! Forbidden Memories"
+      ]
+    },
+    {
+      "series": "Yu-Gi-Oh! GX",
+      "category": "anime",
+      "games": [
+        "Yu-Gi-Oh! GX Tag Force"
+      ]
+    },
+    {
+      "series": "Yu Yu Hakusho",
+      "category": "anime",
+      "games": [
+        "Yu Yu Hakusho: Dark Tournament"
+      ]
+    },
+    {
+      "series": "Zatch Bell!",
+      "category": "anime",
+      "games": [
+        "Zatch Bell! Mamodo Battles"
+      ]
+    }
+  ]
+}

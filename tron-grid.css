@@ -196,3 +196,44 @@ main>.section:not(#home) a:focus-visible,main>.section:not(#home) button:focus-v
 #sticker-collection input,#sticker-collection select{background:#081c33;color:#e8f8ff;border:1px solid #208dc3}
 @media(max-width:650px){main>.section:not(#home){margin:14px 10px;padding:20px}#explore .explore-tile:hover,#shop .shop-feature:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){#explore .explore-tile,#shop .shop-feature{transition:none;transform:none!important}}
+
+/* Responsive mobile arcade: thumb-friendly navigation, accessible dropdowns, tidy cards. */
+@media(max-width:760px){
+ html,body{max-width:100%;overflow-x:clip}
+ .compact-arcade-nav{padding:12px 10px!important}
+ .compact-arcade-nav .nav-player-status{position:static!important;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;margin:0 0 10px;font-size:12px}
+ .compact-arcade-nav .compact-brand{padding-left:0!important;text-align:center;margin-bottom:12px;font-size:14px}
+ .compact-arcade-nav .compact-brand small{display:block;margin:4px 0 0;font-size:9px;letter-spacing:.08em}
+ .compact-arcade-nav nav[aria-label="Main navigation"]{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start;width:100%}
+ .compact-arcade-nav nav[aria-label="Main navigation"]>a,
+ .compact-arcade-nav nav[aria-label="Main navigation"]>details{min-width:0;width:100%}
+ .compact-arcade-nav nav[aria-label="Main navigation"]>a,
+ .compact-arcade-nav nav[aria-label="Main navigation"]>details>summary{display:flex!important;align-items:center;justify-content:center;white-space:normal!important;overflow-wrap:anywhere;text-align:center;min-height:48px;width:100%;font-size:12px!important;padding:10px 7px!important}
+ .compact-arcade-nav nav[aria-label="Main navigation"]>details{position:relative}
+ .compact-arcade-nav nav[aria-label="Main navigation"]>details[open]{grid-column:1/-1}
+ .compact-arcade-nav nav[aria-label="Main navigation"]>details[open]>summary{width:100%}
+ .compact-arcade-nav .compact-options,
+ .compact-arcade-nav .compact-account .compact-options{position:static!important;left:auto!important;right:auto!important;top:auto!important;min-width:0!important;width:100%;margin:6px 0 4px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .compact-arcade-nav .compact-options a,
+ .compact-arcade-nav .compact-options button{min-height:46px;display:flex!important;align-items:center;justify-content:center;text-align:center!important;white-space:normal;overflow-wrap:anywhere;font-size:12px}
+ .compact-arcade-nav .compact-options [hidden]{display:none!important}
+ #home.cu-home-hero{margin:12px 10px;padding:24px 18px}
+ #home #home-news-heading{font-size:clamp(2.35rem,10vw,4rem);letter-spacing:-.045em}
+ #home .cu-home-subhead{line-height:1.8}
+ #home .home-news-feed{grid-template-columns:minmax(0,1fr)}
+ #home nav[aria-label="Quick destinations"]{display:grid!important;grid-template-columns:minmax(0,1fr);gap:9px!important}
+ #home nav[aria-label="Quick destinations"] a{min-height:46px;display:flex;align-items:center;justify-content:center;text-align:center}
+ main>.section:not(#home){margin:12px 10px;padding:20px 16px}
+ main>.section:not(#home) h2{font-size:clamp(1.4rem,6vw,2rem);overflow-wrap:anywhere}
+ #explore .explore-grid,#games .destination-grid,#watch .destination-grid,
+ #shop .shop-feature-grid,#themes .theme-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px}
+ #explore .explore-tile,#games .destination-grid article,#watch .destination-grid article,#shop .shop-feature{min-width:0;padding:18px}
+ #sticker-collection .sticker-gallery-toolbar{display:flex;flex-wrap:wrap;gap:9px}
+ #sticker-collection .sticker-gallery-toolbar input,#sticker-collection .sticker-gallery-toolbar select{max-width:100%;min-width:0}
+ main img,main video,main iframe{max-width:100%;height:auto}
+}
+@media(max-width:380px){
+ .compact-arcade-nav .compact-options,.compact-arcade-nav .compact-account .compact-options{grid-template-columns:minmax(0,1fr)}
+ .compact-arcade-nav nav[aria-label="Main navigation"]>a,.compact-arcade-nav nav[aria-label="Main navigation"]>details>summary{font-size:11px!important}
+ #home #home-news-heading{font-size:2.15rem}
+}

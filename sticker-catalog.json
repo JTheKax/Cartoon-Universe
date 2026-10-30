@@ -197,6 +197,12 @@
           "name": "The Seven Deadly Sins",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "digimon",
+          "name": "Digimon",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

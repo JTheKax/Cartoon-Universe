@@ -191,6 +191,12 @@
           "name": "Attack on Titan",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "seven-deadly-sins",
+          "name": "The Seven Deadly Sins",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

@@ -1,3 +1,5 @@
+// Verified official-series wordmarks from Wikimedia Commons; other series keep local artwork/text fallbacks.
+const verifiedSeriesLogos={'Adventure Time':'https://commons.wikimedia.org/wiki/Special:FilePath/Adventure_Time_logo2.png','Dragon Ball Z':'https://commons.wikimedia.org/wiki/Special:FilePath/Dragon_Ball_Z_logo.svg'};
 // Cartoon Universe 3.0 public Ctoon series catalog. Text fallbacks are intentional.
 const catalog={
 'Cartoons':['Adventure Time','American Dad','Ben 10','Camp Lazlo','Class of 3000',"Codename: Kids Next Door",'Family Guy','Futurama','Jackie Chan Adventures','Mucha Lucha','South Park','SpongeBob SquarePants','Teen Titans','The Simpsons','Tom & Jerry','Xiaolin Showdown'],
@@ -21,7 +23,7 @@ function render(){
   for(const name of names){
    total++;const card=document.createElement('article');card.className='set-card';
    const fallback=document.createElement('div');fallback.className='set-wordmark';fallback.textContent=name;
-   const img=document.createElement('img');img.className='set-logo';img.alt=name+' logo';img.hidden=true;img.loading='lazy';img.src='static/series-logos/'+slug(name)+'.png';
+   const img=document.createElement('img');img.className='set-logo';img.alt=name+' logo';img.hidden=true;img.loading='lazy';img.src=verifiedSeriesLogos[name]||('static/series-logos/'+slug(name)+'.png');
    img.addEventListener('load',()=>{img.hidden=false;fallback.hidden=true});
    img.addEventListener('error',()=>{img.remove();fallback.hidden=false});
    const title=document.createElement('h2');title.textContent=name;const label=document.createElement('small');label.textContent=category;

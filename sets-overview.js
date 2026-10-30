@@ -1,5 +1,5 @@
 // Local artwork takes precedence; the styled wordmark remains visible if an image is missing.
-const series = ['American Dad','Disney','Dragon Ball Z','Family Guy','Futurama','One Piece','SpongeBob SquarePants','The Simpsons','Video Games','Xiaolin Showdown'];
+const series = ['American Dad','Disney','Dragon Ball Z','Family Guy','Futurama','Naruto','One Piece','SpongeBob SquarePants','The Simpsons','Video Games','Xiaolin Showdown'];
 const grid = document.getElementById('sets-grid');
 for (const name of series) {
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');

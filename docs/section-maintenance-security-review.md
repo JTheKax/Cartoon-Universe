@@ -43,3 +43,9 @@ Keep the current owner switch disabled until the implementation and tests pass.
 - The isolated reader now uses one GET RPC request, rejects missing/duplicate/nonboolean section states and invalid global states, and fails closed on network or PostgREST errors. Tests exercise the one-request contract, corrupt data, anonymous RPC visibility and an audited owner change in disposable local Supabase.
 - This **does not** protect real gateway assets or mutation endpoints until the reader and policy are mounted in the actual gateway. The new RPC has not been installed in production; the old global UPDATE remains unaudited. Keep per-page owner controls disabled.
 - Release gate: all CI checks on the latest commit must pass, then separately verify real gateway integration, global audited write, owner recovery, alternate hosts and independently reviewed launch acceptance. No merge/deploy or production database changes without authorization.
+
+## 2026-10-30 review: proposed atomic global maintenance writes
+
+- Added `supabase/global-maintenance-audit-review.sql` as an **unapplied review migration**. It revokes direct authenticated global maintenance UPDATE, provides a server-verified owner-only `set_global_maintenance` RPC, and inserts a global audit record in the same transaction as every status/message change. Failed audit writes must roll back the global status.
+- Added disposable PostgreSQL permission, validation and forced-audit-failure assertions and real disposable Supabase Auth/PostgREST owner/nonowner/rollback checks. This is not yet connected to the owner UI or the real gateway. Do not enable the global buttons or apply the migration to production.
+- The global RPC intentionally uses `SECURITY DEFINER` with a fixed empty search path and explicit owner membership verification. It is callable by authenticated users but rejects nonowners; independent privilege review remains required before release.

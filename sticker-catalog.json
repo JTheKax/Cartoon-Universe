@@ -55,6 +55,12 @@
           "name": "Camp Lazlo",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "spongebob-squarepants",
+          "name": "SpongeBob SquarePants",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

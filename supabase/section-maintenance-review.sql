@@ -74,4 +74,23 @@ revoke all on function public.set_section_maintenance(text,boolean)
  from public, anon, authenticated;
 grant execute on function public.set_section_maintenance(text,boolean)
  to authenticated;
+
+-- One PostgREST request / one PostgreSQL statement yields a consistent
+-- MVCC snapshot of global and section status. Never bypass caller RLS.
+create or replace function public.get_maintenance_snapshot()
+returns jsonb
+language sql stable security invoker
+set search_path = ''
+as $$
+ select jsonb_build_object(
+  'globalMaintenance', (select enabled from public.site_maintenance where id=true),
+  'sectionRows', coalesce((
+   select jsonb_agg(jsonb_build_object(
+    'section_key', section_key, 'maintenance_enabled', maintenance_enabled
+   ) order by section_key) from public.section_maintenance
+  ), '[]'::jsonb)
+ );
+$$;
+revoke all on function public.get_maintenance_snapshot() from public, anon, authenticated;
+grant execute on function public.get_maintenance_snapshot() to anon, authenticated;
 commit;

@@ -1,3 +1,5 @@
+// Verified official-series wordmarks from Wikimedia Commons; other series keep local artwork/text fallbacks.
+const verifiedSeriesLogos={'Adventure Time':'https://commons.wikimedia.org/wiki/Special:FilePath/Adventure_Time_logo2.png','Dragon Ball Z':'https://commons.wikimedia.org/wiki/Special:FilePath/Dragon_Ball_Z_logo.svg','Naruto':'https://commons.wikimedia.org/wiki/Special:FilePath/Naruto_logo.svg','The Simpsons':'https://commons.wikimedia.org/wiki/Special:FilePath/The_Simpsons_Logo.svg','American Dad':'https://commons.wikimedia.org/wiki/Special:FilePath/American_dad_logo.svg','Yu Yu Hakusho':'https://commons.wikimedia.org/wiki/Special:FilePath/Y%C5%AB_Y%C5%AB_Hakusho_logo.svg','Futurama':'https://commons.wikimedia.org/wiki/Special:FilePath/Futurama_1999_logo.svg','SpongeBob SquarePants':'https://commons.wikimedia.org/wiki/Special:FilePath/SpongeBob_SquarePants_logo.png'};
 // Cartoon Universe 3.0 public Ctoon series catalog. Text fallbacks are intentional.
 const catalog={
 'Cartoons':['Adventure Time','American Dad','Ben 10','Camp Lazlo','Class of 3000',"Codename: Kids Next Door",'Family Guy','Futurama','Jackie Chan Adventures','Mucha Lucha','South Park','SpongeBob SquarePants','Teen Titans','The Simpsons','Tom & Jerry','Xiaolin Showdown'],
@@ -21,11 +23,11 @@ function render(){
   for(const name of names){
    total++;const card=document.createElement('article');card.className='set-card';
    const fallback=document.createElement('div');fallback.className='set-wordmark';fallback.textContent=name;
-   const img=document.createElement('img');img.className='set-logo';img.alt=name+' logo';img.hidden=true;img.loading='lazy';img.src='static/series-logos/'+slug(name)+'.png';
+   const img=document.createElement('img');img.className='set-logo';img.alt=name+' logo';img.hidden=true;img.loading='lazy';img.src=verifiedSeriesLogos[name]||('static/series-logos/'+slug(name)+'.png');
    img.addEventListener('load',()=>{img.hidden=false;fallback.hidden=true});
    img.addEventListener('error',()=>{img.remove();fallback.hidden=false});
    const title=document.createElement('h2');title.textContent=name;const label=document.createElement('small');label.textContent=category;
-   card.append(img,fallback,title,label);grid.append(card);
+   const link=document.createElement('a');link.href='set-detail.html?'+new URLSearchParams({series:name,category}).toString();link.setAttribute('aria-label','Open '+name+' set');link.style.cssText='display:flex;flex-direction:column;align-items:center;text-align:center;color:inherit;text-decoration:none;width:100%;height:100%';link.append(img,fallback,title,label);card.append(link);grid.append(card);
   }
   container.append(grid);
  }

@@ -74,7 +74,8 @@
   const mark=document.createElement('span');mark.className='subseries-logo-symbol';mark.setAttribute('aria-hidden','true');mark.textContent=symbol;
   const name=document.createElement('strong');name.className='subseries-logo-name';name.textContent=sub.name;
   logo.append(mark,name);
-  if(directFiles[sub.id])addLogoImage(logo,sub,'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(directFiles[sub.id]));
+  if(typeof sub.logoUrl==='string' && /^https:\/\//.test(sub.logoUrl))addLogoImage(logo,sub,sub.logoUrl);
+  else if(directFiles[sub.id])addLogoImage(logo,sub,'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(directFiles[sub.id]));
   else void findCommonsLogo(sub,logo);
   return logo
  };

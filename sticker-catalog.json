@@ -1,36 +1,300 @@
 {
   "series": [
     {
-      "id": "disney",
-      "name": "Disney"
+      "id": "cartoons",
+      "name": "Cartoons",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 1,
+      "subseries": [
+        {
+          "id": "dexters-laboratory",
+          "name": "Dexter's Laboratory",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "ed-edd-n-eddy",
+          "name": "Ed, Edd n Eddy",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "johnny-bravo",
+          "name": "Johnny Bravo",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "fosters-home-for-imaginary-friends",
+          "name": "Foster's Home for Imaginary Friends",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "the-powerpuff-girls",
+          "name": "The Powerpuff Girls",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "samurai-jack",
+          "name": "Samurai Jack",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "xiaolin-showdown",
+          "name": "Xiaolin Showdown",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "camp-lazlo",
+          "name": "Camp Lazlo",
+          "status": "Coming Soon",
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/camp-lazlo.png"
+        },
+        {
+          "id": "spongebob-squarepants",
+          "name": "SpongeBob SquarePants",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "the-fairly-oddparents",
+          "name": "The Fairly OddParents",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "jimmy-neutron",
+          "name": "Jimmy Neutron",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "danny-phantom",
+          "name": "Danny Phantom",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "class-of-3000",
+          "name": "Class of 3000",
+          "status": "Coming Soon",
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/class-of-3000-new.png"
+        },
+        {
+          "id": "courage-the-cowardly-dog",
+          "name": "Courage the Cowardly Dog",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "codename-kids-next-door",
+          "name": "Codename: Kids Next Door",
+          "status": "Coming Soon",
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/codename-kids-next-door.png"
+        },
+        {
+          "id": "family-guy",
+          "name": "Family Guy",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "south-park",
+          "name": "South Park",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "adventure-time",
+          "name": "Adventure Time",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "the-simpsons",
+          "name": "The Simpsons",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "mucha-lucha",
+          "name": "¡Mucha Lucha!",
+          "status": "Coming Soon",
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/mucha-lucha-new.png"
+        },
+        {
+          "id": "ben-10",
+          "name": "Ben 10",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "tom-and-jerry",
+          "name": "Tom & Jerry",
+          "status": "Coming Soon",
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/tom-and-jerry.png"
+        },
+        {
+          "id": "jackie-chan-adventures",
+          "name": "Jackie Chan Adventures",
+          "status": "Coming Soon",
+          "ctoonCount": 0,
+          "logoUrl": "https://raw.githubusercontent.com/JTheKax/Cartoon-Universe/feature/sticker-shop-catalog-preview-20261029/assets/logos/jackie-chan-adventures.jpg"
+        },
+        {
+          "id": "teen-titans",
+          "name": "Teen Titans",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        }
+      ]
     },
     {
-      "id": "dragon-ball-z",
-      "name": "Dragon Ball Z"
+      "id": "anime",
+      "name": "Anime",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 2,
+      "subseries": [
+        {
+          "id": "dragon-ball-z",
+          "name": "Dragon Ball Z",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "naruto",
+          "name": "Naruto",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "one-piece",
+          "name": "One Piece",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "attack-on-titan",
+          "name": "Attack on Titan",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "seven-deadly-sins",
+          "name": "The Seven Deadly Sins",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "digimon",
+          "name": "Digimon",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "pokemon",
+          "name": "Pokémon",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "inuyasha",
+          "name": "Inuyasha",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "yu-gi-oh",
+          "name": "Yu-Gi-Oh!",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "yu-yu-hakusho",
+          "name": "Yu Yu Hakusho",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "zatch-bell",
+          "name": "Zatch Bell!",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "duel-masters",
+          "name": "Duel Masters",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "hamtaro",
+          "name": "Hamtaro",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "lupin-the-third",
+          "name": "Lupin the Third",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "fullmetal-alchemist",
+          "name": "Fullmetal Alchemist",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "case-closed",
+          "name": "Case Closed",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        },
+        {
+          "id": "yu-gi-oh-gx",
+          "name": "Yu-Gi-Oh! GX",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        }
+      ]
     },
     {
-      "id": "family-guy",
-      "name": "Family Guy"
+      "id": "movies",
+      "name": "Movies",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 3
     },
     {
-      "id": "futurama",
-      "name": "Futurama"
-    },
-    {
-      "id": "spongebob-squarepants",
-      "name": "SpongeBob SquarePants"
-    },
-    {
-      "id": "the-simpsons",
-      "name": "The Simpsons"
-    },
-    {
-      "id": "xiaolin-showdown",
-      "name": "Xiaolin Showdown"
+      "id": "video-games",
+      "name": "Video Games",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 4
     },
     {
       "id": "misc",
-      "name": "Misc."
+      "name": "Misc.",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 5
     }
   ],
   "stickers": []

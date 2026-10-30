@@ -31,6 +31,12 @@
           "name": "Foster's Home for Imaginary Friends",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "the-powerpuff-girls",
+          "name": "The Powerpuff Girls",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

@@ -42,3 +42,13 @@ node --check owner-sticker-creator.js
 node --test tests/sticker-collection.test.mjs
 ```
 The PR runs a separate disposable PostgreSQL 17 job applying the SQL proposal only inside CI.
+
+## Collection usability and draft-privacy follow-up (October 30, 2026)
+- Corrected malformed `theme.js` script tags on both sticker pages; their document titles and page markup are no longer swallowed by an unterminated script element.
+- Added a local, case-insensitive binder search by sticker or album name; it composes with rarity, album and Owned/Need filters. This is purely client-side and makes no extra database requests.
+- Albums remain alphabetical except `Misc` / `Misc.`, which is intentionally last. Missing stickers are labeled **Need**.
+- Clear previously loaded collection models on account transitions to avoid displaying stale account inventory. Clear owner-only local artwork and draft fields when the authenticated owner changes, signs out, or fails verification; preserve drafts for a verified same-account session refresh.
+- Added isolated unit/contract tests for these behaviors. No catalog rows, storage uploads, grants, or production SQL were introduced.
+
+### Review before enabling owner publishing
+The local creator's browser file type/size checks are preview convenience only, **not** upload security. Any future publishing API must independently verify the owner on the server, validate decoded image content and size, prevent unsafe paths and overwrite, enforce licensed artwork policies, and log catalog changes. Do not enable the disabled publish button until these are implemented and tested in an isolated environment.

@@ -20,14 +20,16 @@ export function createStickerView(sets=[],stickers=[],inventory=[]){
   const entries=catalog.filter(s=>s.set_id===set.id);
   return {...set,total:entries.length,collected:entries.filter(s=>s.quantity>0).length,
    duplicates:entries.reduce((n,s)=>n+Math.max(0,s.quantity-1),0)};
- }).sort((a,b)=>a.title.localeCompare(b.title));
+ }).sort((a,b)=>{const misc=s=>/^misc\.?$/i.test(s.title.trim());return Number(misc(a))-Number(misc(b))||a.title.localeCompare(b.title);});
  return {catalog,albums,totalOwned:catalog.filter(s=>s.quantity>0).length,
   totalCopies:catalog.reduce((n,s)=>n+s.quantity,0)};
 }
-export function filterStickers(catalog,{rarity='all',album='all',owned='all'}={}){
+export function filterStickers(catalog,{rarity='all',album='all',owned='all',search=''}={}){
+ const query=typeof search==='string'?search.trim().toLocaleLowerCase().slice(0,100):'';
  return catalog.filter(s=>(rarity==='all'||s.rarity===rarity)&&
   (album==='all'||s.set.slug===album)&&
-  (owned==='all'||(owned==='yes'?s.quantity>0:s.quantity===0)));
+  (owned==='all'||(owned==='yes'?s.quantity>0:s.quantity===0))&&
+  (!query||s.name.toLocaleLowerCase().includes(query)||s.set.title.toLocaleLowerCase().includes(query)));
 }
 
 /**

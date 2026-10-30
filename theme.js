@@ -41,3 +41,9 @@ document.addEventListener('DOMContentLoaded',()=>{
  document.body.prepend(header);
  document.querySelectorAll('.arcade-destination > nav.cmart-tabs').forEach(el=>el.remove());
 });
+
+// Load the optional music dock on pages using the shared theme bundle.
+if(!document.querySelector('script[src$="music-player.js"]')){
+ const css=document.createElement('link');css.rel='stylesheet';css.href=new URL('music-player.css',document.currentScript?.src||location.href).href;document.head.append(css);
+ const script=document.createElement('script');script.src=new URL('music-player.js',document.currentScript?.src||location.href).href;script.defer=true;document.head.append(script);
+}

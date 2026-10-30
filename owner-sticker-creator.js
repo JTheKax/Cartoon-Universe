@@ -9,20 +9,29 @@ const albumInput=document.getElementById('creator-album');
 const rarityInput=document.getElementById('creator-rarity');
 const fileInput=document.getElementById('creator-image');
 const art=document.getElementById('creator-art');
-let revision=0,previewUrl=null;
+let revision=0,previewUrl=null,verifiedOwnerId=null;
 function revokePreview(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null;}}
+function clearDraft(){
+ revokePreview();
+ nameInput.value='';albumInput.value='';rarityInput.value='Common';fileInput.value='';
+ art.replaceChildren('🃏');
+ document.getElementById('creator-preview-name').textContent='Untitled sticker';
+ document.getElementById('creator-preview-album').textContent='No album selected';
+ document.getElementById('creator-preview-rarity').textContent='Common';
+}
 async function verifyOwner(){
  const current=++revision;content.hidden=true;status.textContent='Verifying owner access…';
  try{
   const {data:{user},error:authError}=await client.auth.getUser();
   if(current!==revision)return;
-  if(authError||!user||user.is_anonymous){status.textContent='Sign in with the owner account to access the Sticker Creator.';return;}
+  if(authError||!user||user.is_anonymous){verifiedOwnerId=null;clearDraft();status.textContent='Sign in with the owner account to access the Sticker Creator.';return;}
   const {data:owner,error}=await client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();
   if(current!==revision)return;
-  if(error||!owner){status.textContent='Owner access required. This studio is not available to players.';return;}
+  if(error||!owner){verifiedOwnerId=null;clearDraft();status.textContent='Owner access required. This studio is not available to players.';return;}
+  if(verifiedOwnerId!==user.id){clearDraft();verifiedOwnerId=user.id;}
   content.hidden=false;
   status.textContent='Owner verified. You can preview drafts; publishing is not enabled.';
- }catch{if(current===revision)status.textContent='Unable to verify owner access. Try again later.';}
+ }catch{if(current===revision){verifiedOwnerId=null;clearDraft();status.textContent='Unable to verify owner access. Try again later.';}}
 }
 document.getElementById('creator-preview-button').addEventListener('click',()=>{
  if(content.hidden)return;

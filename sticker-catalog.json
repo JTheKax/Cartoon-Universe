@@ -1,4 +1,45 @@
 {
-  "series": [],
+  "series": [
+    {
+      "id": "cartoons",
+      "name": "Cartoons",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 1
+    },
+    {
+      "id": "anime",
+      "name": "Anime",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 2
+    },
+    {
+      "id": "movies",
+      "name": "Movies",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 3
+    },
+    {
+      "id": "video-games",
+      "name": "Video Games",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 4
+    },
+    {
+      "id": "misc",
+      "name": "Misc.",
+      "logo": null,
+      "logoStatus": "custom set title treatment",
+      "status": "Coming Soon",
+      "order": 5
+    }
+  ],
   "stickers": []
 }

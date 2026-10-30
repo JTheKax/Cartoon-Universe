@@ -73,6 +73,12 @@
           "name": "Jimmy Neutron",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "danny-phantom",
+          "name": "Danny Phantom",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

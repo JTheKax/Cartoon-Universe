@@ -6,7 +6,15 @@
       "logo": null,
       "logoStatus": "custom set title treatment",
       "status": "Coming Soon",
-      "order": 1
+      "order": 1,
+      "subseries": [
+        {
+          "id": "dexters-laboratory",
+          "name": "Dexter's Laboratory",
+          "status": "Coming Soon",
+          "ctoonCount": 0
+        }
+      ]
     },
     {
       "id": "anime",

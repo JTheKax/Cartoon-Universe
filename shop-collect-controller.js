@@ -9,7 +9,7 @@
   seriesCount.textContent=String(series.length);
   published.textContent=String(ctoons.filter(item=>item.published===true).length);
   count.textContent=ctoons.length+' Ctoons recorded';
-  if(series.length){const shelf=document.getElementById('series-empty');shelf.className='library-cards';shelf.replaceChildren();for(const item of series){const card=document.createElement('article');card.className='library-card';const art=document.createElement('div');art.className='library-card-art';const themes={
+  if(series.length){const shelf=document.getElementById('series-empty');shelf.className='library-cards';shelf.replaceChildren();for(const item of series){const card=document.createElement('a');card.className='library-card';card.href='shop-collect-series.html?set='+encodeURIComponent(item.id);card.setAttribute('aria-label','Open '+item.name+' Ctoon set');const art=document.createElement('div');art.className='library-card-art';const themes={
   'cartoons':{symbol:'✦',color:'#ffb32c',background:'linear-gradient(135deg,#6c278f,#d34878)'},
   'anime':{symbol:'⛩',color:'#ffcad9',background:'linear-gradient(135deg,#5d204c,#c13b66)'},
   'movies':{symbol:'▶',color:'#ffe7a0',background:'linear-gradient(135deg,#171c39,#8d6225)'},

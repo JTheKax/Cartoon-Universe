@@ -19,6 +19,12 @@
           "name": "Ed, Edd n Eddy",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "johnny-bravo",
+          "name": "Johnny Bravo",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

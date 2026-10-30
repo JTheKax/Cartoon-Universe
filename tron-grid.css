@@ -153,3 +153,26 @@ nav a:focus-visible::after,nav .nav-trigger:focus-visible::after{
   .compact-arcade-nav nav>a,.compact-arcade-nav nav>details>summary,
   .account-quick-menu summary,.account-quick-menu button{transition:none;transform:none!important}
 }
+
+/* Cartoon Universe arcade news launchpad */
+#home.cu-home-hero{position:relative;isolation:isolate;overflow:hidden;max-width:1160px;margin:30px auto;padding:clamp(22px,4vw,52px);border:2px solid #25c8ff;border-radius:18px;background:radial-gradient(ellipse at 80% 0%,#164c7e77,transparent 55%),linear-gradient(145deg,#06192f,#020a19 75%);box-shadow:0 0 0 4px #041323,0 0 38px #008fff55,inset 0 0 45px #0065ad22;color:#eafaff}
+#home.cu-home-hero::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;background:repeating-linear-gradient(0deg,transparent 0 37px,#0e9ee014 38px 39px),repeating-linear-gradient(90deg,transparent 0 37px,#0e9ee014 38px 39px);mask-image:linear-gradient(100deg,transparent 15%,black 100%);opacity:.7}
+#home .cu-home-topline{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#8be7ff;font:800 11px system-ui;letter-spacing:.17em;border-bottom:1px solid #208ab7;padding-bottom:18px}
+#home .cu-live-dot{display:inline-block;width:9px;height:9px;background:#27e5e9;border-radius:50%;box-shadow:0 0 12px #27e5e9;animation:cu-dot 2s infinite}
+#home .eyebrow{margin:30px 0 10px;color:#78dbff;letter-spacing:.2em}
+#home #home-news-heading{font-size:clamp(2.5rem,7vw,5.5rem);line-height:1.03;letter-spacing:-.055em;font-weight:1000;margin:8px 0 16px;color:#f5fcff;text-shadow:0 0 22px #008eff55}
+#home #home-news-heading span{display:block;color:#46d8ff;text-shadow:0 0 28px #00aeff88}
+#home .cu-home-subhead{font-size:clamp(11px,1.6vw,15px);font-weight:900;letter-spacing:.14em;color:#e2f8ff}
+#home .cu-home-subhead span{color:#36d8ff;margin:0 9px}
+#home .cu-home-intro{max-width:650px;color:#b6cfe1;line-height:1.7}
+#home .cu-home-news-title{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:35px 0 0;padding:12px 16px;border:1px solid #167eb7;background:#071f39;color:#a9edff;font-size:12px;font-weight:900;letter-spacing:.11em}
+#home .cu-home-pulse{color:#4bffce}
+#home .home-news-feed{margin-top:0}
+#home .home-news-group{background:linear-gradient(155deg,#0c2b49,#071628);border:1px solid #208ac6;border-top:3px solid #35d6ff;border-radius:0 0 12px 12px;box-shadow:0 9px 25px #0005}
+#home .home-news-item{border-top-color:#225678}
+#home .home-news-item a{color:#8ee9ff}
+#home .home-news-item h3{color:#e3f8ff}
+#home nav[aria-label="Quick destinations"] a{background:linear-gradient(180deg,#126ca7,#06345c)!important;color:white!important;border:1px solid #31d0ff!important;box-shadow:0 0 12px #009fff66!important}
+@keyframes cu-dot{50%{opacity:.45;box-shadow:0 0 4px #27e5e9}}
+@media(max-width:620px){#home .cu-home-topline-right{display:none}#home .cu-home-subhead span{margin:0 3px}#home.cu-home-hero{margin:14px 10px}}
+@media(prefers-reduced-motion:reduce){#home .cu-live-dot{animation:none}}

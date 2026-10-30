@@ -25,6 +25,12 @@
           "name": "Johnny Bravo",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "fosters-home-for-imaginary-friends",
+          "name": "Foster's Home for Imaginary Friends",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

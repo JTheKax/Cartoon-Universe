@@ -32,7 +32,17 @@
   img.src='https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(verifiedLogos[sub.id]);
   logo.classList.add('has-official-logo');logo.prepend(img)
  };
- const makeLogo=(sub)=>{const [symbol,accent,bg]=logoThemes[sub.id]||['✦','#a8e9ff','#34486b'];const logo=document.createElement('div');logo.className='subseries-logo';logo.style.setProperty('--logo-accent',accent);logo.style.setProperty('--logo-bg',bg);logo.setAttribute('role','img');logo.setAttribute('aria-label',sub.name+' custom Ctoon collection logo');const mark=document.createElement('span');mark.className='subseries-logo-symbol';mark.setAttribute('aria-hidden','true');mark.textContent=symbol;const name=document.createElement('strong');name.className='subseries-logo-name';name.textContent=sub.name;logo.append(mark,name);if(verifiedLogos[sub.id])logoImage(sub,logo);return logo};
+ const makeLogo=(sub)=>{const [symbol,accent,bg]=logoThemes[sub.id]||['✦','#a8e9ff','#34486b'];const logo=document.createElement('div');logo.className='subseries-logo';logo.style.setProperty('--logo-accent',accent);logo.style.setProperty('--logo-bg',bg);logo.setAttribute('role','img');logo.setAttribute('aria-label',sub.name+' custom Ctoon collection logo');const mark=document.createElement('span');mark.className='subseries-logo-symbol';mark.setAttribute('aria-hidden','true');mark.textContent=symbol;const name=document.createElement('strong');name.className='subseries-logo-name';name.textContent=sub.name;logo.append(mark,name);if(verifiedLogos[sub.id]){logoImage(sub,logo)}else{
+   const search='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent('intitle:'+sub.name+' logo')+'&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url&iiurlwidth=520&format=json&origin=*';
+   fetch(search).then(r=>r.json()).then(data=>{
+    const pages=Object.values(data.query?.pages||{});
+    const normalize=x=>x.toLowerCase().replace(/[^a-z0-9]/g,'');
+    const target=normalize(sub.name);
+    const match=pages.find(p=>{const t=normalize(p.title.replace(/^File:/i,'').replace(/\.(svg|png|jpg|jpeg|webp)$/i,''));return t.includes(target)&&t.includes('logo')&&p.imageinfo?.[0]?.thumburl});
+    if(!match)return;
+    const img=document.createElement('img');img.className='official-series-logo';img.alt=sub.name+' television series logo';img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{img.remove();logo.classList.remove('has-official-logo')};img.src=match.imageinfo[0].thumburl;logo.classList.add('has-official-logo');logo.prepend(img)
+   }).catch(()=>{});
+  }return logo};
  const showMessage=(message)=>{const p=document.createElement('p');p.className='set-empty';p.textContent=message;grid.replaceChildren(p)};
  fetch('sticker-catalog.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Catalog unavailable');return r.json()}).then(data=>{
   const set=(data.series||[]).find(s=>s.id===id);

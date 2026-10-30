@@ -22,31 +22,62 @@
  'the-powerpuff-girls':['♥','#f8a8cc','#3c6ca8'],
  'xiaolin-showdown':['☯','#e9ad58','#8b343c']
  };
- const verifiedLogos={
+ const logoAliases={
+  'the-fairly-oddparents':['Fairly OddParents','The Fairly OddParents'],
+  'spongebob-squarepants':['SpongeBob SquarePants','SpongeBob'],
+  'codename-kids-next-door':['Codename Kids Next Door','Kids Next Door','KND'],
+  'fosters-home-for-imaginary-friends':['Fosters Home for Imaginary Friends'],
+  'ed-edd-n-eddy':['Ed Edd n Eddy'],
+  'jimmy-neutron':['The Adventures of Jimmy Neutron Boy Genius','Jimmy Neutron'],
+  'class-of-3000':['Class of 3000'],
+  'camp-lazlo':['Camp Lazlo']
+ };
+ const directFiles={
   'dexters-laboratory':'Dexter-logo.png',
   'courage-the-cowardly-dog':'Courage The Cowardly Dog logo.png'
  };
- const fandomLogos={
-  'camp-lazlo':'https://fusionfall.fandom.com/wiki/Special:Redirect/file/Camp_Lazlo.png',
-  'class-of-3000':'https://fusionfall.fandom.com/wiki/Special:Redirect/file/Class_of_3000.png'
- };
- const logoImage=(sub,logo)=>{
+ const addLogoImage=(logo,sub,url)=>{
+  if(!url||logo.querySelector('img'))return;
   const img=document.createElement('img');img.className='official-series-logo';img.alt=sub.name+' television series logo';img.loading='lazy';img.referrerPolicy='no-referrer';
+  img.onload=()=>{logo.classList.add('has-official-logo');logo.setAttribute('aria-label',sub.name+' television series logo')};
   img.onerror=()=>{img.remove();logo.classList.remove('has-official-logo')};
-  img.src='https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(verifiedLogos[sub.id]);
-  logo.classList.add('has-official-logo');logo.prepend(img)
+  img.src=url;logo.prepend(img)
  };
- const makeLogo=(sub)=>{const [symbol,accent,bg]=logoThemes[sub.id]||['✦','#a8e9ff','#34486b'];const logo=document.createElement('div');logo.className='subseries-logo';logo.style.setProperty('--logo-accent',accent);logo.style.setProperty('--logo-bg',bg);logo.setAttribute('role','img');logo.setAttribute('aria-label',sub.name+' custom Ctoon collection logo');const mark=document.createElement('span');mark.className='subseries-logo-symbol';mark.setAttribute('aria-hidden','true');mark.textContent=symbol;const name=document.createElement('strong');name.className='subseries-logo-name';name.textContent=sub.name;logo.append(mark,name);if(fandomLogos[sub.id]){const img=document.createElement('img');img.className='official-series-logo';img.alt=sub.name+' original show logo';img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{img.remove();logo.classList.remove('has-official-logo')};img.src=fandomLogos[sub.id];logo.classList.add('has-official-logo');logo.prepend(img)}else if(verifiedLogos[sub.id]){logoImage(sub,logo)}else{
-   const search='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent('intitle:'+sub.name+' logo')+'&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url&iiurlwidth=520&format=json&origin=*';
-   fetch(search).then(r=>r.json()).then(data=>{
-    const pages=Object.values(data.query?.pages||{});
-    const normalize=x=>x.toLowerCase().replace(/[^a-z0-9]/g,'');
-    const target=normalize(sub.name);
-    const match=pages.find(p=>{const t=normalize(p.title.replace(/^File:/i,'').replace(/\.(svg|png|jpg|jpeg|webp)$/i,''));return t.includes(target)&&t.includes('logo')&&p.imageinfo?.[0]?.thumburl});
-    if(!match)return;
-    const img=document.createElement('img');img.className='official-series-logo';img.alt=sub.name+' television series logo';img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{img.remove();logo.classList.remove('has-official-logo')};img.src=match.imageinfo[0].thumburl;logo.classList.add('has-official-logo');logo.prepend(img)
-   }).catch(()=>{});
-  }return logo};
+ const findCommonsLogo=async(sub,logo)=>{
+  const names=logoAliases[sub.id]||[sub.name];
+  const normalize=x=>x.toLowerCase().replace(/[^a-z0-9]/g,'');
+  for(const name of names){
+   for(const query of ['intitle:"'+name+'" logo','"'+name+'" logo']){
+    try{
+     const url='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(query)+'&gsrnamespace=6&gsrlimit=30&prop=imageinfo&iiprop=url&iiurlwidth=520&format=json&origin=*';
+     const response=await fetch(url);if(!response.ok)continue;
+     const data=await response.json();
+     const target=normalize(name);
+     const candidates=Object.values(data.query?.pages||{}).filter(p=>{
+      const filename=p.title.replace(/^File:/i,'').replace(/\.(svg|png|jpg|jpeg|webp)$/i,'');
+      const normalized=normalize(filename);
+      return normalized.includes(target)&&normalized.includes('logo')&&p.imageinfo?.[0]?.thumburl;
+     });
+     if(candidates.length){
+      candidates.sort((a,b)=>a.title.length-b.title.length);
+      addLogoImage(logo,sub,candidates[0].imageinfo[0].thumburl);return
+     }
+    }catch(e){/* retain readable title fallback */}
+   }
+  }
+ };
+ const makeLogo=(sub)=>{
+  const [symbol,accent,bg]=logoThemes[sub.id]||['✦','#a8e9ff','#34486b'];
+  const logo=document.createElement('div');logo.className='subseries-logo';
+  logo.style.setProperty('--logo-accent',accent);logo.style.setProperty('--logo-bg',bg);
+  logo.setAttribute('role','img');logo.setAttribute('aria-label',sub.name+' collection title');
+  const mark=document.createElement('span');mark.className='subseries-logo-symbol';mark.setAttribute('aria-hidden','true');mark.textContent=symbol;
+  const name=document.createElement('strong');name.className='subseries-logo-name';name.textContent=sub.name;
+  logo.append(mark,name);
+  if(directFiles[sub.id])addLogoImage(logo,sub,'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(directFiles[sub.id]));
+  else void findCommonsLogo(sub,logo);
+  return logo
+ };
  const showMessage=(message)=>{const p=document.createElement('p');p.className='set-empty';p.textContent=message;grid.replaceChildren(p)};
  fetch('sticker-catalog.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Catalog unavailable');return r.json()}).then(data=>{
   const set=(data.series||[]).find(s=>s.id===id);

@@ -14,7 +14,7 @@ styles.css tron-grid.css account.css owner.css clean-arcade.css script.js auth.j
 supabase-config.js theme.js logo-preferences.js admin-nav.js home-profile.js
 coin-wallet.js global-chat.js home-news.js owner.js owner-coin-adjustments.js owner-theater.js maintenance-preview.js maintenance-controls.js maintenance-notice.js
 nav-account-controls.js retro-game-library.js shop-preview.js shop-collect-controller.js
-shop-inventory-controller.js shop-local-movie.js account-redirect.js sticker-catalog.json
+shop-inventory-controller.js sets-overview-enhancements.js shop-local-movie.js account-redirect.js sticker-catalog.json
 assets/appearance-catalog.json static/cartoon-carnival.png static/haunted-arcade.gif
 static/theater.html static/theater.js static/theater-dvd-library.js static/dark-side-ring-blue-cover.svg static/yu-gi-oh-gx-cover.jpg
 shop-auctions.html shop-cards-battle.html shop-cards-deck-build.html shop-cards.html

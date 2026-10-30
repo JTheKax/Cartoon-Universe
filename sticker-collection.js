@@ -11,6 +11,7 @@ const view=document.body.dataset.stickerView;
 const albumFilter=document.getElementById('sticker-album-filter');
 const rarityFilter=document.getElementById('sticker-rarity-filter');
 const ownedFilter=document.getElementById('sticker-owned-filter');
+const searchFilter=document.getElementById('sticker-search-filter');
 const ownerLink=document.getElementById('sticker-owner-link');
 let revision=0;
 let model=null;
@@ -39,7 +40,7 @@ function art(path,label){
 }
 function renderStickers(){
  if(!model)return;
- const entries=filterStickers(model.catalog,{rarity:rarityFilter.value,album:albumFilter.value,owned:ownedFilter.value});
+ const entries=filterStickers(model.catalog,{rarity:rarityFilter.value,album:albumFilter.value,owned:ownedFilter.value,search:searchFilter?.value||''});
  grid.replaceChildren();
  if(!entries.length){grid.append(el('p','sticker-message',model.catalog.length?'No stickers match these filters.':'No published stickers in the catalog yet.'));return;}
  for(const sticker of entries){
@@ -47,7 +48,7 @@ function renderStickers(){
   card.dataset.rarity=sticker.rarity;
   card.append(art(sticker.image_path,sticker.name),el('h3',null,sticker.name),el('p',null,sticker.set.title));
   card.append(el('span','sticker-pill',sticker.rarity));
-  card.append(el('p',null,sticker.quantity?'Owned: '+sticker.quantity:'Missing from your collection'));
+  card.append(el('p',null,sticker.quantity?'Owned: '+sticker.quantity:'Need'));
   grid.append(card);
  }
 }
@@ -85,7 +86,7 @@ function render(){
 }
 async function load(){
  const current=++revision;
- app.hidden=true;ownerLink.hidden=true;setMessage('Checking your account…');
+ app.hidden=true;ownerLink.hidden=true;model=null;grid.replaceChildren();summary.replaceChildren();setMessage('Checking your account…');
  try{
   const {data:{user},error:authError}=await client.auth.getUser();
   if(current!==revision)return;
@@ -109,6 +110,7 @@ async function load(){
  }
 }
 for(const control of [albumFilter,rarityFilter,ownedFilter])control?.addEventListener('change',renderStickers);
+searchFilter?.addEventListener('input',renderStickers);
 client.auth.onAuthStateChange(()=>setTimeout(load,0));
 window.addEventListener('pageshow',load);
 load();

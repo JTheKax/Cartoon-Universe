@@ -1,5 +1,5 @@
 // Verified official-series wordmarks from Wikimedia Commons; other series keep local artwork/text fallbacks.
-const verifiedSeriesLogos={'Adventure Time':'https://commons.wikimedia.org/wiki/Special:FilePath/Adventure_Time_logo2.png','Dragon Ball Z':'https://commons.wikimedia.org/wiki/Special:FilePath/Dragon_Ball_Z_logo.svg'};
+const verifiedSeriesLogos={'Adventure Time':'https://commons.wikimedia.org/wiki/Special:FilePath/Adventure_Time_logo2.png','Dragon Ball Z':'https://commons.wikimedia.org/wiki/Special:FilePath/Dragon_Ball_Z_logo.svg','Naruto':'https://commons.wikimedia.org/wiki/Special:FilePath/Naruto_logo.svg','The Simpsons':'https://commons.wikimedia.org/wiki/Special:FilePath/The_Simpsons_Logo.svg'};
 // Cartoon Universe 3.0 public Ctoon series catalog. Text fallbacks are intentional.
 const catalog={
 'Cartoons':['Adventure Time','American Dad','Ben 10','Camp Lazlo','Class of 3000',"Codename: Kids Next Door",'Family Guy','Futurama','Jackie Chan Adventures','Mucha Lucha','South Park','SpongeBob SquarePants','Teen Titans','The Simpsons','Tom & Jerry','Xiaolin Showdown'],

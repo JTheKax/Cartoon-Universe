@@ -6,38 +6,46 @@ const PROJECT='https://gjfyemvcrgrthbrlqqnz.supabase.co';
 const COOKIE='__Host-cu_owner_verify';
 const TTL=300000;
 const HTML='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cartoon Universe Owner Verification</title><link rel="stylesheet" href="/__maintenance/owner-verification.css"></head><body><main><p class="eyebrow">CARTOON UNIVERSE · OWNER CHECK</p><h1>Verify owner sign-in</h1><p>This page checks owner access only. It cannot change your profile, coins, or maintenance settings.</p><form id="verify-form"><label for="identifier">Username or email</label><input id="identifier" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="254" required><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" maxlength="1024" required><button id="verify" type="submit">Verify owner sign-in</button></form><p id="status" role="status" aria-live="polite">Use your existing owner account.</p><button id="clear" type="button" hidden>Clear verification session</button><p id="arcade-entry" hidden><a href="/__maintenance/arcade/">Enter owner arcade</a></p><p class="note">Your password goes directly to Supabase. No password or refresh token is stored by this verification server.</p></main><script type="module" src="/__maintenance/owner-verification.js"></script></body></html>';
-const CSS=':root{color-scheme:dark;font-family:system-ui,sans-serif;background:#140c28;color:#efeaff}body{margin:0;padding:36px 18px}main{max-width:520px;margin:6vh auto;padding:28px;background:#24163d;border:1px solid #74549f;border-radius:18px}h1{color:#81f2ee;line-height:1.15}.eyebrow,.note{font-size:.85rem;color:#cbb9e7}p{line-height:1.6}label{display:block;margin:18px 0 7px;font-weight:600}input,button{box-sizing:border-box;width:100%;font:inherit;border-radius:9px;padding:12px;border:1px solid #8a6dad}input{background:#160e29;color:#fff}button{margin-top:20px;background:#7ce6dc;color:#15122b;font-weight:750;cursor:pointer}button:disabled{opacity:.6;cursor:wait}a{color:#ffda93}:focus-visible{outline:3px solid #ffda93;outline-offset:3px}#status{min-height:3em}';
+const CSS=':root{color-scheme:dark;--cyan:#66f5ff;--yellow:#ffdc69;--pink:#ff6dc5}*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:24px;color:#f6f3ff;font:16px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;background:linear-gradient(#0a0920b8,#0a0920c9),url("/__maintenance/arcade-error-background.png") center/cover fixed,radial-gradient(ellipse at top,#30205f,#0a0920 70%)}main{max-width:560px;margin:5vh auto;padding:clamp(24px,5vw,40px);border:4px solid var(--cyan);background:#171439;box-shadow:0 0 0 7px #0a0920,0 0 0 11px #7256d3,10px 10px 0 #050414}h1{color:var(--cyan);font-size:clamp(25px,5vw,38px);line-height:1.2;text-transform:uppercase;text-shadow:3px 3px 0 #62388c}.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--pink)}.note{font-size:12px;color:#bcb3e1}p{line-height:1.6}label{display:block;margin:18px 0 7px;font-weight:700;color:var(--yellow)}input,button{width:100%;font:inherit;border-radius:0;padding:12px;border:2px solid #8a6dad}input{background:#0a0920;color:#fff}button{margin-top:20px;background:var(--cyan);color:#15122b;font-weight:800;box-shadow:4px 4px 0 #0b091a;cursor:pointer}button:hover{background:#a6fbff}button:disabled{opacity:.6;cursor:wait}a{color:var(--yellow)}:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}#status{min-height:3em}@media(max-width:480px){body{padding:16px}main{box-shadow:0 0 0 4px #0a0920,0 0 0 7px #7256d3;padding:24px 18px}}';
 export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetchImpl=fetch,now=Date.now,onVerified=()=>{}}){
  const siteOrigin=productionSiteOrigin(origin);
  if(supabaseUrl!==PROJECT||typeof publishableKey!=='string'||!/^sb_publishable_[A-Za-z0-9_-]+$/.test(publishableKey)||publishableKey.length<=30)throw new Error('Explicit owner-verification origin, project, and publishable key are required.');
  const script=readFileSync(new URL('./owner-verification-client.js',import.meta.url));
  const sessions=new Map();
  const cookie=(id,age)=>`${COOKIE}=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}; Secure`;
- const csp=`default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' ${PROJECT}; form-action 'none'; base-uri 'none'; frame-ancestors 'none'`;
+ const csp=`default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self' ${PROJECT}; form-action 'none'; base-uri 'none'; frame-ancestors 'none'`;
  async function api(path,token,method='GET'){
   const response=await fetchImpl(PROJECT+path,{method,headers:{apikey:publishableKey,Authorization:'Bearer '+token},redirect:'error',signal:AbortSignal.timeout(5000)});
   if(!response.ok)throw new Error('Owner verification unavailable');
   return response;
  }
- async function owner(token){
-  if(!token)return false;
+ async function ownerIdentity(token){
+  if(!token)return null;
   try{
    const user=await (await api('/auth/v1/user',token)).json();
    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id||'')||user.is_anonymous===true)return false;
    const rows=await (await api('/rest/v1/owner_members?select=user_id&user_id=eq.'+encodeURIComponent(user.id),token)).json();
-   return Array.isArray(rows)&&rows.some(row=>row.user_id===user.id);
-  }catch{return false;}
+   return Array.isArray(rows)&&rows.some(row=>row.user_id===user.id)?user.id:null;
+  }catch{return null;}
  }
- const authorized=async req=>{
+ const owner=async token=>!!await ownerIdentity(token);
+ // Server-only identity resolver for isolated audited RPC integration.
+ // The token is never returned by an HTTP endpoint or placed in a response body.
+ const identity=async req=>{
   const id=(req.headers.cookie||'').split(';').map(value=>value.trim()).find(value=>value.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);
   const session=sessions.get(id);
-  const valid=!!session&&session.expires>now()&&await owner(session.token);
-  if(!valid)sessions.delete(id);
-  return valid;
+  if(!session||session.expires<=now()){
+   sessions.delete(id);
+   return {verified:false};
+  }
+  const userId=await ownerIdentity(session.token);
+  if(!userId){sessions.delete(id);return {verified:false};}
+  return {verified:true,userId,accessToken:session.token};
  };
+ const authorized=async req=>(await identity(req)).verified===true;
  const handle=async(req,send)=>{
   const path=req.url.split('?')[0];
-  const known=['/__maintenance/owner-signin','/__maintenance/owner-verification.js','/__maintenance/owner-verification.css','/__maintenance/owner-verification-config.js','/__maintenance/verify-session','/__maintenance/owner-status'];
+  const known=['/__maintenance/owner-signin','/__maintenance/owner-verification.js','/__maintenance/owner-verification.css','/__maintenance/owner-verification-config.js','/__maintenance/verify-session','/__maintenance/owner-status','/__maintenance/arcade-error-background.png'];
   if(!known.includes(path))return false;
   const done=(code,body,type='text/plain; charset=utf-8',extra={})=>{send(code,body,type,{'Content-Security-Policy':csp,...extra});return true;};
   const json=(code,data,extra={})=>done(code,JSON.stringify(data),'application/json; charset=utf-8',extra);
@@ -69,6 +77,10 @@ export function createOwnerVerification({origin,supabaseUrl,publishableKey,fetch
    if(!valid)sessions.delete(id);
    return json(200,{ownerVerified:valid,readOnly:true});
   }
+  if(path==='/__maintenance/arcade-error-background.png'){
+   try{return done(200,readFileSync(new URL('../deploy/public-maintenance/arcade-error-background.png',import.meta.url)),'image/png');}
+   catch{return done(404,'Artwork not installed');}
+  }
   if(path==='/__maintenance/owner-signin')return done(200,HTML,'text/html; charset=utf-8');
   if(path==='/__maintenance/owner-verification.css')return done(200,CSS,'text/css; charset=utf-8');
   if(path==='/__maintenance/owner-verification.js')return done(200,script,'text/javascript; charset=utf-8');
@@ -77,5 +89,6 @@ export const SUPABASE_KEY=${JSON.stringify(publishableKey)};
 `,'text/javascript; charset=utf-8');
  };
  handle.authorized=authorized;
+ handle.identity=identity;
  return handle;
 }

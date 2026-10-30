@@ -17,6 +17,12 @@ jobs:
           node-version: '22'
       - name: Run static site checks
         run: node scripts/check-site.mjs
+      - name: Test isolated sticker collection, album and owner draft contracts
+        run: |
+          node --check sticker-collection-core.mjs
+          node --check sticker-collection.js
+          node --check owner-sticker-creator.js
+          node --test tests/sticker-collection.test.mjs
       - name: Validate JavaScript syntax
         run: |
           node --check script.js
@@ -98,6 +104,39 @@ jobs:
       - name: Verify overlapping reward claims award once
         timeout-minutes: 2
         run: python3 scripts/test-reward-concurrency.py
+  sticker-database:
+    name: Test sticker inventory RLS (disposable database)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sticker_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sticker_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: sticker_ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create disposable auth fixture
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/ci_bootstrap.sql
+      - name: Create disposable account schema
+        run: psql -v ON_ERROR_STOP=1 -f supabase/schema.sql
+      - name: Apply review-only sticker proposal to disposable database
+        run: psql -v ON_ERROR_STOP=1 -f sql/review/20261028_sticker_inventory_proposal.sql
+      - name: Verify inventory ownership, audit and owner-only grants
+        run: psql -v ON_ERROR_STOP=1 -f sql/tests/sticker_inventory_security_test.sql
   maintenance-browser:
     name: Test maintenance browser (simulated identities)
     runs-on: ubuntu-latest

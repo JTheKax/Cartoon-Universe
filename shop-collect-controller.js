@@ -11,6 +11,19 @@
  const grid=document.getElementById('collect-sticker-grid');
  const make=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e};
  const records=[]; // Include catalog previews in their series without enabling sales.
+ const seriesCards=new Map([['disney','disney-series-link'],['dragon-ball-z','dragon-ball-z-series-link'],['family-guy','family-guy-series-link'],['futurama','futurama-series-link'],['spongebob-squarepants','spongebob-series-link'],['the-simpsons','simpsons-series-link'],['xiaolin-showdown','xiaolin-series-link'],['misc','misc-series-link']]);
+ function applySeriesLogos(groups){
+  if(!Array.isArray(groups))return;
+  for(const group of groups){
+   const card=document.getElementById(seriesCards.get(group.id));if(!card)continue;
+   const art=card.querySelector('.library-card-art');if(!art)continue;
+   if(typeof group.logo==='string'&&/^https:\/\//.test(group.logo)){
+    const img=document.createElement('img');img.src=group.logo;img.alt=group.name+' series logo';img.loading='lazy';img.referrerPolicy='no-referrer';
+    img.addEventListener('error',()=>{img.remove();if(!art.textContent.trim())art.textContent=group.name;});
+    art.replaceChildren(img);
+   }else if(!art.textContent.trim()){art.textContent=group.name;}
+  }
+ }
  function render(){
   const q=filters.search.value.trim().toLowerCase();
   const matches=records.filter(x=>(filters.series.value==='all'||x.series===filters.series.value)&&(filters.rarity.value==='all'||x.rarity===filters.rarity.value)&&(filters.ownership.value==='all'||(x.owned===true?'owned':x.owned===false?'need':'unknown')===filters.ownership.value)&&[x.name,x.number].some(v=>String(v||'').toLowerCase().includes(q)));
@@ -34,6 +47,6 @@
  simpsonsLink.addEventListener('click',()=>{filters.series.value='The Simpsons';render()});
  miscLink.addEventListener('click',()=>{filters.series.value='Misc.';render()});
  Object.values(filters).forEach(el=>el.addEventListener('input',render));
- fetch('sticker-catalog.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Catalog unavailable');return r.json()}).then(data=>{if(!Array.isArray(data.stickers))throw Error('Invalid catalog');records.push(...data.stickers.filter(x=>x&&typeof x.name==='string'&&typeof x.series==='string'&&data.series.some(group=>group.name===x.series)));updateCounts();render()}).catch(()=>{grid.replaceChildren(make('strong','','Sticker registry not available on this preview deployment.'));document.getElementById('registry-count').textContent='Registry data not loaded';});
+ fetch('sticker-catalog.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Catalog unavailable');return r.json()}).then(data=>{if(!Array.isArray(data.stickers))throw Error('Invalid catalog');applySeriesLogos(data.series);records.push(...data.stickers.filter(x=>x&&typeof x.name==='string'&&typeof x.series==='string'&&data.series.some(group=>group.name===x.series)));updateCounts();render()}).catch(()=>{grid.replaceChildren(make('strong','','Sticker registry not available on this preview deployment.'));document.getElementById('registry-count').textContent='Registry data not loaded';});
  render();
 })();

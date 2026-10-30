@@ -67,6 +67,12 @@
           "name": "The Fairly OddParents",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "jimmy-neutron",
+          "name": "Jimmy Neutron",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

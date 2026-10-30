@@ -139,6 +139,12 @@
           "name": "Tom & Jerry",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "jackie-chan-adventures",
+          "name": "Jackie Chan Adventures",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

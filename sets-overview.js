@@ -1,30 +1,31 @@
-// Local artwork takes precedence; the styled wordmark remains visible if an image is missing.
-const series = ['American Dad','Disney','Dragon Ball Z','Family Guy','Futurama','Naruto','One Piece','SpongeBob SquarePants','The Simpsons','Video Games','Xiaolin Showdown'];
-const subseries = { Disney: ['Big Hero 6', "The Emperor's New Groove", 'Hercules', 'Kim Possible', 'Phineas and Ferb', 'Pirates of the Caribbean', 'The Nightmare Before Christmas'] };
+// Series Overview catalog: keep all published categories visible while artwork is pending.
+const series = ['American Dad','Disney','Dragon Ball Z','Family Guy','Futurama','Naruto','One Piece','SpongeBob SquarePants','The Simpsons','Video Games','Xiaolin Showdown','Cartoons','Anime','Misc.'];
+const subseries = {
+  Disney: ['Big Hero 6',"The Emperor's New Groove",'Hercules','Kim Possible','Phineas and Ferb','Pirates of the Caribbean','The Nightmare Before Christmas'],
+  Cartoons: ['Adventure Time','Ben 10','Camp Lazlo','Class of 3000',"Codename: Kids Next Door",'Jackie Chan Adventures','Mucha Lucha','South Park','Teen Titans','Tom & Jerry'],
+  Anime: ['Attack on Titan','Case Closed','Digimon','Dragon Ball Z','Duel Masters','Fullmetal Alchemist','Hamtaro','Inuyasha','Lupin the Third','Naruto','One Piece','Pokémon','The Seven Deadly Sins','Yu-Gi-Oh!','Yu-Gi-Oh! GX','Yu Yu Hakusho','Zatch Bell']
+};
 const grid = document.getElementById('sets-grid');
-for (const name of series) {
-  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  const card = document.createElement('article'); card.className='set-card';
-  const fallback = document.createElement('div'); fallback.className='set-wordmark'; fallback.textContent=name;
-  const image = document.createElement('img'); image.className='set-logo'; image.alt=name+' series logo'; image.src='static/series-logos/'+slug+'.png'; image.hidden=true;
-  image.addEventListener('load',()=>{image.hidden=false;fallback.hidden=true});
-  image.addEventListener('error',()=>{image.remove();fallback.hidden=false});
-  const title=document.createElement('h2'); title.textContent=name;
-  card.append(image,fallback,title);
-  if (subseries[name]) {
-    const group = document.createElement('div');
-    group.className = 'set-subseries';
-    const heading = document.createElement('h3'); heading.textContent = 'Subseries';
-    const list = document.createElement('ul');
-    for (const child of subseries[name]) {
-      const item = document.createElement('li'); item.textContent = child; list.append(item);
+const ordered = [...new Set(series)].sort((a,b)=>a==='Misc.'?1:b==='Misc.'?-1:a.localeCompare(b));
+for (const name of ordered) {
+  const slug=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const card=document.createElement('article'); card.className='set-card';
+  const fallback=document.createElement('div'); fallback.className='set-wordmark'; fallback.textContent=name;
+  const img=document.createElement('img'); img.className='set-logo'; img.alt=name+' logo'; img.src='static/series-logos/'+slug+'.png'; img.hidden=true;
+  img.addEventListener('load',()=>{img.hidden=false;fallback.hidden=true});
+  img.addEventListener('error',()=>{img.remove();fallback.hidden=false});
+  const title=document.createElement('h2');title.textContent=name;card.append(img,fallback,title);
+  if(subseries[name]){
+    const group=document.createElement('div');group.className='set-subseries';
+    const heading=document.createElement('h3');heading.textContent='Subseries';
+    const list=document.createElement('ul');
+    for(const child of subseries[name]){
+      const li=document.createElement('li');li.textContent=child;list.append(li);
     }
-    group.append(heading,list); card.append(group);
+    group.append(heading,list);card.append(group);
+  }
+  if(name==='Video Games'){
+    const link=document.createElement('a');link.href='console-game-sets-preview.html';link.textContent='Browse Video Game Sets';link.style.color='#7dd3fc';card.append(link);
   }
   grid.append(card);
 }
-const gamesCard=document.createElement('section');gamesCard.className='set-card';gamesCard.style.marginTop='24px';gamesCard.style.alignItems='stretch';gamesCard.style.textAlign='left';
-const gamesHeading=document.createElement('h2');gamesHeading.textContent='Video Games — 90 Series';gamesCard.append(gamesHeading);
-const gamesLink=document.createElement('a');gamesLink.href='console-game-sets-preview.html';gamesLink.textContent='Browse all Video Game Sets →';gamesLink.style.color='#7dd3fc';gamesLink.style.padding='12px 0';gamesCard.append(gamesLink);
-const note=document.createElement('p');note.textContent='Original games, cartoon console games and anime console games. Preview catalog; artwork and player ownership are not connected.';gamesCard.append(note);
-grid.after(gamesCard);

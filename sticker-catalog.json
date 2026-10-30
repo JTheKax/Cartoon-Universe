@@ -245,6 +245,12 @@
           "name": "Hamtaro",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "lupin-the-third",
+          "name": "Lupin the Third",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

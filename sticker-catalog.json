@@ -209,6 +209,12 @@
           "name": "Pokémon",
           "status": "Coming Soon",
           "ctoonCount": 0
+        },
+        {
+          "id": "inuyasha",
+          "name": "Inuyasha",
+          "status": "Coming Soon",
+          "ctoonCount": 0
         }
       ]
     },

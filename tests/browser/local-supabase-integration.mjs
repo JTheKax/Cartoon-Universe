@@ -34,7 +34,7 @@ try{
  cli(['migration','new','local_maintenance_integration']);
  const migration=(await readdir(join(directory,'supabase/migrations'))).find(name=>name.endsWith('_local_maintenance_integration.sql'));
  check(migration,'CLI did not generate the local migration');
- const sources=['supabase/schema.sql','sql/tests/local_supabase_maintenance_fixture.sql','supabase/maintenance-daily-reward-guard.sql','supabase/maintenance-controls-review.sql','supabase/section-maintenance-review.sql'];
+ const sources=['supabase/schema.sql','sql/tests/local_supabase_maintenance_fixture.sql','supabase/maintenance-daily-reward-guard.sql','supabase/maintenance-controls-review.sql','supabase/section-maintenance-review.sql','supabase/global-maintenance-audit-review.sql'];
  const sql=(await Promise.all(sources.map(path=>readFile(join(root,path),'utf8')))).map(text=>text.replace(/^(?:begin|commit);\s*$/gm,'')).join('\n');
  await writeFile(join(directory,'supabase/migrations',migration),sql);
  execFileSync('docker',['network','create','-o','com.docker.network.bridge.host_binding_ipv4=127.0.0.1',network],{stdio:'pipe'});networkCreated=true;
@@ -134,6 +134,33 @@ try{
  psql('drop trigger test_section_audit_fail on public.section_maintenance_audit; drop function public.test_section_audit_fail();');
  console.log('Real local section maintenance: nonowner denial, owner audit, concurrent writes and rollback passed.');
 
+ // Global maintenance must use the same atomic owner-only audit contract.
+ const deniedGlobal=await playerClient.rpc('set_global_maintenance',{p_enabled:true,p_message:null});
+ check(!!deniedGlobal.error,'Nonowner changed global maintenance through RPC');
+ const directGlobal=await ownerClient.from('site_maintenance').update({enabled:true}).eq('id',true).select('id');
+ check(!!directGlobal.error||directGlobal.data?.length===0,'Owner bypassed audited global RPC with a direct UPDATE');
+ const globalWrite=await ownerClient.rpc('set_global_maintenance',{p_enabled:true,p_message:'Disposable global maintenance'});
+ check(!globalWrite.error&&globalWrite.data?.saved===true&&globalWrite.data?.audited===true,
+  'Owner global RPC failed to acknowledge audited write');
+ const globalState=await admin.from('site_maintenance').select('enabled,message').eq('id',true).single();
+ const globalAudit=await admin.from('global_maintenance_audit').select('previous_enabled,maintenance_enabled,owner_id');
+ check(!globalState.error&&globalState.data.enabled===true&&globalState.data.message==='Disposable global maintenance'
+  &&!globalAudit.error&&globalAudit.data.length===1&&globalAudit.data[0].previous_enabled===false
+  &&globalAudit.data[0].maintenance_enabled===true&&globalAudit.data[0].owner_id===owner.id,
+  'Global maintenance audit and state mismatch');
+ psql(`create function public.test_global_audit_fail() returns trigger language plpgsql as $audit_fail$
+ begin raise exception 'isolated global audit failure'; end $audit_fail$;
+ create trigger test_global_audit_fail before insert on public.global_maintenance_audit
+ for each row execute function public.test_global_audit_fail();`);
+ const globalRollback=await ownerClient.rpc('set_global_maintenance',{p_enabled:false,p_message:null});
+ check(!!globalRollback.error,'Global audit failure did not abort the owner RPC');
+ const globalAfterRollback=await admin.from('site_maintenance').select('enabled').eq('id',true).single();
+ const globalAuditAfterRollback=await admin.from('global_maintenance_audit').select('id');
+ check(!globalAfterRollback.error&&globalAfterRollback.data.enabled===true
+  &&!globalAuditAfterRollback.error&&globalAuditAfterRollback.data.length===1,
+  'Global maintenance status did not roll back after audit failure');
+ psql('drop trigger test_global_audit_fail on public.global_maintenance_audit; drop function public.test_global_audit_fail();');
+ console.log('Real local global maintenance: owner-only audited writes and atomic rollback passed.');
  psql('update public.site_maintenance set enabled=true where id=true;');
  const {data:before,error:readError}=await admin.from('coin_wallets').select('balance').eq('user_id',player.id).single();
  check(!readError&&before.balance===100,'Could not read disposable wallet');

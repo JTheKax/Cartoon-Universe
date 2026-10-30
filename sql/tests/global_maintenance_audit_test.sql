@@ -11,7 +11,7 @@ begin
   raise exception 'Unsafe global maintenance grants';
  end if;
  if not exists(select 1 from pg_proc where oid='public.set_global_maintenance(boolean,text)'::regprocedure
-    and prosecdef and proconfig @> array['search_path=']) then
+    and prosecdef and coalesce(array_to_string(proconfig,','),'') like '%search_path=%') then
   raise exception 'Global RPC must use a restricted security-definer search path';
  end if;
 end $$;

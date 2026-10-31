@@ -18,7 +18,16 @@ export function createStickerView(sets=[],stickers=[],inventory=[]){
    .sort((a,b)=>rarityOrder.get(b.rarity)-rarityOrder.get(a.rarity)||a.name.localeCompare(b.name));
  const albums=Array.from(setMap.values()).map(set=>{
   const entries=catalog.filter(s=>s.set_id===set.id);
-  return {...set,total:entries.length,collected:entries.filter(s=>s.quantity>0).length,
+  const total=entries.length;
+  const collected=entries.filter(s=>s.quantity>0).length;
+  const rarityProgress=Object.fromEntries(RARITIES.map(rarity=>[rarity,{owned:0,total:0}]));
+  for(const sticker of entries){
+   rarityProgress[sticker.rarity].total++;
+   if(sticker.quantity>0)rarityProgress[sticker.rarity].owned++;
+  }
+  return {...set,total,collected,needed:total-collected,
+   completion:total?Math.round(100*collected/total):0,
+   rarityProgress,
    duplicates:entries.reduce((n,s)=>n+Math.max(0,s.quantity-1),0)};
  }).sort((a,b)=>{const misc=s=>/^misc\.?$/i.test(s.title.trim());return Number(misc(a))-Number(misc(b))||a.title.localeCompare(b.title);});
  return {catalog,albums,totalOwned:catalog.filter(s=>s.quantity>0).length,

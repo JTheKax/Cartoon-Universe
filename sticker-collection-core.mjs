@@ -52,3 +52,22 @@ export async function collectPagedRows(fetchPage,{pageSize=500,maxPages=40}={}){
  }
  throw new Error('Sticker collection exceeds the safe page limit; increase the reviewed limit before displaying totals.');
 }
+
+/**
+ * Nonproduction Ctoon membership adapter. This schema has no quantity or rarity;
+ * never convert membership into an authoritative duplicate/copy count.
+ * Callers must explicitly present unknown quantities and rarities as unknown.
+ */
+export function adaptCtoonMembership(catalog=[],ownership=[]){
+ const ownedIds=new Set(ownership.filter(row=>row&&typeof row.sticker_id==='string').map(row=>row.sticker_id));
+ return catalog.filter(row=>row&&typeof row.id==='string'&&row.published===true).map(row=>({
+  id:row.id,
+  series:row.series,
+  subseries:row.subseries,
+  name:row.title,
+  artwork_url:row.artwork_url,
+  owned:ownedIds.has(row.id),
+  quantity:null,
+  rarity:null
+ }));
+}

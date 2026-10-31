@@ -1,8 +1,54 @@
 // Movie Theater on-demand preview. The legacy 24/7 TV channel is disabled.
 
-// External chat controller: inline scripts are blocked by the protected owner gateway CSP.
+// Shared theater chat: persisted in Supabase, synchronized with Realtime.
 if(document.getElementById('theater-chat-toggle')){
-(()=>{const toggle=document.getElementById('theater-chat-toggle'),win=document.getElementById('theater-chat-window'),close=document.getElementById('theater-chat-close'),form=document.getElementById('theater-chat-form'),input=document.getElementById('theater-chat-input'),messages=document.getElementById('theater-chat-messages');function setOpen(open){win.hidden=!open;toggle.setAttribute('aria-expanded',String(open));if(open)input.focus()}toggle.addEventListener('click',()=>setOpen(win.hidden));close.addEventListener('click',()=>setOpen(false));form.addEventListener('submit',event=>{event.preventDefault();const value=input.value.trim();if(!value)return;const item=document.createElement('div');item.className='theater-chat-message mine';item.textContent=value;messages.append(item);messages.scrollTop=messages.scrollHeight;input.value='';input.focus()})})();
+(async()=>{
+ const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2');
+ const {SUPABASE_URL,SUPABASE_ANON_KEY}=await import('../config.js');
+ const db=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+ const toggle=document.getElementById('theater-chat-toggle'),win=document.getElementById('theater-chat-window'),close=document.getElementById('theater-chat-close'),form=document.getElementById('theater-chat-form'),input=document.getElementById('theater-chat-input'),messages=document.getElementById('theater-chat-messages');
+ messages.replaceChildren();
+ const status=document.createElement('p');status.setAttribute('role','status');status.className='theater-chat-status';form.before(status);
+ let user=null,owner=false,profileName='Player',loading=false;
+ function setOpen(open){win.hidden=!open;toggle.setAttribute('aria-expanded',String(open));toggle.textContent=open?'💬 Hide Chat':'💬 Open Chat';if(open&&!input.disabled)input.focus();}
+ toggle.addEventListener('click',()=>setOpen(win.hidden));close.addEventListener('click',()=>setOpen(false));
+ async function identity(){
+  const {data:{user:current},error:authError}=await db.auth.getUser();if(authError)console.warn('Chat authentication:',authError.message);user=current;owner=false;profileName='Player';
+  if(user){const [{data:p},{data:o}]=await Promise.all([db.from('profiles').select('display_name,username').eq('id',user.id).maybeSingle(),db.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle()]);profileName=String(p?.display_name?.trim()||p?.username?.trim()||'Player').slice(0,40);owner=Boolean(o);}
+  input.disabled=!user;form.querySelector('button[type="submit"]').disabled=!user;
+  input.placeholder=user?'Message the theater…':'Sign in to join the live chat';
+  status.textContent=user?'Live theater chat • '+profileName+(owner?' • Owner moderation':''):'Live chat is viewable by everyone. Sign in to send messages.';
+ }
+ const seen=new Set();
+ function render(item){
+  if(seen.has(item.id))return;seen.add(item.id);
+  const line=document.createElement('div');line.className='theater-chat-message'+(item.user_id===user?.id?' mine':'');
+  const meta=document.createElement('div');meta.className='theater-chat-meta';
+  const name=document.createElement('strong');name.textContent=item.display_name;
+  const time=document.createElement('time');time.dateTime=item.created_at;time.textContent=new Date(item.created_at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  meta.append(name,time);line.append(meta);
+  const body=document.createElement('div');body.textContent=item.body;line.append(body);
+  if(owner){const remove=document.createElement('button');remove.type='button';remove.className='theater-chat-delete';remove.textContent='Remove';remove.setAttribute('aria-label','Remove message from '+item.display_name);remove.addEventListener('click',async()=>{remove.disabled=true;const {error}=await db.from('theater_chat_messages').delete().eq('id',item.id);if(error){status.textContent='Could not remove message: '+error.message;remove.disabled=false;}else{seen.delete(item.id);line.remove();}});line.append(remove);}
+  line.dataset.id=String(item.id);messages.append(line);while(messages.children.length>100){seen.delete(messages.firstChild.dataset.id);messages.firstChild.remove();}messages.scrollTop=messages.scrollHeight;
+ }
+ async function load(){
+  if(loading)return;loading=true;
+  const {data,error}=await db.from('theater_chat_messages').select('id,user_id,display_name,body,created_at').order('created_at',{ascending:false}).limit(100);
+  if(error)status.textContent='Chat history unavailable: '+error.message;
+  else{messages.replaceChildren();seen.clear();(data||[]).reverse().forEach(render);}
+  loading=false;
+ }
+ await identity();await load();
+ const channel=db.channel('theater-chat-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'theater_chat_messages'},payload=>render(payload.new)).on('postgres_changes',{event:'DELETE',schema:'public',table:'theater_chat_messages'},payload=>{if(payload.old?.id){seen.delete(payload.old.id);messages.querySelectorAll('[data-id]').forEach(el=>{if(el.dataset.id===String(payload.old.id))el.remove();});}else load();}).subscribe(state=>{if(state==='CHANNEL_ERROR'||state==='TIMED_OUT')status.textContent='Chat connection interrupted. Refresh to reconnect.';});
+ db.auth.onAuthStateChange(()=>{setTimeout(()=>identity().then(load).catch(console.error),0);});
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();if(!user)return;const body=input.value.trim();if(!body||body.length>300)return;
+  const button=form.querySelector('button[type="submit"]');button.disabled=true;
+  const {error}=await db.from('theater_chat_messages').insert({user_id:user.id,display_name:profileName,body});
+  button.disabled=false;if(error)status.textContent='Message not sent: '+error.message;else{input.value='';status.textContent='Message sent';await load();input.focus();}
+ });
+ window.addEventListener('pagehide',()=>db.removeChannel(channel),{once:true});
+})().catch(error=>{const el=document.getElementById('theater-chat-messages');if(el)el.textContent='Live chat could not connect: '+error.message;});
 }
 
 // DVD shelf preview selection (sample cases do not imply playable content).
@@ -82,3 +128,5 @@ const darkCoverUpload=document.getElementById('dark-side-cover-upload');
 function showDarkCover(data){const cover=document.querySelector('.dark-side-logo-art');if(!cover||!/^data:image\/(jpeg|png|webp);base64,/.test(data))return;cover.replaceChildren();const img=document.createElement('img');img.src=data;img.alt='Dark Side of the Ring custom DVD cover';img.style.cssText='width:100%;height:100%;object-fit:fill;display:block';img.onerror=()=>{try{localStorage.removeItem(darkCoverKey);}catch{}img.remove();const fallback=document.createElement('img');fallback.src='dark-side-ring-blue-cover.svg';fallback.alt='Dark Side of the Ring DVD cover';fallback.style.cssText='width:100%;height:100%;object-fit:fill;display:block';cover.append(fallback);};cover.style.padding='0';cover.append(img);}
 try{const saved=localStorage.getItem(darkCoverKey);if(saved)showDarkCover(saved);}catch{}
 if(darkCoverUpload)darkCoverUpload.addEventListener('change',()=>{const file=darkCoverUpload.files&&darkCoverUpload.files[0];const status=document.getElementById('dark-side-cover-status');if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>2000000){status.textContent='Use a JPEG, PNG or WebP under 2 MB.';return;}const reader=new FileReader();reader.onload=()=>{try{localStorage.setItem(darkCoverKey,String(reader.result));showDarkCover(String(reader.result));status.textContent='Custom DVD cover saved on this browser.';}catch{status.textContent='Could not save the cover in browser storage.';}};reader.readAsDataURL(file);});
+
+import('./theater-dvd-library.js?v=20261029-cover-display-3').catch(error=>{console.error(error);document.getElementById('dvd-selection').textContent='DVD library failed to load: '+error.message;});

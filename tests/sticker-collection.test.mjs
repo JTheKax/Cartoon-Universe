@@ -126,3 +126,32 @@ test('owner draft is cleared when owner authorization is lost or changes',()=>{
  assert.ok(js.includes('if(error||!owner){verifiedOwnerId=null;clearDraft()'));
  assert.ok(js.includes('if(authError||!user||user.is_anonymous){verifiedOwnerId=null;clearDraft()'));
 });
+
+
+test('album progress tracks Need and each rarity without counting duplicate copies twice',()=>{
+ const model=createStickerView(sets,stickers,[{sticker_id:'1',quantity:3},{sticker_id:'3',quantity:1}]);
+ const arcade=model.albums.find(a=>a.slug==='arcade-originals');
+ assert.equal(arcade.needed,1);
+ assert.equal(arcade.completion,50);
+ assert.deepEqual(arcade.rarityProgress.Rare,{owned:1,total:1});
+ assert.deepEqual(arcade.rarityProgress.Legendary,{owned:0,total:1});
+ assert.deepEqual(arcade.rarityProgress.Common,{owned:0,total:0});
+ assert.equal(arcade.duplicates,2);
+ assert.equal(model.albums.find(a=>a.slug==='space').completion,100);
+});
+test('empty albums show zero completion and no invented rarity progress',()=>{
+ const model=createStickerView([...sets,{id:'empty',slug:'empty',title:'Empty Album'}],stickers,[]);
+ const empty=model.albums.find(a=>a.slug==='empty');
+ assert.equal(empty.total,0);
+ assert.equal(empty.needed,0);
+ assert.equal(empty.completion,0);
+ assert.ok(Object.values(empty.rarityProgress).every(v=>v.owned===0&&v.total===0));
+});
+test('album UI uses text nodes and does not mutate player inventory',()=>{
+ const js=file('sticker-collection.js');
+ assert.match(js,/album\.rarityProgress\[rarity\]/);
+ assert.match(js,/album\.needed\+' Need'/);
+ assert.match(js,/stat\('Need',model\.catalog\.length-model\.totalOwned\)/);
+ assert.doesNotMatch(js,/\.innerHTML\s*=/);
+ assert.doesNotMatch(js,/\.rpc\(|\.insert\(|\.update\(|\.upsert\(|\.delete\(/);
+});

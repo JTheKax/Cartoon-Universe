@@ -27,7 +27,7 @@ class AppearanceCatalogTests(unittest.TestCase):
         for page in (owner,home):
             self.assertIn('logo-preferences.js',page)
             self.assertIn('theme.js',page)
-        self.assertIn('id="nav-owner-tab" hidden',home)
+        self.assertIn('id="admin-nav" hidden',home)
         self.assertIn('src="admin-nav.js"',home)
 
 if __name__=='__main__':

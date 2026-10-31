@@ -119,23 +119,18 @@ async function load(){
    if(primaryError?.code!=='42P01'&&primaryError?.code!=='PGRST205')throw primaryError;
    const [catalog,ownership]=await Promise.all([
     collectPagedRows((start,end)=>client.from('ctoon_sticker_catalog').select('id,series,subseries,title,artwork_url,published').eq('published',true).order('id').range(start,end)),
-    collectPagedRows((start,end)=>client.from('ctoon_sticker_ownership').select('sticker_id').eq('user_id',user.id).order('sticker_id').range(start,end))
+    collectPagedRows((start,end)=>client.from('ctoon_sticker_ownership').select('sticker_id,quantity').eq('user_id',user.id).order('sticker_id').range(start,end))
    ]);
    if(current!==revision)return;
+   // Ownership quantity lives on the canonical ownership row, not a second table.
+   // RLS restricts these rows to the signed-in user.
    let entries=adaptCtoonMembership(catalog,ownership);
-   // Optional, separately reviewed table. Missing schema leaves legacy counts unknown.
-   try{
-    const counts=await collectPagedRows((start,end)=>client.from('ctoon_sticker_quantities').select('sticker_id,quantity').eq('user_id',user.id).order('sticker_id').range(start,end));
-    if(current!==revision)return;
-    entries=applyCtoonQuantities(entries,counts);
-    quantitiesAvailable=entries.every(item=>item.quantity!==null);
-   }catch(quantityError){
-    if(quantityError?.code!=='42P01'&&quantityError?.code!=='PGRST205')throw quantityError;
-   }
+   entries=applyCtoonQuantities(entries,ownership);
+   quantitiesAvailable=entries.every(item=>item.quantity!==null);
    const titles=[...new Set(entries.map(s=>s.subseries||s.series).filter(Boolean))].sort();
    const sets=titles.map((title,i)=>({id:String(i),title,slug:title.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}));
    const byTitle=new Map(sets.map(set=>[set.title,set]));
-   const stickers=entries.map(s=>({...s,set:byTitle.get(s.subseries||s.series),image_path:null}));
+   const stickers=entries.map(s=>({...s,set:byTitle.get(s.subseries||s.series),image_path:s.artwork_url||null}));
    model={catalog:stickers,albums:sets.map(set=>{const items=stickers.filter(s=>s.set.id===set.id);return {...set,total:items.length,collected:items.filter(s=>s.owned).length,duplicates:items.every(s=>s.quantity!==null)?items.reduce((n,s)=>n+Math.max(0,s.quantity-1),0):null};}),totalOwned:stickers.filter(s=>s.owned).length,totalCopies:quantitiesAvailable?stickers.reduce((n,s)=>n+s.quantity,0):null};
    membershipMode=true;
   }

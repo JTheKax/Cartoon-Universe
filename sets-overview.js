@@ -1,5 +1,13 @@
 // Unified Ctoon Sets Overview. Catalog is the source of truth; no invented ownership totals.
 const grid = document.getElementById('sets-grid');
+const existingLogos = {
+  'Camp Lazlo': 'camp-lazlo.png',
+  'Class of 3000': 'class-of-3000-new.png',
+  'Mucha Lucha': 'mucha-lucha-new.png',
+  'Codename: Kids Next Door': 'codename-kids-next-door.png',
+  'Tom & Jerry': 'tom-and-jerry.png',
+  'Jackie Chan Adventures': 'jackie-chan-adventures.jpg'
+};
 const slug = value => value.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 function makeCard(name, category, isCategory = false) {
   const link = document.createElement('a');
@@ -8,7 +16,7 @@ function makeCard(name, category, isCategory = false) {
   const img = document.createElement('img');
   img.className = 'set-logo';
   img.alt = name + ' logo';
-  img.src = 'static/series-logos/' + slug(name) + '.png';
+  img.src = existingLogos[name] ? 'assets/logos/' + existingLogos[name] : 'static/series-logos/' + slug(name) + '.png';
   img.hidden = true;
   const fallback = document.createElement('span');
   fallback.className = 'set-wordmark';

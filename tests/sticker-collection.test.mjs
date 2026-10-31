@@ -138,5 +138,5 @@ test('Ctoon membership adapter isolates per-user ownership when RLS supplies eac
  assert.ok(alice.every(s=>s.quantity===null&&s.rarity===null));
  const page=file('sticker-collection.js');
  assert.ok(page.includes("from('ctoon_sticker_ownership').select('sticker_id').eq('user_id',user.id)"));
- assert.doesNotMatch(page,/\\.insert\\(|\\.update\\(|\\.upsert\\(|\\.delete\\(/);
+ for(const operation of ['.insert(','.update(','.upsert(','.delete('])assert.equal(page.includes(operation),false);
 });

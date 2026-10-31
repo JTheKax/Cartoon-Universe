@@ -47,3 +47,14 @@ test('unpublished series links never silently show unrelated Ctoons',()=>{
  assert.match(collection,/requestedSeries&&!matchingSeries/);
  assert.match(collection,/No published Ctoon album matches this series yet\. Coming Soon\./);
 });
+
+
+test('Ctoon membership adapter preserves unknown duplicate counts',async()=>{
+ const {adaptCtoonMembership}=await import('../sticker-collection-core.mjs');
+ const catalog=[{id:'a',series:'Cartoons',title:'Example',published:true},{id:'b',series:'Anime',title:'Draft',published:false}];
+ const rows=adaptCtoonMembership(catalog,[{sticker_id:'a'}]);
+ assert.equal(rows.length,1);
+ assert.equal(rows[0].owned,true);
+ assert.equal(rows[0].quantity,null);
+ assert.equal(rows[0].rarity,null);
+});

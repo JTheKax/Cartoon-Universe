@@ -20,12 +20,13 @@ for (const name of ordered) {
     const heading=document.createElement('h3');heading.textContent='Subseries';
     const list=document.createElement('ul');
     for(const child of subseries[name]){
-      const li=document.createElement('li');li.textContent=child;list.append(li);
+      const li=document.createElement('li');const link=document.createElement('a');link.textContent=child;link.href='set-detail.html?series='+encodeURIComponent(name)+'&subseries='+encodeURIComponent(child);link.style.color='#bdefff';li.append(link);list.append(li);
     }
     group.append(heading,list);card.append(group);
   }
   if(name==='Video Games'){
     const link=document.createElement('a');link.href='console-game-sets-preview.html';link.textContent='Browse Video Game Sets';link.style.color='#7dd3fc';card.append(link);
   }
+  if(name!=='Video Games') { const browse=document.createElement('a');browse.href='set-detail.html?series='+encodeURIComponent(name);browse.textContent='Browse '+name+' stickers';browse.style.color='#7dd3fc';card.append(browse); }
   grid.append(card);
 }

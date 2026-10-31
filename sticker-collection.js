@@ -75,11 +75,14 @@ function renderAlbums(){
 function render(){
  summary.replaceChildren(stat('unique stickers',model.totalOwned),stat('total copies',model.totalCopies),stat('published stickers',model.catalog.length));
  if(view==='albums'){summary.append(stat('albums',model.albums.length));renderAlbums();return;}
- const requestedAlbum=new URLSearchParams(location.search).get('album');
+ const queryParams=new URLSearchParams(location.search);
+ const requestedAlbum=queryParams.get('album');
+ const requestedSeries=queryParams.get('series');
  const current=albumFilter.value;
  albumFilter.replaceChildren(new Option('All albums','all'));
  for(const album of model.albums)albumFilter.add(new Option(album.title,album.slug));
- albumFilter.value=model.albums.some(a=>a.slug===requestedAlbum)?requestedAlbum:(model.albums.some(a=>a.slug===current)?current:'all');
+ const matchingSeries=model.albums.find(a=>a.title.toLocaleLowerCase()===requestedSeries?.toLocaleLowerCase());
+ albumFilter.value=model.albums.some(a=>a.slug===requestedAlbum)?requestedAlbum:(matchingSeries?.slug||(model.albums.some(a=>a.slug===current)?current:'all'));
  rarityFilter.replaceChildren(new Option('All rarities','all'));
  for(const rarity of RARITIES)rarityFilter.add(new Option(rarity,rarity));
  renderStickers();

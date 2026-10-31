@@ -39,3 +39,16 @@ test('individual section maintenance does not block unrelated sections',()=>{
  assert.equal(guardSectionRoute({pathname:'/radio',globalMaintenance:false,sectionStatuses:{...statuses,radio:true}}).allowed,false);
  assert.equal(guardSectionRoute({pathname:'/shop-games-arcade.html',globalMaintenance:false,sectionStatuses:{...statuses,radio:true}}).allowed,true);
 });
+
+test('route guard independently fails closed for owner when global or unrelated section state is malformed',()=>{
+ for(const [globalMaintenance,sectionStatuses] of [
+  [undefined,statuses],
+  [true,undefined],
+  [true,{...statuses,radio:null}],
+  [false,{...statuses,radio:'false'}],
+  [false,{...statuses,unexpected:false}]
+ ]){
+  assert.deepEqual(guardSectionRoute({pathname:'/index.html',method:'GET',globalMaintenance,sectionStatuses,verifiedOwner:true}),
+   {allowed:false,reason:'maintenance-state-unavailable'});
+ }
+});

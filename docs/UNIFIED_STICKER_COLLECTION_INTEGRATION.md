@@ -20,6 +20,15 @@
 
 This document initiates integration review only. It does not claim the collection has been merged, published or deployed.
 
+
+## Inventory schema reconciliation (2026-10-31)
+
+**Canonical collection contract for this review:** `public.sticker_sets` (album metadata), `public.stickers` (published sticker records), and `public.player_stickers` (authenticated per-player quantities). These are the tables the current `sticker-collection.js` reads. The SQL in `sql/review/20261028_sticker_inventory_proposal.sql` is a **review proposal**, not proof those tables exist in production.
+
+**Separate incompatible proposal:** `supabase/migrations/20261030180000_ctoon_sticker_ownership.sql` defines `public.ctoon_sticker_catalog` and `public.ctoon_sticker_ownership`, which are **not** read by the current collection UI. Do **not** apply this migration as a way to enable the UI, and do not populate both schemas independently. The separate ownership table also has no quantity column, so it cannot directly preserve duplicates.
+
+**Safe reconciliation sequence:** (1) inspect actual production schema read-only and inventory row counts without exposing user records; (2) select one canonical model preserving existing sticker IDs and player quantities; (3) write a reviewed, idempotent migration or compatibility view only if necessary; (4) test RLS for anonymous, player A, player B, and owner in a disposable Supabase project; (5) verify collection page queries and published album mappings; (6) request explicit production migration and deployment approval. No production SQL has been executed here.
+
 ## Deployment readiness gate (2026-10-31)
 
 **Status: NOT YET READY TO MERGE OR DEPLOY.** Missing logos are deferred and must retain visible text fallbacks; they are not a release blocker.

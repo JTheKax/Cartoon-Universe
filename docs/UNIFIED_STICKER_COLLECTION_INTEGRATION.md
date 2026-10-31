@@ -29,7 +29,7 @@ This document initiates integration review only. It does not claim the collectio
 - [x] Ctoon terminology in collection, album, owner draft, homepage, and series views.
 - [x] Read-only authenticated player inventory and Owned/Need calculations in the review code.
 - [x] Add catalog integration tests to both the review and main validation workflows.
-- [ ] GitHub Actions passes for the exact final review commit (including collection, catalog, site and local Supabase checks).
+- [x] GitHub Actions passed for commit b93433955cb84ca258fa9188fe87076a2a7f0a52 (collection review and website validation, including isolated database and local Supabase integration). Re-run for any subsequent commit.
 - [ ] Browser smoke test: mobile/desktop category links, empty Movies/Misc, fallback logos, logged-out and player states.
 - [ ] Verify proposed sticker inventory schema and RLS against a disposable Supabase environment; check compatibility with existing production schema before any migration.
 - [ ] Verify real published catalog entries, album slug/series matching, player-specific inventory and artwork rights.

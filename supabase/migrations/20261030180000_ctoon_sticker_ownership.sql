@@ -13,6 +13,7 @@ create table if not exists public.ctoon_sticker_catalog (
 create table if not exists public.ctoon_sticker_ownership (
  user_id uuid not null references auth.users(id) on delete cascade,
  sticker_id uuid not null references public.ctoon_sticker_catalog(id) on delete cascade,
+ quantity integer not null default 1 check (quantity > 0),
  acquired_at timestamptz not null default now(),
  acquisition_source text not null default 'system',
  primary key (user_id,sticker_id)

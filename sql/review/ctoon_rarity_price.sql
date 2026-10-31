@@ -1,0 +1,1 @@
+alter table public.ctoon_sticker_catalog add column if not exists rarity text not null default 'Common' check (rarity in ('Common','Uncommon','Rare','Epic','Legendary','Prize Only')); alter table public.ctoon_sticker_catalog add column if not exists coin_price integer check (coin_price is null or coin_price >= 0);

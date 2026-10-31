@@ -116,7 +116,7 @@ test('sticker HTML has valid theme script tags and a searchable Need filter',()=
  assert.ok(html.includes('<option value="no">Need</option>'));
  const js=file('sticker-collection.js');
  assert.ok(js.includes("searchFilter?.addEventListener('input',renderStickers)"));
- assert.ok(js.includes('model=null;membershipMode=false;grid.replaceChildren();summary.replaceChildren()'));
+ assert.ok(js.includes('model=null;membershipMode=false;quantitiesAvailable=false;grid.replaceChildren();summary.replaceChildren()'));
 });
 test('owner draft is cleared when owner authorization is lost or changes',()=>{
  const js=file('owner-sticker-creator.js');
@@ -139,4 +139,20 @@ test('Ctoon membership adapter isolates per-user ownership when RLS supplies eac
  const page=file('sticker-collection.js');
  assert.ok(page.includes("from('ctoon_sticker_ownership').select('sticker_id').eq('user_id',user.id)"));
  for(const operation of ['.insert(','.update(','.upsert(','.delete('])assert.equal(page.includes(operation),false);
+});
+
+
+test('verified quantities preserve unknown legacy counts and count extras',async()=>{
+ const {adaptCtoonMembership,applyCtoonQuantities}=await import('../sticker-collection-core.mjs');
+ const catalog=[{id:'a',title:'A',published:true},{id:'b',title:'B',published:true}];
+ const legacy=adaptCtoonMembership(catalog,[{sticker_id:'a'}]);
+ const mixed=applyCtoonQuantities(legacy,[{sticker_id:'a',quantity:3}]);
+ assert.equal(mixed[0].quantity,3);
+ assert.equal(mixed[0].owned,true);
+ assert.equal(mixed[1].quantity,null);
+ assert.equal(mixed[1].owned,false);
+ assert.throws(()=>applyCtoonQuantities(legacy,[{sticker_id:'a',quantity:-1}]));
+ assert.throws(()=>applyCtoonQuantities(legacy,[{sticker_id:'a',quantity:1},{sticker_id:'a',quantity:2}]));
+ const page=file('sticker-collection.js');
+ assert.ok(page.includes("from('ctoon_sticker_quantities').select('sticker_id,quantity').eq('user_id',user.id)"));
 });

@@ -1,0 +1,156 @@
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
+import {RARITIES,createStickerView,filterStickers,safeStickerArt,collectPagedRows,adaptCtoonMembership,applyCtoonQuantities} from './sticker-collection-core.mjs';
+
+const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const status=document.getElementById('sticker-status');
+const app=document.getElementById('sticker-app');
+const grid=document.getElementById('sticker-grid');
+const summary=document.getElementById('sticker-summary');
+const view=document.body.dataset.stickerView;
+const albumFilter=document.getElementById('sticker-album-filter');
+const rarityFilter=document.getElementById('sticker-rarity-filter');
+const ownedFilter=document.getElementById('sticker-owned-filter');
+const searchFilter=document.getElementById('sticker-search-filter');
+const ownerLink=document.getElementById('sticker-owner-link');
+let revision=0;
+let model=null;
+let membershipMode=false;
+let quantitiesAvailable=false;
+document.querySelector('[data-nav="'+view+'"]')?.setAttribute('aria-current','page');
+function el(tag,className,text){
+ const node=document.createElement(tag);
+ if(className)node.className=className;
+ if(text!==undefined)node.textContent=String(text);
+ return node;
+}
+function setMessage(message,kind='info'){
+ status.textContent=message;
+ status.dataset.kind=kind;
+}
+function stat(label,value){
+ const node=el('span');
+ node.append(el('strong',null,value),' '+label);
+ return node;
+}
+function art(path,label){
+ const frame=el('div','sticker-art');
+ const local=safeStickerArt(path);
+ let remote=null;
+ if(typeof path==='string'){
+  try{const url=new URL(path);const base=new URL(SUPABASE_URL);
+   if(url.protocol==='https:'&&url.origin===base.origin&&url.pathname.startsWith('/storage/v1/object/public/ctoon-artwork/')&&!url.search&&!url.hash)remote=url.href;
+  }catch{/* Local paths are handled separately. */}
+ }
+ const safe=local||remote;
+ if(safe){const img=el('img');img.src=safe;img.alt=label;img.loading='lazy';img.addEventListener('error',()=>frame.replaceChildren('🃏'),{once:true});frame.append(img);}
+ else frame.textContent='🃏';
+ return frame;
+}
+function renderStickers(){
+ if(!model)return;
+ const entries=membershipMode?model.catalog.filter(s=>(albumFilter.value==='all'||s.set.slug===albumFilter.value)&&(ownedFilter.value==='all'||(ownedFilter.value==='yes'?s.owned:!s.owned))&&(!searchFilter?.value||s.name.toLowerCase().includes(searchFilter.value.trim().toLowerCase()))):filterStickers(model.catalog,{rarity:rarityFilter.value,album:albumFilter.value,owned:ownedFilter.value,search:searchFilter?.value||''});
+ grid.replaceChildren();
+ if(!entries.length){grid.append(el('p','sticker-message',model.catalog.length?'No Ctoons match these filters.':'No published Ctoons in the catalog yet.'));return;}
+ for(const sticker of entries){
+  const card=el('article','sticker-card'+((membershipMode?sticker.owned:sticker.quantity)?'':' is-missing'));
+  if(sticker.rarity)card.dataset.rarity=sticker.rarity;
+  card.append(art(sticker.image_path,sticker.name),el('h3',null,sticker.name),el('p',null,sticker.set.title));
+  if(sticker.rarity)card.append(el('span','sticker-pill',sticker.rarity));
+  card.append(el('p',null,membershipMode?(sticker.quantity===null?(sticker.owned?'Owned · count unavailable':'Need · count unavailable'):(sticker.quantity?'Owned: '+sticker.quantity+' · '+Math.max(0,sticker.quantity-1)+' extras':'Need')):(sticker.quantity?'Owned: '+sticker.quantity:'Need')));
+  grid.append(card);
+ }
+}
+function renderAlbums(){
+ grid.replaceChildren();
+ if(!model.albums.length){grid.append(el('p','sticker-message','No published Ctoon albums yet.'));return;}
+ for(const album of model.albums){
+  const card=el('article','sticker-card');
+  card.append(el('div','sticker-art','📚'),el('h3',null,album.title));
+  card.append(el('p',null,album.collected+' of '+album.total+' Ctoons collected'));
+  const progress=el('div','sticker-progress');
+  progress.setAttribute('role','progressbar');
+  progress.setAttribute('aria-label',album.title+' completion');
+  progress.setAttribute('aria-valuemin','0');progress.setAttribute('aria-valuemax','100');
+  const percent=album.total?Math.round(100*album.collected/album.total):0;
+  progress.setAttribute('aria-valuenow',String(percent));
+  const bar=el('span');bar.style.width=percent+'%';progress.append(bar);
+  card.append(progress);if(album.duplicates!==null)card.append(el('p',null,album.duplicates+' duplicate copies'));
+  const link=el('a','sticker-link','Open album →');
+  link.href='sticker-collection.html?album='+encodeURIComponent(album.slug);
+  card.append(link);grid.append(card);
+ }
+}
+function render(){
+ summary.replaceChildren(stat('unique Ctoons',model.totalOwned),...(model.totalCopies===null?[]:[stat('total copies',model.totalCopies)]),stat('published Ctoons',model.catalog.length));
+ if(view==='albums'){summary.append(stat('albums',model.albums.length));renderAlbums();return;}
+ const queryParams=new URLSearchParams(location.search);
+ const requestedAlbum=queryParams.get('album');
+ const requestedSeries=queryParams.get('series');
+ const current=albumFilter.value;
+ albumFilter.replaceChildren(new Option('All albums','all'));
+ for(const album of model.albums)albumFilter.add(new Option(album.title,album.slug));
+ const normalized=value=>String(value||'').normalize('NFKD').toLocaleLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+ const matchingSeries=requestedSeries?model.albums.find(a=>normalized(a.title)===normalized(requestedSeries)||normalized(a.slug)===normalized(requestedSeries)):null;
+ const matchingAlbum=requestedAlbum?model.albums.find(a=>a.slug===requestedAlbum):null;
+ albumFilter.value=matchingAlbum?.slug||matchingSeries?.slug||(requestedAlbum||requestedSeries?'all':model.albums.some(a=>a.slug===current)?current:'all');
+ if((requestedSeries&&!matchingSeries)||(requestedAlbum&&!matchingAlbum)){
+  grid.replaceChildren(el('p','sticker-message','No published Ctoon album matches this series yet. Coming Soon.'));
+  return;
+ }
+ rarityFilter.replaceChildren(new Option('All rarities','all'));
+ if(membershipMode){rarityFilter.closest('label').hidden=true;}else{rarityFilter.closest('label').hidden=false;for(const rarity of RARITIES)rarityFilter.add(new Option(rarity,rarity));}
+ renderStickers();
+}
+async function load(){
+ const current=++revision;
+ app.hidden=true;ownerLink.hidden=true;model=null;membershipMode=false;quantitiesAvailable=false;grid.replaceChildren();summary.replaceChildren();setMessage('Checking your account…');
+ try{
+  const {data:{user},error:authError}=await client.auth.getUser();
+  if(current!==revision)return;
+  if(authError||!user||user.is_anonymous){setMessage('Sign in to see your personal Ctoon collection.');return;}
+  // Owner navigation is cosmetic only; owner permissions are enforced separately by RLS.
+  client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle()
+   .then(({data,error})=>{if(current===revision&&!error&&data)ownerLink.hidden=false;})
+   .catch(()=>{});
+  try{
+  const [sets,stickers,inventory]=await Promise.all([
+   collectPagedRows((start,end)=>client.from('sticker_sets').select('id,slug,title').eq('published',true).order('id').range(start,end)),
+   collectPagedRows((start,end)=>client.from('stickers').select('id,set_id,name,rarity,image_path').eq('published',true).order('id').range(start,end)),
+   collectPagedRows((start,end)=>client.from('player_stickers').select('sticker_id,quantity').eq('user_id',user.id).order('sticker_id').range(start,end))
+  ]);
+  if(current!==revision)return;
+  model=createStickerView(sets,stickers,inventory);
+  }catch(primaryError){
+   // Only fall back for a missing-table schema; never mask RLS, network, or pagination errors.
+   if(primaryError?.code!=='42P01'&&primaryError?.code!=='PGRST205')throw primaryError;
+   const [catalog,ownership]=await Promise.all([
+    collectPagedRows((start,end)=>client.from('ctoon_sticker_catalog').select('id,series,subseries,title,artwork_url,published').eq('published',true).order('id').range(start,end)),
+    collectPagedRows((start,end)=>client.from('ctoon_sticker_ownership').select('sticker_id,quantity').eq('user_id',user.id).order('sticker_id').range(start,end))
+   ]);
+   if(current!==revision)return;
+   // Ownership quantity lives on the canonical ownership row, not a second table.
+   // RLS restricts these rows to the signed-in user.
+   let entries=adaptCtoonMembership(catalog,ownership);
+   const ownedById=new Map(ownership.map(row=>[row.sticker_id,row]));
+   entries=applyCtoonQuantities(entries,catalog.map(row=>({sticker_id:row.id,quantity:ownedById.get(row.id)?.quantity??0})));
+   quantitiesAvailable=entries.every(item=>item.quantity!==null);
+   const titles=[...new Set(entries.map(s=>s.subseries||s.series).filter(Boolean))].sort();
+   const sets=titles.map((title,i)=>({id:String(i),title,slug:title.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}));
+   const byTitle=new Map(sets.map(set=>[set.title,set]));
+   const stickers=entries.map(s=>({...s,set:byTitle.get(s.subseries||s.series),image_path:s.artwork_url||null}));
+   model={catalog:stickers,albums:sets.map(set=>{const items=stickers.filter(s=>s.set.id===set.id);return {...set,total:items.length,collected:items.filter(s=>s.owned).length,duplicates:items.every(s=>s.quantity!==null)?items.reduce((n,s)=>n+Math.max(0,s.quantity-1),0):null};}),totalOwned:stickers.filter(s=>s.owned).length,totalCopies:quantitiesAvailable?stickers.reduce((n,s)=>n+s.quantity,0):null};
+   membershipMode=true;
+  }
+  render();app.hidden=false;
+  setMessage(membershipMode?'Showing read-only Ctoon ownership. Copy counts display when verified quantity records exist; otherwise counts remain unavailable. Rarity is unavailable.':'Showing your account’s read-only Ctoon collection. No changes can be made here.');
+
+ }catch{
+  if(current===revision)setMessage('Unable to load the complete Ctoon collection. The database may be unavailable or the safe pagination limit was reached. No partial totals are shown.','error');
+ }
+}
+for(const control of [albumFilter,rarityFilter,ownedFilter])control?.addEventListener('change',renderStickers);
+searchFilter?.addEventListener('input',renderStickers);
+client.auth.onAuthStateChange(()=>setTimeout(load,0));
+window.addEventListener('pageshow',load);
+load();

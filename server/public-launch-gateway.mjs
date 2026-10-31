@@ -88,6 +88,9 @@ export function createPublicGateway({config,fetchImpl=fetch,now=Date.now,
    const name=protectedRoute?
     (raw==='/__maintenance/arcade'||raw===prefix?'index.html':raw.slice(prefix.length)):
     (raw==='/'?'index.html':raw.slice(1));
+   // The Ctoon Sets Overview is hosted on the public static site, not in this gateway's asset allowlist.
+   if(!protectedRoute && (name==='sets-overview.html'||name==='sets-overview'))
+    return send(302,'','text/plain; charset=utf-8',{Location:'https://cartoon-universe-3.onrender.com/sets-overview.html'});
    if(!ASSETS.has(name))return send(404,'Not found');
    const verified=protectedRoute||OWNER_ONLY.has(name)?await owner.authorized(req):false;
    if((protectedRoute||OWNER_ONLY.has(name))&&!verified)

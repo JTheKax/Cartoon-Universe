@@ -26,7 +26,9 @@ async function loadDetail() {
       status.textContent = 'Series not found in this category.'; return;
     }
     if (subseries) {
-      status.textContent = 'Series catalog entry. View your authenticated sticker collection to check published Ctoons and Owned / Need status. Unpublished artwork is not counted.';\n      card('My Ctoon Collection', 'Sign in to view your actual published sticker inventory.', 'sticker-collection.html');\n      card('My Albums', 'See collection progress calculated from published stickers only.', 'sticker-albums.html');
+      status.textContent = 'Series catalog entry. View your authenticated sticker collection to check published Ctoons and Owned / Need status. Unpublished artwork is not counted.';
+      card('My Ctoon Collection', 'Sign in to view your actual published sticker inventory.', 'sticker-collection.html');
+      card('My Albums', 'See collection progress calculated from published stickers only.', 'sticker-albums.html');
     } else {
       status.textContent = category.series.length ? 'Choose a series below. Ownership progress will appear once authenticated collection records are connected.' : 'Coming Soon: no series have been published in this category yet.';
       for (const name of category.series) card(name, 'Sticker catalog pending verification', 'set-detail.html?series=' + encodeURIComponent(series) + '&subseries=' + encodeURIComponent(name));

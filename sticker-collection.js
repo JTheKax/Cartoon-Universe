@@ -42,7 +42,7 @@ function renderStickers(){
  if(!model)return;
  const entries=filterStickers(model.catalog,{rarity:rarityFilter.value,album:albumFilter.value,owned:ownedFilter.value,search:searchFilter?.value||''});
  grid.replaceChildren();
- if(!entries.length){grid.append(el('p','sticker-message',model.catalog.length?'No stickers match these filters.':'No published stickers in the catalog yet.'));return;}
+ if(!entries.length){grid.append(el('p','sticker-message',model.catalog.length?'No Ctoons match these filters.':'No published Ctoons in the catalog yet.'));return;}
  for(const sticker of entries){
   const card=el('article','sticker-card'+(sticker.quantity?'':' is-missing'));
   card.dataset.rarity=sticker.rarity;
@@ -54,11 +54,11 @@ function renderStickers(){
 }
 function renderAlbums(){
  grid.replaceChildren();
- if(!model.albums.length){grid.append(el('p','sticker-message','No published sticker albums yet.'));return;}
+ if(!model.albums.length){grid.append(el('p','sticker-message','No published Ctoon albums yet.'));return;}
  for(const album of model.albums){
   const card=el('article','sticker-card');
   card.append(el('div','sticker-art','📚'),el('h3',null,album.title));
-  card.append(el('p',null,album.collected+' of '+album.total+' stickers collected'));
+  card.append(el('p',null,album.collected+' of '+album.total+' Ctoons collected'));
   const progress=el('div','sticker-progress');
   progress.setAttribute('role','progressbar');
   progress.setAttribute('aria-label',album.title+' completion');
@@ -73,7 +73,7 @@ function renderAlbums(){
  }
 }
 function render(){
- summary.replaceChildren(stat('unique stickers',model.totalOwned),stat('total copies',model.totalCopies),stat('published stickers',model.catalog.length));
+ summary.replaceChildren(stat('unique Ctoons',model.totalOwned),stat('total copies',model.totalCopies),stat('published Ctoons',model.catalog.length));
  if(view==='albums'){summary.append(stat('albums',model.albums.length));renderAlbums();return;}
  const queryParams=new URLSearchParams(location.search);
  const requestedAlbum=queryParams.get('album');
@@ -106,7 +106,7 @@ async function load(){
   if(current!==revision)return;
   model=createStickerView(sets,stickers,inventory);
   render();app.hidden=false;
-  setMessage('Showing your account’s read-only sticker collection. No changes can be made here.');
+  setMessage('Showing your account’s read-only Ctoon collection. No changes can be made here.');
 
  }catch{
   if(current===revision)setMessage('Unable to load the complete sticker collection. The database may be unavailable or the safe pagination limit was reached. No partial totals are shown.','error');

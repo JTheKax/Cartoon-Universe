@@ -128,7 +128,7 @@ test('owner draft is cleared when owner authorization is lost or changes',()=>{
 });
 
 
-test('Ctoon membership adapter isolates per-user ownership when RLS supplies each user's rows',async()=>{
+test('Ctoon membership adapter isolates per-user ownership when RLS supplies each user rows',async()=>{
  const {adaptCtoonMembership}=await import('../sticker-collection-core.mjs');
  const catalog=[{id:'a',series:'Cartoons',title:'Alpha',published:true},{id:'b',series:'Anime',title:'Beta',published:true},{id:'draft',title:'Hidden',published:false}];
  const alice=adaptCtoonMembership(catalog,[{sticker_id:'a'}]);
@@ -137,6 +137,6 @@ test('Ctoon membership adapter isolates per-user ownership when RLS supplies eac
  assert.deepEqual(bob.map(s=>[s.id,s.owned]),[['a',false],['b',true]]);
  assert.ok(alice.every(s=>s.quantity===null&&s.rarity===null));
  const page=file('sticker-collection.js');
- assert.match(page,/from\('ctoon_sticker_ownership'\)\.select\('sticker_id'\)\.eq\('user_id',user\.id\)/);
- assert.doesNotMatch(page,/\.insert\(|\.update\(|\.upsert\(|\.delete\(/);
+ assert.ok(page.includes("from('ctoon_sticker_ownership').select('sticker_id').eq('user_id',user.id)"));
+ assert.doesNotMatch(page,/\\.insert\\(|\\.update\\(|\\.upsert\\(|\\.delete\\(/);
 });

@@ -45,15 +45,18 @@ test('player page only reads authenticated inventory and never mutates it',()=>{
  assert.doesNotMatch(client,/\.rpc\(|\.insert\(|\.update\(|\.upsert\(|\.delete\(/);
  assert.match(client,/\.textContent=/);
 });
-test('owner creator verifies membership and cannot publish or upload',()=>{
+test('owner creator verifies membership before restricted upload and catalog management',()=>{
  const html=file('owner-sticker-creator.html');
  const js=file('owner-sticker-creator.js');
  assert.match(html,/id="creator-content" hidden/);
- assert.match(html,/id="creator-publish" disabled/);
+ assert.match(html,/id="creator-publish"/);
  assert.match(js,/auth\.getUser\(\)/);
  assert.match(js,/from\('owner_members'\)/);
  assert.match(js,/URL\.createObjectURL/);
- assert.doesNotMatch(js,/\.rpc\(|\.insert\(|\.update\(|\.upload\(/);
+ assert.match(js,/\.upload\(/);
+ assert.match(js,/from\('ctoon_sticker_catalog'\)\.insert\(/);
+ assert.match(js,/from\('ctoon_sticker_catalog'\)\.update\(/);
+ assert.match(js,/published:false/);
 });
 test('SQL proposal keeps inventory private and grants only audited owner awards',()=>{
  const sql=file('sql/review/20261028_sticker_inventory_proposal.sql');

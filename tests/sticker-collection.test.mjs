@@ -156,3 +156,12 @@ test('verified quantities preserve unknown legacy counts and count extras',async
  const page=file('sticker-collection.js');
  assert.ok(page.includes("from('ctoon_sticker_quantities').select('sticker_id,quantity').eq('user_id',user.id)"));
 });
+
+
+test('zero verified quantity cannot silently erase legacy Ctoon ownership',async()=>{
+ const {adaptCtoonMembership,applyCtoonQuantities}=await import('../sticker-collection-core.mjs');
+ const owned=adaptCtoonMembership([{id:'a',title:'A',published:true}],[{sticker_id:'a'}]);
+ assert.throws(()=>applyCtoonQuantities(owned,[{sticker_id:'a',quantity:0}]),/conflicts/);
+ const unowned=adaptCtoonMembership([{id:'a',title:'A',published:true}],[]);
+ assert.equal(applyCtoonQuantities(unowned,[{sticker_id:'a',quantity:0}])[0].quantity,0);
+});

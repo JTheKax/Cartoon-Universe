@@ -19,3 +19,21 @@
 ## Current state
 
 This document initiates integration review only. It does not claim the collection has been merged, published or deployed.
+
+## Deployment readiness gate (2026-10-31)
+
+**Status: NOT YET READY TO MERGE OR DEPLOY.** Missing logos are deferred and must retain visible text fallbacks; they are not a release blocker.
+
+- [x] Five planned categories and 44 distinct subseries in the review catalog.
+- [x] Clickable category and series links, with missing-logo text fallback.
+- [x] Ctoon terminology in collection, album, owner draft, homepage, and series views.
+- [x] Read-only authenticated player inventory and Owned/Need calculations in the review code.
+- [x] Add catalog integration tests to both the review and main validation workflows.
+- [ ] GitHub Actions passes for the exact final review commit (including collection, catalog, site and local Supabase checks).
+- [ ] Browser smoke test: mobile/desktop category links, empty Movies/Misc, fallback logos, logged-out and player states.
+- [ ] Verify proposed sticker inventory schema and RLS against a disposable Supabase environment; check compatibility with existing production schema before any migration.
+- [ ] Verify real published catalog entries, album slug/series matching, player-specific inventory and artwork rights.
+- [ ] Confirm review/production navigation and links are compatible with the live site's deployment entry point.
+- [ ] Obtain explicit approval before merging or deploying.
+
+No production database changes or artwork import are authorized by this checklist.

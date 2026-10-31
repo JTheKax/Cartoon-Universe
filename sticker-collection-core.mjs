@@ -82,6 +82,7 @@ export function applyCtoonQuantities(entries=[],rows=[]){
  }
  return entries.map(entry=>{
   const quantity=counts.has(entry.id)?counts.get(entry.id):null;
+  if(quantity===0&&entry.owned)throw new Error('Ctoon quantity conflicts with existing ownership');
   return {...entry,quantity,owned:quantity===null?entry.owned:quantity>0};
  });
 }

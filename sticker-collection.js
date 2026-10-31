@@ -125,7 +125,8 @@ async function load(){
    // Ownership quantity lives on the canonical ownership row, not a second table.
    // RLS restricts these rows to the signed-in user.
    let entries=adaptCtoonMembership(catalog,ownership);
-   entries=applyCtoonQuantities(entries,ownership);
+   const ownedById=new Map(ownership.map(row=>[row.sticker_id,row]));
+   entries=applyCtoonQuantities(entries,catalog.map(row=>({sticker_id:row.id,quantity:ownedById.get(row.id)?.quantity??0})));
    quantitiesAvailable=entries.every(item=>item.quantity!==null);
    const titles=[...new Set(entries.map(s=>s.subseries||s.series).filter(Boolean))].sort();
    const sets=titles.map((title,i)=>({id:String(i),title,slug:title.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}));

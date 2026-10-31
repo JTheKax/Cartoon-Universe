@@ -33,7 +33,27 @@ test('unknown sections deny even verified owners',()=>{
  assert.equal(sectionAccess({section:'secret',globalMaintenance:false,sectionStatuses:allOpen,verifiedOwner:true}).allowed,false);
 });
 test('only a strictly verified owner flag bypasses maintenance',()=>{
- assert.equal(sectionAccess({section:'radio',globalMaintenance:true,verifiedOwner:true}).allowed,true);
+ assert.equal(sectionAccess({section:'radio',globalMaintenance:true,sectionStatuses:allOpen,verifiedOwner:true}).allowed,true);
  for(const verifiedOwner of [false,'true',1,null,undefined])
   assert.equal(sectionAccess({section:'radio',globalMaintenance:true,verifiedOwner}).allowed,false);
+});
+
+test('verified owners cannot bypass malformed or partial maintenance snapshots',()=>{
+ const cases=[
+  {globalMaintenance:undefined,sectionStatuses:allOpen},
+  {globalMaintenance:'false',sectionStatuses:allOpen},
+  {globalMaintenance:true,sectionStatuses:null},
+  {globalMaintenance:true,sectionStatuses:{}},
+  {globalMaintenance:true,sectionStatuses:{...allOpen,radio:'false'}},
+  {globalMaintenance:true,sectionStatuses:{...allOpen,extra:false}},
+  {globalMaintenance:true,sectionStatuses:Object.fromEntries(Object.entries(allOpen).filter(([key])=>key!=='radio'))}
+ ];
+ for(const input of cases){
+  assert.deepEqual(sectionAccess({section:'home',verifiedOwner:true,...input}),
+   {allowed:false,reason:'maintenance-state-unavailable'});
+ }
+});
+test('invalid unrelated section status denies otherwise live page',()=>{
+ const invalid={...allOpen,radio:undefined};
+ assert.equal(sectionAccess({section:'home',globalMaintenance:false,sectionStatuses:invalid}).allowed,false);
 });

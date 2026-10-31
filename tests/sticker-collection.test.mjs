@@ -137,7 +137,7 @@ test('Ctoon membership adapter isolates per-user ownership when RLS supplies eac
  assert.deepEqual(bob.map(s=>[s.id,s.owned]),[['a',false],['b',true]]);
  assert.ok(alice.every(s=>s.quantity===null&&s.rarity===null));
  const page=file('sticker-collection.js');
- assert.ok(page.includes("from('ctoon_sticker_ownership').select('sticker_id').eq('user_id',user.id)"));
+ assert.ok(page.includes("from('ctoon_sticker_ownership').select('sticker_id,quantity').eq('user_id',user.id)"));
  for(const operation of ['.insert(','.update(','.upsert(','.delete('])assert.equal(page.includes(operation),false);
 });
 
@@ -154,7 +154,7 @@ test('verified quantities preserve unknown legacy counts and count extras',async
  assert.throws(()=>applyCtoonQuantities(legacy,[{sticker_id:'a',quantity:-1}]));
  assert.throws(()=>applyCtoonQuantities(legacy,[{sticker_id:'a',quantity:1},{sticker_id:'a',quantity:2}]));
  const page=file('sticker-collection.js');
- assert.ok(page.includes("from('ctoon_sticker_quantities').select('sticker_id,quantity').eq('user_id',user.id)"));
+ assert.ok(page.includes("entries=applyCtoonQuantities(entries,catalog.map(row=>"));
 });
 
 

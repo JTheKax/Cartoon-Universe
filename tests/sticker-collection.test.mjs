@@ -116,7 +116,7 @@ test('sticker HTML has valid theme script tags and a searchable Need filter',()=
  assert.ok(html.includes('<option value="no">Need</option>'));
  const js=file('sticker-collection.js');
  assert.ok(js.includes("searchFilter?.addEventListener('input',renderStickers)"));
- assert.ok(js.includes('model=null;grid.replaceChildren();summary.replaceChildren()'));
+ assert.ok(js.includes('model=null;membershipMode=false;grid.replaceChildren();summary.replaceChildren()'));
 });
 test('owner draft is cleared when owner authorization is lost or changes',()=>{
  const js=file('owner-sticker-creator.js');

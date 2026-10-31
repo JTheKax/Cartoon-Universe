@@ -28,5 +28,6 @@ for (const name of ordered) {
     const link=document.createElement('a');link.href='console-game-sets-preview.html';link.textContent='Browse Video Game Sets';link.style.color='#7dd3fc';card.append(link);
   }
   if(name!=='Video Games') { const browse=document.createElement('a');browse.href='set-detail.html?series='+encodeURIComponent(name);browse.textContent='Browse '+name+' stickers';browse.style.color='#7dd3fc';card.append(browse); }
+  if(name!=='Video Games'){const album=document.createElement('a');album.href='sticker-albums.html';album.textContent='My collection progress';album.style.color='#7dd3fc';card.append(album);}
   grid.append(card);
 }

@@ -39,3 +39,11 @@ test('series detail has no literal escaped line breaks in executable script', ()
   assert.ok(script.includes('loadDetail()'));
   assert.ok(!script.includes('\\n'));
 });
+
+
+test('unpublished series links never silently show unrelated Ctoons',()=>{
+ const collection=readFileSync(new URL('../sticker-collection.js',import.meta.url),'utf8');
+ assert.match(collection,/normalized\(a\.title\)===normalized\(requestedSeries\)/);
+ assert.match(collection,/requestedSeries&&!matchingSeries/);
+ assert.match(collection,/No published Ctoon album matches this series yet\. Coming Soon\./);
+});

@@ -81,8 +81,14 @@ function render(){
  const current=albumFilter.value;
  albumFilter.replaceChildren(new Option('All albums','all'));
  for(const album of model.albums)albumFilter.add(new Option(album.title,album.slug));
- const matchingSeries=model.albums.find(a=>a.title.toLocaleLowerCase()===requestedSeries?.toLocaleLowerCase());
- albumFilter.value=model.albums.some(a=>a.slug===requestedAlbum)?requestedAlbum:(matchingSeries?.slug||(model.albums.some(a=>a.slug===current)?current:'all'));
+ const normalized=value=>String(value||'').normalize('NFKD').toLocaleLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+ const matchingSeries=requestedSeries?model.albums.find(a=>normalized(a.title)===normalized(requestedSeries)||normalized(a.slug)===normalized(requestedSeries)):null;
+ const matchingAlbum=requestedAlbum?model.albums.find(a=>a.slug===requestedAlbum):null;
+ albumFilter.value=matchingAlbum?.slug||matchingSeries?.slug||(requestedAlbum||requestedSeries?'all':model.albums.some(a=>a.slug===current)?current:'all');
+ if((requestedSeries&&!matchingSeries)||(requestedAlbum&&!matchingAlbum)){
+  grid.replaceChildren(el('p','sticker-message','No published Ctoon album matches this series yet. Coming Soon.'));
+  return;
+ }
  rarityFilter.replaceChildren(new Option('All rarities','all'));
  for(const rarity of RARITIES)rarityFilter.add(new Option(rarity,rarity));
  renderStickers();

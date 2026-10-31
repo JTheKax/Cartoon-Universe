@@ -58,22 +58,31 @@ function renderAlbums(){
  for(const album of model.albums){
   const card=el('article','sticker-card');
   card.append(el('div','sticker-art','📚'),el('h3',null,album.title));
-  card.append(el('p',null,album.collected+' of '+album.total+' stickers collected'));
+  card.append(el('p',null,album.collected+' of '+album.total+' stickers collected · '+album.needed+' Need'));
   const progress=el('div','sticker-progress');
   progress.setAttribute('role','progressbar');
   progress.setAttribute('aria-label',album.title+' completion');
   progress.setAttribute('aria-valuemin','0');progress.setAttribute('aria-valuemax','100');
-  const percent=album.total?Math.round(100*album.collected/album.total):0;
+  const percent=album.completion;
   progress.setAttribute('aria-valuenow',String(percent));
   const bar=el('span');bar.style.width=percent+'%';progress.append(bar);
-  card.append(progress,el('p',null,album.duplicates+' duplicate copies'));
+  card.append(progress,el('p',null,percent+'% complete · '+album.duplicates+' duplicate copies'));
+  const breakdown=el('ul','sticker-rarity-progress');
+  for(const rarity of RARITIES){
+   const counts=album.rarityProgress[rarity];
+   if(!counts.total)continue;
+   const item=el('li');
+   item.append(el('span',null,rarity),el('strong',null,counts.owned+' / '+counts.total));
+   breakdown.append(item);
+  }
+  if(breakdown.childElementCount)card.append(breakdown);
   const link=el('a','sticker-link','Open album →');
   link.href='sticker-collection.html?album='+encodeURIComponent(album.slug);
   card.append(link);grid.append(card);
  }
 }
 function render(){
- summary.replaceChildren(stat('unique stickers',model.totalOwned),stat('total copies',model.totalCopies),stat('published stickers',model.catalog.length));
+ summary.replaceChildren(stat('unique stickers',model.totalOwned),stat('Need',model.catalog.length-model.totalOwned),stat('total copies',model.totalCopies),stat('published stickers',model.catalog.length));
  if(view==='albums'){summary.append(stat('albums',model.albums.length));renderAlbums();return;}
  const requestedAlbum=new URLSearchParams(location.search).get('album');
  const current=albumFilter.value;

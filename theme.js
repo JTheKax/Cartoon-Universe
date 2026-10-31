@@ -15,6 +15,7 @@
  let selected='haunted';
  try{selected=localStorage.getItem(key)||'haunted'}catch{}
  apply(selected);
+ document.addEventListener('cu-select-theme',event=>{ const id=event.detail?.id; if(!themes.has(id))return; selected=id;apply(selected);try{localStorage.setItem(key,selected)}catch{} });
  document.addEventListener('DOMContentLoaded',()=>{
   apply(selected);
   document.querySelectorAll('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>{

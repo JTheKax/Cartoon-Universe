@@ -11,6 +11,8 @@ on:
       - 'sets-overview*'
       - 'set-detail.html'
       - 'tests/sticker-collection.test.mjs'
+      - 'tests/ctoon-series-integration.test.mjs'
+      - 'data/ctoon-series-plan.json'
       - 'sql/review/20261028_sticker_inventory_proposal.sql'
       - '.github/workflows/sticker-collection-review.yml'
 permissions:
@@ -25,9 +27,10 @@ jobs:
         with:
           node-version: '22'
       - name: Run read-only collection tests
-        run: node --test tests/sticker-collection.test.mjs
+        run: node --test tests/sticker-collection.test.mjs tests/ctoon-series-integration.test.mjs
       - name: Check JavaScript syntax
         run: |
           node --check sticker-collection-core.mjs
           node --check sticker-collection.js
           node --check sets-overview.js
+          node --check owner-sticker-creator.js

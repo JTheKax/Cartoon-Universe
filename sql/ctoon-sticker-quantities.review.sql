@@ -19,3 +19,7 @@ CREATE POLICY "Players can read their own Ctoon quantities"
 -- Planned migration: each legacy ownership row may seed quantity=1 only after
 -- confirming no pre-existing quantities; it cannot recover historic duplicates.
 -- Do not show missing quantity rows as zero until migration and rollout are complete.
+
+-- Privileged inventory writes must be implemented as an audited server-side
+-- transaction. The table intentionally has no authenticated write grants.
+-- A safe rollout must reconcile ownership and quantity records atomically.

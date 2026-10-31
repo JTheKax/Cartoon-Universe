@@ -52,3 +52,9 @@ The PR runs a separate disposable PostgreSQL 17 job applying the SQL proposal on
 
 ### Review before enabling owner publishing
 The local creator's browser file type/size checks are preview convenience only, **not** upload security. Any future publishing API must independently verify the owner on the server, validate decoded image content and size, prevent unsafe paths and overwrite, enforce licensed artwork policies, and log catalog changes. Do not enable the disabled publish button until these are implemented and tested in an isolated environment.
+
+## Album progress and rarity breakdown follow-up (October 31, 2026)
+- The read-only album view model now computes **Need**, percentage completion and owned/total counts for each of the six rarities. Duplicate copies do not inflate completion or rarity progress.
+- Album cards show those per-rarity totals alongside existing duplicate counts. The collector summary now also shows the total number of published stickers still needed.
+- Added mock tests for partially completed albums, fully completed albums, empty albums, and the no-inventory-mutation UI contract. No inventory RPC, upload, SQL execution or production data changes were introduced.
+- CI caveat from the prior run: the hosted maintenance cookie-probe endpoint failed to become available; this is an external integration dependency, not a sticker test failure. Do not bypass or silently skip the security test. Require a fully green run before any preview deployment.

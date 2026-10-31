@@ -71,3 +71,17 @@ export function adaptCtoonMembership(catalog=[],ownership=[]){
   rarity:null
  }));
 }
+
+/** Overlay verified copy counts without inventing quantities for legacy ownership. */
+export function applyCtoonQuantities(entries=[],rows=[]){
+ const counts=new Map();
+ for(const row of rows){
+  if(!row||typeof row.sticker_id!=='string'||!Number.isSafeInteger(row.quantity)||row.quantity<0)throw new Error('Invalid Ctoon quantity');
+  if(counts.has(row.sticker_id))throw new Error('Duplicate Ctoon quantity row');
+  counts.set(row.sticker_id,row.quantity);
+ }
+ return entries.map(entry=>{
+  const quantity=counts.has(entry.id)?counts.get(entry.id):null;
+  return {...entry,quantity,owned:quantity===null?entry.owned:quantity>0};
+ });
+}

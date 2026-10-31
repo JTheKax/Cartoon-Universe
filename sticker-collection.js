@@ -35,7 +35,14 @@ function stat(label,value){
 }
 function art(path,label){
  const frame=el('div','sticker-art');
- const safe=safeStickerArt(path);
+ const local=safeStickerArt(path);
+ let remote=null;
+ if(typeof path==='string'){
+  try{const url=new URL(path);const base=new URL(SUPABASE_URL);
+   if(url.protocol==='https:'&&url.origin===base.origin&&url.pathname.startsWith('/storage/v1/object/public/ctoon-artwork/')&&!url.search&&!url.hash)remote=url.href;
+  }catch{/* Local paths are handled separately. */}
+ }
+ const safe=local||remote;
  if(safe){const img=el('img');img.src=safe;img.alt=label;img.loading='lazy';img.addEventListener('error',()=>frame.replaceChildren('🃏'),{once:true});frame.append(img);}
  else frame.textContent='🃏';
  return frame;

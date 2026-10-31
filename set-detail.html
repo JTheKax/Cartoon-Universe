@@ -1,11 +1,11 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sticker Set | Cartoon Universe</title><link rel="stylesheet" href="styles.css"><style>body{background:#07132c;color:#f5f8ff;font-family:system-ui,sans-serif}main{max-width:1050px;margin:3rem auto;padding:1.5rem}a{color:#7dd3fc}.notice{border:1px solid #38bdf8;background:#13274a;border-radius:12px;padding:1.2rem}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}.card{background:#13274a;border:1px solid #38bdf8;border-radius:12px;padding:1rem}.muted{color:#b7c9e5}</style></head><body><main><a href="sets-overview.html">← Sets Overview</a><h1 id="heading">Sticker Set</h1><p id="status" class="notice" role="status">Loading set details…</p><div id="results" class="grid"></div></main><script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ctoon Set | Cartoon Universe</title><link rel="stylesheet" href="styles.css"><style>body{background:#07132c;color:#f5f8ff;font-family:system-ui,sans-serif}main{max-width:1050px;margin:3rem auto;padding:1.5rem}a{color:#7dd3fc}.notice{border:1px solid #38bdf8;background:#13274a;border-radius:12px;padding:1.2rem}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}.card{background:#13274a;border:1px solid #38bdf8;border-radius:12px;padding:1rem}.muted{color:#b7c9e5}</style></head><body><main><a href="sets-overview.html">← Sets Overview</a><h1 id="heading">Ctoon Set</h1><p id="status" class="notice" role="status">Loading set details…</p><div id="results" class="grid"></div></main><script>
 const params = new URLSearchParams(location.search);
 const series = params.get('series') || '';
 const subseries = params.get('subseries') || '';
 const heading = document.getElementById('heading');
 const status = document.getElementById('status');
 const results = document.getElementById('results');
-heading.textContent = subseries || series || 'Sticker Set';
+heading.textContent = subseries || series || 'Ctoon Set';
 function card(title, description, href) {
   const node = document.createElement('article'); node.className = 'card';
   const h = document.createElement('h2'); h.textContent = title;
@@ -27,11 +27,11 @@ async function loadDetail() {
     }
     if (subseries) {
       status.textContent = 'Series catalog entry. View your authenticated sticker collection to check published Ctoons and Owned / Need status. Unpublished artwork is not counted.';
-      card('My Ctoon Collection', 'Sign in to view your actual published sticker inventory.', 'sticker-collection.html?series=' + encodeURIComponent(subseries));
-      card('My Albums', 'See collection progress calculated from published stickers only.', 'sticker-albums.html');
+      card('My Ctoon Collection', 'Sign in to view your actual published Ctoon inventory.', 'sticker-collection.html?series=' + encodeURIComponent(subseries));
+      card('My Albums', 'See collection progress calculated from published Ctoons only.', 'sticker-albums.html');
     } else {
       status.textContent = category.series.length ? 'Choose a series below. Ownership progress will appear once authenticated collection records are connected.' : 'Coming Soon: no series have been published in this category yet.';
-      for (const name of category.series) card(name, 'Sticker catalog pending verification', 'set-detail.html?series=' + encodeURIComponent(series) + '&subseries=' + encodeURIComponent(name));
+      for (const name of category.series) card(name, 'Ctoon catalog pending verification', 'set-detail.html?series=' + encodeURIComponent(series) + '&subseries=' + encodeURIComponent(name));
     }
   } catch (error) { status.textContent = 'Could not load the series catalog. Please try again.'; console.error(error); }
 }

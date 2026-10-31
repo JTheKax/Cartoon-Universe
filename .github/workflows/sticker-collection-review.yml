@@ -1,0 +1,36 @@
+name: Sticker collection review
+on:
+  push:
+    branches:
+      - review/unified-sticker-collection-20261031
+  pull_request:
+    paths:
+      - 'sticker-collection*'
+      - 'sticker-albums.html'
+      - 'owner-sticker-creator*'
+      - 'sets-overview*'
+      - 'set-detail.html'
+      - 'tests/sticker-collection.test.mjs'
+      - 'tests/ctoon-series-integration.test.mjs'
+      - 'data/ctoon-series-plan.json'
+      - 'sql/review/20261028_sticker_inventory_proposal.sql'
+      - '.github/workflows/sticker-collection-review.yml'
+permissions:
+  contents: read
+jobs:
+  collection-unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run read-only collection tests
+        run: node --test tests/sticker-collection.test.mjs tests/ctoon-series-integration.test.mjs
+      - name: Check JavaScript syntax
+        run: |
+          node --check sticker-collection-core.mjs
+          node --check sticker-collection.js
+          node --check sets-overview.js
+          node --check owner-sticker-creator.js

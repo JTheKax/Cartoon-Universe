@@ -93,7 +93,7 @@ async function load(){
  try{
   const {data:{user},error:authError}=await client.auth.getUser();
   if(current!==revision)return;
-  if(authError||!user||user.is_anonymous){setMessage('Sign in to see your personal sticker collection.');return;}
+  if(authError||!user||user.is_anonymous){setMessage('Sign in to see your personal Ctoon collection.');return;}
   // Owner navigation is cosmetic only; owner permissions are enforced separately by RLS.
   client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle()
    .then(({data,error})=>{if(current===revision&&!error&&data)ownerLink.hidden=false;})
@@ -109,7 +109,7 @@ async function load(){
   setMessage('Showing your account’s read-only Ctoon collection. No changes can be made here.');
 
  }catch{
-  if(current===revision)setMessage('Unable to load the complete sticker collection. The database may be unavailable or the safe pagination limit was reached. No partial totals are shown.','error');
+  if(current===revision)setMessage('Unable to load the complete Ctoon collection. The database may be unavailable or the safe pagination limit was reached. No partial totals are shown.','error');
  }
 }
 for(const control of [albumFilter,rarityFilter,ownedFilter])control?.addEventListener('change',renderStickers);

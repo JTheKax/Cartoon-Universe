@@ -25,6 +25,10 @@ jobs:
         run: node --test tests/cartoon-coins.test.mjs
       - name: Test Supabase browser configuration validation
         run: node --test tests/supabase-config.test.mjs
+      - name: Test unified sticker collection read-only security contracts
+        run: node --test tests/sticker-collection.test.mjs
+      - name: Validate unified Ctoon catalog and series links
+        run: node --test tests/ctoon-series-integration.test.mjs
       - name: Validate maintenance UI safety checks
         run: node --test tests/maintenance-ui.test.mjs
       - name: Validate maintenance JavaScript syntax

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "description": "Planned Ctoon series catalog. Series are not published until artwork and sticker records are verified.",
+  "categories": [
+    {
+      "id": "cartoons",
+      "name": "Cartoons",
+      "series": [
+        "Dexter’s Laboratory",
+        "Ed, Edd n Eddy",
+        "Johnny Bravo",
+        "Foster’s Home for Imaginary Friends",
+        "The Powerpuff Girls",
+        "Samurai Jack",
+        "Xiaolin Showdown",
+        "Camp Lazlo",
+        "SpongeBob SquarePants",
+        "The Fairly OddParents",
+        "Jimmy Neutron",
+        "Danny Phantom",
+        "Class of 3000",
+        "Courage the Cowardly Dog",
+        "Codename: Kids Next Door",
+        "Family Guy",
+        "South Park",
+        "Adventure Time",
+        "The Simpsons",
+        "¡Mucha Lucha!",
+        "Ben 10",
+        "Tom and Jerry",
+        "Jackie Chan Adventures",
+        "Teen Titans"
+      ]
+    },
+    {
+      "id": "anime",
+      "name": "Anime",
+      "series": [
+        "Dragon Ball Z",
+        "Naruto",
+        "One Piece",
+        "Attack on Titan",
+        "The Seven Deadly Sins",
+        "Digimon",
+        "Pokémon",
+        "Inuyasha",
+        "Yu-Gi-Oh!",
+        "Yu Yu Hakusho",
+        "Zatch Bell!",
+        "Duel Masters",
+        "Hamtaro",
+        "Lupin the Third",
+        "Fullmetal Alchemist",
+        "Case Closed",
+        "Yu-Gi-Oh! GX"
+      ]
+    },
+    {
+      "id": "movies",
+      "name": "Movies",
+      "series": []
+    },
+    {
+      "id": "video-games",
+      "name": "Video Games",
+      "series": [
+        "Kingdom Hearts",
+        "Super Mario",
+        "The Legend of Zelda"
+      ]
+    },
+    {
+      "id": "misc",
+      "name": "Misc",
+      "series": []
+    }
+  ],
+  "publicationRules": {
+    "requireArtwork": true,
+    "requireSeriesLink": true,
+    "ownershipPerUser": true,
+    "unreleasedLabel": "Coming Soon"
+  }
+}

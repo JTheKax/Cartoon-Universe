@@ -15,7 +15,7 @@ function clearDraft(){
  revokePreview();
  nameInput.value='';albumInput.value='';rarityInput.value='Common';fileInput.value='';
  art.replaceChildren('🃏');
- document.getElementById('creator-preview-name').textContent='Untitled sticker';
+ document.getElementById('creator-preview-name').textContent='Untitled Ctoon';
  document.getElementById('creator-preview-album').textContent='No album selected';
  document.getElementById('creator-preview-rarity').textContent='Common';
 }
@@ -24,7 +24,7 @@ async function verifyOwner(){
  try{
   const {data:{user},error:authError}=await client.auth.getUser();
   if(current!==revision)return;
-  if(authError||!user||user.is_anonymous){verifiedOwnerId=null;clearDraft();status.textContent='Sign in with the owner account to access the Sticker Creator.';return;}
+  if(authError||!user||user.is_anonymous){verifiedOwnerId=null;clearDraft();status.textContent='Sign in with the owner account to access the Ctoon Creator.';return;}
   const {data:owner,error}=await client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();
   if(current!==revision)return;
   if(error||!owner){verifiedOwnerId=null;clearDraft();status.textContent='Owner access required. This studio is not available to players.';return;}
@@ -35,7 +35,7 @@ async function verifyOwner(){
 }
 document.getElementById('creator-preview-button').addEventListener('click',()=>{
  if(content.hidden)return;
- document.getElementById('creator-preview-name').textContent=nameInput.value.trim().slice(0,70)||'Untitled sticker';
+ document.getElementById('creator-preview-name').textContent=nameInput.value.trim().slice(0,70)||'Untitled Ctoon';
  document.getElementById('creator-preview-album').textContent=albumInput.value.trim().slice(0,70)||'No album selected';
  document.getElementById('creator-preview-rarity').textContent=RARITIES.includes(rarityInput.value)?rarityInput.value:'Common';
  revokePreview();art.replaceChildren('🃏');
@@ -46,7 +46,7 @@ document.getElementById('creator-preview-button').addEventListener('click',()=>{
  }
  previewUrl=URL.createObjectURL(file);
  const img=document.createElement('img');
- img.alt='Local sticker draft artwork';
+ img.alt='Local Ctoon draft artwork';
  img.src=previewUrl;
  img.addEventListener('error',()=>{revokePreview();art.replaceChildren('🃏');status.textContent='Could not preview this image.';},{once:true});
  art.replaceChildren(img);

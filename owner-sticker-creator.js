@@ -30,7 +30,7 @@ async function verifyOwner(){
   if(error||!owner){verifiedOwnerId=null;clearDraft();status.textContent='Owner access required. This studio is not available to players.';return;}
   if(verifiedOwnerId!==user.id){clearDraft();verifiedOwnerId=user.id;}
   content.hidden=false;
-  status.textContent='Owner verified. You can preview drafts; publishing is not enabled.';
+  status.textContent='Owner verified. You can upload artwork and save unpublished Ctoon drafts.';
  }catch{if(current===revision){verifiedOwnerId=null;clearDraft();status.textContent='Unable to verify owner access. Try again later.';}}
 }
 document.getElementById('creator-preview-button').addEventListener('click',()=>{
@@ -56,3 +56,32 @@ window.addEventListener('pagehide',revokePreview);
 client.auth.onAuthStateChange(()=>setTimeout(verifyOwner,0));
 window.addEventListener('pageshow',verifyOwner);
 verifyOwner();
+
+document.getElementById('creator-publish').addEventListener('click',async()=>{
+ const button=document.getElementById('creator-publish');
+ if(!verifiedOwnerId||content.hidden)return;
+ const name=nameInput.value.trim(),series=albumInput.value.trim();
+ const file=fileInput.files?.[0];
+ if(!name||!series||!file){status.textContent='Enter a Ctoon name, series and artwork before publishing.';return;}
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size<1||file.size>5*1024*1024){status.textContent='Artwork must be PNG, JPG or WebP, up to 5 MB.';return;}
+ button.disabled=true;
+ try{
+  const {data:{user},error:authError}=await client.auth.getUser();
+  if(authError||!user||user.id!==verifiedOwnerId||user.is_anonymous)throw new Error('Owner session changed. Sign in again.');
+  const {data:owner,error:ownerError}=await client.from('owner_members').select('user_id').eq('user_id',user.id).maybeSingle();
+  if(ownerError||!owner)throw new Error('Owner verification failed.');
+  const code='ctoon-'+crypto.randomUUID();
+  const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+  const key=code+'.'+ext;
+  const {error:uploadError}=await client.storage.from('ctoon-artwork').upload(key,file,{contentType:file.type,upsert:false});
+  if(uploadError)throw uploadError;
+  const {data:publicData}=client.storage.from('ctoon-artwork').getPublicUrl(key);
+  const {error:saveError}=await client.from('ctoon_sticker_catalog').insert({
+   series,subseries:null,sticker_code:code,title:name,artwork_url:publicData.publicUrl,published:false
+  });
+  if(saveError)throw new Error('Artwork uploaded, but the draft record was not saved: '+saveError.message);
+  status.textContent='Ctoon artwork uploaded and draft saved. It is unpublished until approved in the catalog.';
+  clearDraft();
+ }catch(error){status.textContent='Unable to save Ctoon draft: '+error.message;}
+ finally{button.disabled=false;}
+});

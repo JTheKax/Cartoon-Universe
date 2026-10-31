@@ -29,6 +29,22 @@ This document initiates integration review only. It does not claim the collectio
 
 **Safe reconciliation sequence:** (1) inspect actual production schema read-only and inventory row counts without exposing user records; (2) select one canonical model preserving existing sticker IDs and player quantities; (3) write a reviewed, idempotent migration or compatibility view only if necessary; (4) test RLS for anonymous, player A, player B, and owner in a disposable Supabase project; (5) verify collection page queries and published album mappings; (6) request explicit production migration and deployment approval. No production SQL has been executed here.
 
+
+## Verified database compatibility (read-only inspection, 2026-10-31)
+
+The connected Supabase projects were inspected using `information_schema` only. **Production Cartoon Universe** (`gjfyemvcrgrthbrlqqnz`) returned no public table names containing `sticker`; **nonproduction Yu-Gi-Oh Card Shop Test** (`dcunaehkbbybrzxrheai`) contains `ctoon_sticker_catalog`, `ctoon_sticker_ownership`, and `ctoon_stickers`, but not `sticker_sets`, `stickers`, or `player_stickers`.
+
+Test database columns: `ctoon_sticker_catalog(id, series, subseries, sticker_code, title, artwork_url, published, created_at)`; `ctoon_sticker_ownership(user_id, sticker_id, acquired_at, acquisition_source)`; `ctoon_stickers(id, series_key, sticker_key, title, created_at)`. The ownership table has **no quantity column**. The present collection UI therefore cannot yet read either connected project's observed schema directly. This is a confirmed release blocker, not evidence of lost player inventory. These results are schema metadata only; no rows or ownership records were read or modified.
+
+### Proposed compatibility approach (not executed)
+
+1. Treat `ctoon_sticker_catalog.id` as the candidate stable sticker identifier and `ctoon_sticker_ownership(user_id, sticker_id)` as a candidate membership relation **only after verifying foreign keys, RLS, grants, row counts and existing application reads**.
+2. Determine whether `ctoon_stickers` is a legacy catalog or separate active source before mapping or merging it. Never delete or rewrite its records based on table names alone.
+3. Establish whether duplicates exist elsewhere (e.g., an events or inventory table). Do not manufacture quantity=1 as an authoritative duplicate count. If ownership is membership-only, show Owned/Need without claiming duplicate quantities.
+4. Adapt the collection's read-only data access behind an explicit schema adapter or create reviewed compatibility views with `security_invoker=true` where supported. Keep unpublished catalog rows hidden and ownership scoped to the authenticated user; do not expose cross-user inventory.
+5. In a disposable environment, seed two users and published/unpublished stickers; verify anonymous restrictions, user isolation, missing series behavior, and zero-write access. Run the full collection and site CI after implementation.
+6. Confirm the actual production source of sticker data and obtain explicit approval before any migration or release. **No migration or data copy has been executed.**
+
 ## Deployment readiness gate (2026-10-31)
 
 **Status: NOT YET READY TO MERGE OR DEPLOY.** Missing logos are deferred and must retain visible text fallbacks; they are not a release blocker.

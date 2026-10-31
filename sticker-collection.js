@@ -1,6 +1,6 @@
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
 import {SUPABASE_URL,SUPABASE_ANON_KEY} from './config.js';
-import {RARITIES,createStickerView,filterStickers,safeStickerArt,collectPagedRows} from './sticker-collection-core.mjs';
+import {RARITIES,createStickerView,filterStickers,safeStickerArt,collectPagedRows,adaptCtoonMembership} from './sticker-collection-core.mjs';
 
 const client=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const status=document.getElementById('sticker-status');
